@@ -74,6 +74,16 @@ function connectUser(name, socket, token, room) {
 	if (room) {
 		user.joinRoom(room, person);
 	}
+	
+	//added - announcement stuff
+	fs.readFile('config/announcement.txt', function(err, data) {
+		if (err) return;
+		var announcement = data.toString().replace(/\"/g, '\\"');
+		emit(socket, 'console', {
+			rawMessage: '<script type="text/javascript">$("#simheader").html("' + announcement + '");</script>'
+		});
+	});
+	
 	return person;
 }
 
@@ -435,7 +445,7 @@ var User = (function () {
 
 				if (userid === "serei") avatar = 172;
 				else if (userid === "hobsgoblin") avatar = 52;
-				else if (userid === "ataraxia" || userid === "okuu") avatar = 1008;
+				else if (userid === "ataraxia") avatar = 1002;
 				else if (userid === "verbatim") avatar = 283;
 				else if (userid === "mortygymleader") avatar = 144;
 				else if (userid === "leadermorty") avatar = 144;
@@ -454,7 +464,14 @@ var User = (function () {
 				else if (userid === "greatsage") avatar = 1005;
 				else if (userid === "bojangles") avatar = 1006;
 				else if (userid === "dtc") avatar = 30;
-				else if (userid === "hugendugen") avatar = 1009;
+				else if (userid === "panpaw")avatar = 7;
+				else if (userid === "panpaw")avatar = 7;
+				else if (userid === "godhand")avatar = 45;
+				else if (userid === "jd") avatar = 25;
+				else if (userid === "kupo") avatar = 1006;
+				else if (userid === "lightblue")avatar = 285;
+				else if (userid === "energ218") avatar = 192;
+				else if (userid === "wiitle") avatar = 218;
 
 				if (usergroups[userid]) {
 					group = usergroups[userid].substr(0,1);
