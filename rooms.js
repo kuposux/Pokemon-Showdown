@@ -50,6 +50,51 @@ function BattleRoom(roomid, format, p1, p2, parentid, rated) {
 		}
 	};
 	this.win = function(winner) {
+		/* tournament */
+		var joined1 = false;
+		var joined2 = false;
+		var room = this.parentid;
+		if (winner == this.p1.userid) {
+			var loser = this.p2.userid;
+		}
+		else {
+			var loser = this.p1.userid;
+		}
+		for (var i in tour[room].players) {
+			if (tour[room].players[i] == winner) {
+				joined1 = true;
+			}
+			if (tour[room].players[i] == loser) {
+				joined2 = true;
+			}
+		}
+		var opps = false;
+		if (joined1 == joined2 && joined1 == true) {
+			for (var i in tour[room].round) {
+				var current = tour[room].round[i].split('|');
+				if (((current[0] == winner && current[1] == loser) || (current[0] == loser && current[1] == winner)) && current[2] == 1) {
+					if (this.format.toLowerCase() == tour[room].tier.toLowerCase()) {
+						var opps = true;
+						var part = i;
+					}
+				}
+			}
+		}
+		if (opps == true) {
+			//both players are in the tournament and are opponents
+			var obj = tour[room].round[part].split('|');
+			obj[2] = 2;
+			obj[3] = winner;
+			tour[room].round[part] = obj.join('|');
+			tour[room].winners[tour[room].winners.length] = winner;
+			tour[room].losers[tour[room].losers.length] = loser;
+			Rooms.rooms[room].addRaw(sanitize(loser) + ' lost their tournament battle against ' + sanitize(winner) + '.');
+			if (tour[room].winners.length >= tour[room].round.length) {
+				tour.nextRound(room);
+			}
+		}
+
+		/* normal non tour stuff */
 		if (selfR.rated) {
 			var winnerid = toId(winner);
 			var rated = selfR.rated;
@@ -269,6 +314,54 @@ function BattleRoom(roomid, format, p1, p2, parentid, rated) {
 		selfR.battle.send('win', otherids[side]);
 		selfR.active = selfR.battle.active;
 		selfR.update();
+
+		/* tournament */
+		var joined1 = false;
+		var joined2 = false;
+		var room = this.parentid;
+		var loser = name;
+		if (user) {
+			var loser = user.userid;
+		}
+		var winner = this.p1.userid;
+		if (loser == this.p1.userid) {
+			var winner = this.p2.userid;
+		}
+		for (var i in tour[room].players) {
+			if (tour[room].players[i] == winner) {
+				joined1 = true;
+			}
+			if (tour[room].players[i] == loser) {
+				joined2 = true;
+			}
+		}
+		var opps = false;
+		if (joined1 == joined2 && joined1 == true) {
+			for (var i in tour[room].round) {
+				var current = tour[room].round[i].split('|');
+				if (((current[0] == winner && current[1] == loser) || (current[0] == loser && current[1] == winner)) && current[2] == 1) {
+					if (this.format.toLowerCase() == tour[room].tier.toLowerCase()) {
+						var opps = true;
+						var part = i;
+					}
+				}
+			}
+		}
+		if (opps == true) {
+			//both players are in the tournament and are opponents
+			var obj = tour[room].round[part].split('|');
+			obj[2] = 2;
+			obj[3] = winner;
+			tour[room].round[part] = obj.join('|');
+			tour[room].winners[tour[room].winners.length] = winner;
+			tour[room].losers[tour[room].losers.length] = loser;
+			Rooms.rooms[room].addRaw(sanitize(loser) + ' lost their tournament battle against ' + sanitize(winner) + '.');
+			if (tour[room].winners.length >= tour[room].round.length) {
+				tour.nextRound(room);
+			}
+		}
+
+		/* not part of tournament */
 		return true;
 	};
 	this.kickInactive = function() {
@@ -980,6 +1073,40 @@ function LobbyRoom(roomid) {
 			selfR.add('|b|'+newRoom.id+'|'+p1.getIdentity()+'|'+p2.getIdentity());
 		} else {
 			selfR.send('|B|'+newRoom.id+'|'+p1.getIdentity()+'|'+p2.getIdentity());
+		}
+
+		/* tournament */
+		var joined1 = false;
+		var joined2 = false;
+		var room = newRoom.parentid;
+		var p1 = p1.userid;
+		var p2 = p2.userid;
+		for (var i in tour[room].players) {
+			if (tour[room].players[i] == p1) {
+				joined1 = true;
+			}
+			if (tour[room].players[i] == p2) {
+				joined2 = true;
+			}
+		}
+		var opps = false;
+		if (joined1 == joined2 && joined1 == true) {
+			for (var i in tour[room].round) {
+				var current = tour[room].round[i].split('|');
+				if (((current[0] == p1 && current[1] == p2) || (current[0] == p2 && current[1] == p1)) && current[2] == 0) {
+					if (newRoom.format.toLowerCase() == tour[room].tier.toLowerCase()) {
+						var opps = true;
+						var part = i;
+					}
+				}
+			}
+		}
+		if (opps == true) {
+			//both players are in the tournament and are opponents
+			var obj = tour[room].round[part].split('|');
+			obj[2] = 1;
+			tour[room].round[part] = obj.join('|');
+			Rooms.rooms[room].addRaw('<b>Tournament battle between ' + sanitize(p1) + ' and ' + sanitize(p2) + ' has started.</b>');
 		}
 	};
 	this.addRoom = function(room, format, p1, p2, parent, rated) {
