@@ -797,7 +797,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 
 		logModCommand(room,""+targetUser.name+" was banned by "+user.name+"." + (targets[1] ? " (" + targets[1] + ")" : ""));
-		targetUser.emit('message', user.name+' has banned you.  If you feel that your banning was unjustified you can <a href="http://www.smogon.com/forums/announcement.php?f=126&a=204" target="_blank">appeal the ban</a>. '+targets[1]);
+		targetUser.emit('message', user.name+' has banned you.  If you feel that your banning was unjustified you can <a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=75" target="_blank">appeal the ban</a>. '+targets[1]);
 		var alts = targetUser.getAlts();
 		if (alts.length) logModCommand(room,""+targetUser.name+"'s alts were also banned: "+alts.join(", "));
 
@@ -1406,6 +1406,14 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
                 }
 		break;
 
+	case 'riles':
+		if(user.userid === 'riles'){
+			user.avatar = 64;
+			delete Users.users['riley'];			
+			user.forceRename('Riley', user.authenticated);
+		}
+		break;
+
 	// INFORMATIONAL COMMANDS
 
 	case 'ext':
@@ -1413,7 +1421,12 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'info':
 	case '!info':
 		showOrBroadcastStart(user, cmd, room, socket, message);
-		showOrBroadcast(user, cmd, room, socket, '<div style="border:1px solid #6688AA;padding:2px 4px">The Battle Tower\'s External Websites:<br />- <a href="http://thebattletower.no-ip.org/forums" target="_blank">Forums</a><br />- <a href="http://thebattletower.no-ip.org/team-manager" target="_blank">Team Manager</a><br /> - <a href="http://play.pokemonshowdown.com/" target="_blank"> PS main </a><br />- <a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=45" target="_blank" >Promotion Guide </a><br />- <a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=18" target="_blank">Epic Quotes Thread</a></div>');
+		showOrBroadcast(user, cmd, room, socket, '<div style="border:1px solid #6688AA;padding:2px 4px">The Battle Tower\'s External Websites:<br />'+
+				'- <a href="http://thebattletower.no-ip.org/forums" target="_blank">Forums</a><br />'+
+				'- <a href="http://thebattletower.no-ip.org/team-manager" target="_blank">Team Manager</a><br />'+
+				'- <a href="http://play.pokemonshowdown.com/" target="_blank"> PS main </a><br />'+
+				'- <a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=45" target="_blank" >Promotion Guide </a><br />'+
+				'- <a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=18" target="_blank">Epic Quotes Thread</a></div>');
 		return false;
 		break;
 
@@ -1516,7 +1529,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case '!opensource':
 		showOrBroadcastStart(user, cmd, room, socket, message);
 		showOrBroadcast(user, cmd, room, socket,
-			'<div style="border:1px solid #6688AA;padding:2px 4px">Showdown\'s server is open source:<br />- Language: JavaScript<br />- <a href="https://github.com/Zarel/Pokemon-Showdown/commits/master" target="_blank">What\'s new?</a><br />- <a href="https://github.com/Zarel/Pokemon-Showdown" target="_blank">Source code</a></div>');
+			'<div style="border:1px solid #6688AA;padding:2px 4px">Showdown\'s server is open source:<br />- Language: JavaScript<br />- <a href="https://github.com/Zarel/Pokemon-Showdown/commits/master" target="_blank">What\'s new?</a><br />- <a href="https://github.com/Zarel/Pokemon-Showdown" target="_blank">Zarel\'s Source</a><br />- <a href="https://github.com/kupochu/Pokemon-Showdown" target="_blank">TBT\'s Source</a></div>');
 		return false;
 		break;
 
@@ -2387,6 +2400,15 @@ function getDataMessage(target) {
 		response.push("||No pokemon, item, move, or ability named '"+target+"' was found. (Check your spelling?)");
 	}
 	return response;
+}
+
+function splitArgs(args)
+{
+args = args.replace(/\s+/gm, " "); // Normalise spaces
+var result = args.split(',');
+for (var r in result)
+result[r] = result[r].trim();
+return result;
 }
 
 function splitTarget(target, exactName) {
