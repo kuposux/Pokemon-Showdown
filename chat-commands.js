@@ -1696,6 +1696,26 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return false;
 		break;
 
+	case 'nospectate':
+		if (room.battle) {
+			if (user.userid == room.p1.userid || user.userid == room.p2.userid) {
+				room.nospectate = true;
+				room.addRaw('<i>Spectators were disabled by ' + user.name + '.</i>');
+			}
+		}
+		return false;
+		break;
+	
+	case 'spectate':
+		if (room.battle) {
+			if (user.userid == room.p1.userid || user.userid == room.p2.userid) {
+				delete room.nospectate;
+				room.addRaw('<i>Spectators were enabled by ' + user.name + '.</i>');
+			}
+		}
+		return false;
+		break;
+	
 	case 'join':
 		var targetRoom = Rooms.get(target);
 		if (!targetRoom) {
@@ -1704,6 +1724,10 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 		if (!user.joinRoom(targetRoom, socket)) {
 			emit(socket, 'console', "The room '"+target+"' could not be joined (most likely, you're already in it).");
+			return false;
+		}
+		if (targetRoom.nospectate) {
+			emit(socket, 'console', {evalRawMessage: "leaveTab('" + targetRoom.id + "');return '.';"});
 			return false;
 		}
 		return false;
