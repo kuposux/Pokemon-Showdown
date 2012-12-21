@@ -21,14 +21,134 @@ exports.BattleFormats = {
 		searchShow: true,
 		ruleset: ['Random Battle']
 	},
-	seasonalseasoningsgreetings: {
+	// seasonalseasoningsgreetings: {
+	// 	effectType: 'Format',
+	// 	name: "[Seasonal] Seasoning's Greetings",
+	// 	team: 'randomSeasonal',
+	// 	canUseRandomTeam: true,
+	// 	rated: true,
+	// 	challengeShow: true,
+	// 	searchShow: true,
+	// 	ruleset: ['PotD', 'Pokemon', 'Sleep Clause']
+	// },
+	seasonalwinterwonderland: {
 		effectType: 'Format',
-		name: "[Seasonal] Seasoning's Greetings",
-		team: 'randomSeasonal',
+		name: "[Seasonal] Winter Wonderland",
+		team: 'randomSeasonalWW',
 		canUseRandomTeam: true,
 		rated: true,
 		challengeShow: true,
 		searchShow: true,
+		onBegin: function() {
+			this.setWeather('Hail');
+			delete this.weatherData.duration;
+		},
+		onModifyMove: function(move) {
+			if (move.id === 'present') {
+				move.category = 'Status';
+				move.basePower = 0;
+				delete move.heal;
+				move.accuracy = 100;
+				switch (this.random(20)) {
+				case 0:
+				case 1:
+				case 2:
+				case 3:
+				case 4:
+					move.onTryHit = function() {
+						this.add('-message', "The present was a bomb!");
+					};
+					move.category = 'Physical';
+					move.basePower = 200;
+					break;
+				case 5:
+					move.onTryHit = function() {
+						this.add('-message', "The present was confusion!");
+					};
+					move.volatileStatus = 'confusion';
+					break;
+				case 6:
+					move.onTryHit = function() {
+						this.add('-message', "The present was Disable!");
+					};
+					move.volatileStatus = 'disable';
+					break;
+				case 7:
+					move.onTryHit = function() {
+						this.add('-message', "The present was a taunt!");
+					};
+					move.volatileStatus = 'taunt';
+					break;
+				case 8:
+					move.onTryHit = function() {
+						this.add('-message', "The present was some seeds!");
+					};
+					move.volatileStatus = 'leechseed';
+					break;
+				case 9:
+					move.onTryHit = function() {
+						this.add('-message', "The present was an embargo!");
+					};
+					move.volatileStatus = 'embargo';
+					break;
+				case 10:
+					move.onTryHit = function() {
+						this.add('-message', "The present was a music box!");
+					};
+					move.volatileStatus = 'perishsong';
+					break;
+				case 11:
+					move.onTryHit = function() {
+						this.add('-message', "The present was a curse!");
+					};
+					move.volatileStatus = 'curse';
+					break;
+				case 12:
+					move.onTryHit = function() {
+						this.add('-message', "The present was Torment!");
+					};
+					move.volatileStatus = 'torment';
+					break;
+				case 13:
+					move.onTryHit = function() {
+						this.add('-message', "The present was a trap!");
+					};
+					move.volatileStatus = 'partiallytrapped';
+					break;
+				case 14:
+					move.onTryHit = function() {
+						this.add('-message', "The present was a root!");
+					};
+					move.volatileStatus = 'ingrain';
+					break;
+				case 15:
+				case 16:
+				case 17:
+					move.onTryHit = function() {
+						this.add('-message', "The present was a makeover!");
+					};
+					var boosts = {};
+					var possibleBoosts = ['atk','def','spa','spd','spe','accuracy'].randomize();
+					boosts[possibleBoosts[0]] = 1;
+					boosts[possibleBoosts[1]] = -1;
+					boosts[possibleBoosts[2]] = -1;
+					move.boosts = boosts;
+					break;
+				case 18:
+					move.onTryHit = function() {
+						this.add('-message', "The present was psychic powers!");
+					};
+					move.volatileStatus = 'telekinesis';
+					break;
+				case 19:
+					move.onTryHit = function() {
+						this.add('-message', "The present was fatigue!");
+					};
+					move.volatileStatus = 'mustrecharge';
+					break;
+				}
+			}
+		},
 		ruleset: ['PotD', 'Pokemon', 'Sleep Clause']
 	},
 	challengecup: {
@@ -286,7 +406,21 @@ exports.BattleFormats = {
 		challengeShow: true,
 		canUseRandomTeam: true,
 		debug: true,
-		// no restrictions, for serious
+		ruleset: []
+	},
+	gen3hackmons: {
+		mod: 'gen3',
+		effectType: 'Format',
+		name: "[Gen 3] Hackmons",
+		challengeShow: true,
+		ruleset: ['Pokemon'],
+		banlist: []
+	},
+	gen3customgame: {
+		mod: 'gen3',
+		effectType: 'Format',
+		name: "[Gen 3] Custom Game",
+		challengeShow: true,
 		ruleset: []
 	},
 	gennextnextou: {
@@ -319,7 +453,7 @@ exports.BattleFormats = {
 	},
 	doublesrandombattledev: {
 		effectType: 'Format',
-		section: 'doubles (unfinished)',
+		section: 'doubles',
 		gameType: 'doubles',
 		name: "Doubles Random Battle (dev)",
 		team: 'random',
@@ -329,11 +463,23 @@ exports.BattleFormats = {
 		debug: true,
 		ruleset: ['PotD', 'Pokemon']
 	},
-	doublescustomgamedev: {
+	doubleschallengecup: {
 		effectType: 'Format',
-		section: 'doubles (unfinished)',
+		section: 'doubles',
 		gameType: 'doubles',
-		name: "Doubles Custom Game (dev)",
+		name: "Doubles Challenge Cup",
+		team: 'randomCC',
+		canUseRandomTeam: true,
+		rated: true,
+		challengeShow: true,
+		debug: true,
+		ruleset: ['Pokemon']
+	},
+	doublescustomgame: {
+		effectType: 'Format',
+		section: 'doubles',
+		gameType: 'doubles',
+		name: "Doubles Custom Game",
 		challengeShow: true,
 		canUseRandomTeam: true,
 		debug: true,
@@ -342,11 +488,12 @@ exports.BattleFormats = {
 	},
 	doublesvgc2013dev: {
 		effectType: 'Format',
-		section: 'doubles (unfinished)',
+		section: 'doubles',
 		gameType: 'doubles',
 		name: "Doubles VGC 2013 (dev)",
+		rated: true,
 		challengeShow: true,
-		canUseRandomTeam: true,
+		searchShow: true,
 		debug: true,
 		onBegin: function() {
 			this.debug('cutting down to 4');
@@ -385,8 +532,8 @@ exports.BattleFormats = {
 			'Victini', 
 			'Reshiram', 
 			'Zekrom', 
-			'Kyurem', 
-			'Keldeo', 
+			'Kyurem', 'Kyurem-Black', 'Kyurem-White', 
+			'Keldeo', 'Keldeo-Resolute',
 			'Meloetta', 
 			'Genesect',
 			'Sky Drop', 'Dark Void', 'Soul Dew'
@@ -587,7 +734,7 @@ exports.BattleFormats = {
 			for (var i=0; i<team.length; i++) {
 				var template = this.getTemplate(team[i].species);
 				if (speciesTable[template.num]) {
-					return [template.name+" is banned by Species Clause."];
+					return ["You are limited to one of each pokemon by Species Clause.","(You have at least two "+template.name+")"];
 				}
 				speciesTable[template.num] = true;
 			}
@@ -604,7 +751,7 @@ exports.BattleFormats = {
 				var item = toId(team[i].item);
 				if (!item) continue;
 				if (itemTable[item]) {
-					return [this.getItem(item).name+" is banned by Item Clause."];
+					return ["You are limited to one of each item by Item Clause.","(You have at least two "+this.getItem(item).name+")"];
 				}
 				itemTable[item] = true;
 			}

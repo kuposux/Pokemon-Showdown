@@ -264,10 +264,10 @@ exports.BattleItems = {
 		fling: {
 			basePower: 10
 		},
-		onSourceModifyMove: function(move) {
-			if (typeof move.accuracy !== 'number') return;
+		onAccuracy: function(accuracy) {
+			if (typeof accuracy !== 'number') return;
 			this.debug('brightpowder - decreasing accuracy');
-			move.accuracy *= 0.9;
+			return accuracy * 0.9;
 		},
 		desc: "Raises evasion 10%."
 	},
@@ -575,26 +575,18 @@ exports.BattleItems = {
 		id: "custapberry",
 		name: "Custap Berry",
 		spritenum: 86,
-		isUnreleased: true,
 		isBerry: true,
 		naturalGift: {
 			basePower: 80,
 			type: "Ghost"
 		},
-		onResidual: function(pokemon) {
+		onModifyPriority: function(priority, pokemon) {
 			if (pokemon.hp <= pokemon.maxhp/4 || (pokemon.hp <= pokemon.maxhp/2 && pokemon.ability === 'gluttony')) {
-				pokemon.eatItem();
-			}
-		},
-		onEat: function(pokemon) {
-			pokemon.addVolatile('custapberry');
-		},
-		effect: {
-			duration: 2,
-			onModifyPriority: function(priority, pokemon) {
-				this.add('-enditem', pokemon, 'Custap Berry');
-				pokemon.removeVolatile('custapberry');
-				return priority + 0.1;
+				if (pokemon.eatItem()) {
+					this.add('-enditem', pokemon, 'Custap Berry');
+					pokemon.removeVolatile('custapberry');
+					return priority + 0.1;
+				}
 			}
 		},
 		desc: "Activates at 25% HP. Next move used goes first. Unobtainable in BW. One-time use."
@@ -1452,10 +1444,10 @@ exports.BattleItems = {
 		fling: {
 			basePower: 10
 		},
-		onSourceModifyMove: function(move) {
-			if (typeof move.accuracy !== 'number') return;
-			this.debug('Lax Incense - decreasing accuracy');
-			move.accuracy *= 0.9;
+		onAccuracy: function(accuracy) {
+			if (typeof accuracy !== 'number') return;
+			this.debug('lax incense - decreasing accuracy');
+			return accuracy * 0.9;
 		},
 		desc: "Hold item which raises evasion 10%. Allows breeding of Wynaut."
 	},

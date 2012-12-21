@@ -49,6 +49,12 @@ exports.BattleAbilities = {
 			}
 		}
 	},
+	"marvelscale": {
+		inherit:true,
+		onImmunity: function(type, pokemon) {
+			if (type === 'hail') return false;
+		}
+	},
 	"snowcloak": {
 		inherit: true,
 		onImmunity: function(type, pokemon) {
@@ -59,6 +65,27 @@ exports.BattleAbilities = {
 				return basePower * 3/4;
 			}
 			return basePower * 7/8;
+		},
+		onAccuracy: function() {}
+	},
+	"sandveil": {
+		inherit: true,
+		onImmunity: function(type, pokemon) {
+			if (type === 'sandstorm') return false;
+		},
+		onSourceBasePower: function(basePower) {
+			if (this.isWeather('sandstorm')) {
+				return basePower * 4/5;
+			}
+		},
+		onAccuracy: function() {}
+	},
+	"waterveil": {
+		inherit: true,
+		onSourceBasePower: function(basePower) {
+			if (this.isWeather('raindance')) {
+				return basePower * 4/5;
+			}
 		}
 	},
 	"icebody": {
@@ -70,12 +97,13 @@ exports.BattleAbilities = {
 			this.heal(target.maxhp/16);
 		},
 		onAfterDamage: function(damage, target, source, move) {
-			if (move && move.isContact && this.hasWeather('hail')) {
+			if (move && move.isContact && this.isWeather('hail')) {
 				if (this.random(10) < 3) {
 					source.trySetStatus('frz', target, move);
 				}
 			}
-		}
+		},
+		onWeather: function() {}
 	},
 	"flowergift": {
 		inherit: true,
@@ -162,17 +190,6 @@ exports.BattleAbilities = {
 			}
 		}
 	},
-	"sheerforce": {
-		inherit: true,
-		onModifyMove: function(move, pokemon) {
-			if (move.secondaries || pokemon.item === 'lifeorb') {
-				if (!move.basePowerModifier) move.basePowerModifier = 1;
-				move.basePowerModifier *= 13/10;
-				delete move.secondaries;
-				move.negateSecondary = true;
-			}
-		}
-	},
 	"reckless": {
 		inherit: true,
 		onBasePower: function(basePower, attacker, defender, move) {
@@ -235,9 +252,14 @@ exports.BattleAbilities = {
 		inherit: true,
 		onDamage: function(damage, target, source, effect) {
 			if (effect && effect.effectType === 'Move') {
-				damage -= target.maxhp/16;
+				damage -= target.maxhp/8;
 				if (damage < 0) damage = 0;
 				return damage;
+			}
+		},
+		onHit: function(target, source, move) {
+			if (move.id === 'shellsmash') {
+				target.setAbility('');
 			}
 		}
 	},
@@ -245,28 +267,38 @@ exports.BattleAbilities = {
 		inherit: true,
 		onDamage: function(damage, target, source, effect) {
 			if (effect && effect.effectType === 'Move') {
-				damage -= target.maxhp/16;
+				damage -= target.maxhp/8;
 				if (damage < 0) damage = 0;
 				return damage;
 			}
 		}
 	},
 	"weakarmor": {
-		inherit: true,
 		onDamage: function(damage, target, source, effect) {
 			if (effect && effect.effectType === 'Move') {
-				damage -= target.maxhp/16;
+				damage -= target.maxhp/8;
 				if (damage < 0) damage = 0;
+				target.setAbility('');
+				this.boost({spe: 1});
 				return damage;
 			}
-		}
+		},
+		onAfterDamage: function() {}
 	},
 	"magmaarmor": {
 		inherit: true,
+		onImmunity: function(type, pokemon) {
+			if (type === 'hail') return false;
+		},
 		onDamage: function(damage, target, source, effect) {
 			if (effect && effect.effectType === 'Move') {
-				damage -= target.maxhp/16;
+				damage -= target.maxhp/8;
 				if (damage < 0) damage = 0;
+				if (effect.type === 'Ice' || effect.type === 'Water') {
+					this.add('-activate', target, 'ability: Magma Armor');
+					target.setAbility('battlearmor');
+					damage = 0;
+				}
 				return damage;
 			}
 		}
@@ -303,6 +335,18 @@ exports.BattleAbilities = {
 			}
 		}
 	},
+	"gluttony": {
+		inherit: true,
+		onResidualOrder: 26,
+		onResidualSubOrder: 1,
+		onResidual: function(pokemon) {
+			if (!pokemon.gluttonyFlag && !pokemon.item && this.getItem(pokemon.lastItem).isBerry) {
+				pokemon.gluttonyFlag = true;
+				pokemon.setItem(pokemon.lastItem);
+				this.add("-item", pokemon, pokemon.item, '[from] ability: Gluttony');
+			}
+		}
+	},
 	"guts": {
 		inherit: true,
 		onDamage: function(damage, attacker, defender, effect) {
@@ -324,6 +368,26 @@ exports.BattleAbilities = {
 		onDamage: function(damage, attacker, defender, effect) {
 			if (effect && (effect.id === 'psn' || effect.id === 'tox')) {
 				return damage / 2;
+			}
+		}
+	},
+	"truant": {
+		onModifyMove: function(move, pokemon) {
+			if (!move.self) move.self = {};
+			if (!move.self.volatileStatus) move.self.volatileStatus = 'truant';
+		},
+		effect: {
+			duration: 2,
+			onStart: function(pokemon) {
+				this.add('-start', pokemon, 'Truant');
+			},
+			onBeforeMove: function(pokemon, target, move) {
+				if (pokemon.removeVolatile('truant')) {
+					this.add('cant', pokemon, 'ability: Truant');
+					pokemon.movedThisTurn = true;
+					this.heal(pokemon.maxhp/3);
+					return false;
+				}
 			}
 		}
 	},

@@ -122,7 +122,9 @@ LoginServer = {
 			self.requestEnd();
 		};
 
-		self.requestTimeoutTimer = setTimeout(reqError, LOGIN_SERVER_TIMEOUT);
+		self.requestTimeoutTimer = setTimeout(function() {
+			reqError('timeout');
+		}, LOGIN_SERVER_TIMEOUT);
 
 		req = http.request(requestOptions, function(res) {
 			if (self.requestTimeoutTimer) {
@@ -147,7 +149,11 @@ LoginServer = {
 					var data = JSON.parse(buffer);
 				} catch (e) {}
 				for (var i=0,len=requestCallbacks.length; i<len; i++) {
-					requestCallbacks[i](data?data[i]:null, res.statusCode);
+					if (data) {
+						requestCallbacks[i](data[i], res.statusCode);
+					} else {
+						requestCallbacks[i](null, res.statusCode, 'corruption');
+					}
 				}
 				self.requestEnd();
 			}.once();
@@ -257,14 +263,26 @@ if (config.protocol === 'io') {
  * Otherwise, an empty string will be returned.
  */
 toId = function(text) {
-	if (typeof text === 'number') text = ''+text;
 	if (text && text.id) text = text.id;
 	else if (text && text.userid) text = text.userid;
-	text = string(text);
-	if (typeof text !== 'string') return ''; //???
-	return text.toLowerCase().replace(/[^a-z0-9]+/g, '');
+
+	return string(text).toLowerCase().replace(/[^a-z0-9]+/g, '');
 };
 toUserid = toId;
+
+/**
+ * Validates a username or Pokemon nickname
+ */
+var bannedNameStartChars = {'~':1, '&':1, '@':1, '%':1, '+':1, '-':1, '!':1, '?':1, '#':1};
+toName = function(name) {
+	name = string(name).trim();
+	name = name.replace(/(\||\n|\[|\]|\,)/g, '');
+	while (bannedNameStartChars[name.substr(0,1)]) {
+		name = name.substr(1);
+	}
+	if (name.length > 18) name = name.substr(0,18);
+	return name;
+};
 
 /**
  * Escapes a string for HTML

@@ -74,7 +74,7 @@ Major changes:
     in Hail (and 12.5% out of Hail)
   - Ice Body has 30% chance of freezing a contact move (and grants passive
     healing out of Hail, too)
-  - Thick Fat grants immunity to Hail damage  
+  - Thick Fat and Marvel Scale grant immunity to Hail damage  
      
 - Freezing doesn't have a 20% thaw chance. Instead, thawing happens at the end
   of the second turn. Because this new freeze effect is a nerf, Blizzard now
@@ -108,7 +108,7 @@ Major changes:
 
 - Relic Song switches Meloetta's SpA and Atk EVs, boosts, and certain natures,
   specifically: Modest <-> Adamant, Jolly <-> Timid, other natures are left
-  untouched. Its secondary is now 40% -1 Atk -1 SpA (80% after Serene Grace).
+  untouched. It's now 60 base power +1 priority, with no secondary.
 
 - Shuckle gets Berry Shell (select "Stick" in the teambuilder), which gives a
   50% boost to Defense and Sp. Def. It also learns Leech Seed.
@@ -120,8 +120,7 @@ Major changes:
   hits again for 80 base power. It's like Doom Desire, except it still hits
   that first time.
 
-- Life Orb now behaves much more consistently as normal recoil. Sheer Force
-  will boost every move and negate all Life Orb recoil if it is held, Reckless
+- Life Orb now behaves much more consistently as normal recoil. Reckless
   will boost every move if Life Orb is held, and Rock Head will negate Life
   Orb recoil.
 
@@ -156,6 +155,8 @@ New mechanic: Signature Pokemon:
 
   - Galvantula: Electroweb (60 base power, 100% accuracy)
 
+  - Skarmory: Steel Wing (60 base power, 100% accuracy, 50% +1 Def)
+
   - Glaceon: Icy Wind (60 base power, 100% accuracy)
 
   - Swampert: Mud Shot (60 base power, 100% accuracy)
@@ -187,6 +188,12 @@ New mechanic: Intrinsics:
 
   - Weezing: Aftermath
 
+  - Eelektross: Poison Heal
+
+  - Claydol: Filter
+
+  - Cryogonal: Ice Body
+
 Minor move changes:
 
 - all 95%-accurate moves, as well as Charge Beam and Rock Slide, are now 100%
@@ -204,8 +211,8 @@ Minor move changes:
 - Whirlwind and Roar have perfect accuracy
 
 - Silver Wind, Ominous Wind, and AncientPower have a 100% chance of raising
-  one random stat by 1, rather than a 10% chance of raising every stat
-  (accuracy and evasion still can't be raised, unlike with Acupressure)
+  one of Def/SpA/SpD/Spe at random, rather than a 10% chance of raising every
+  stat
 
 - Twineedle has a new base power of 50
 
@@ -216,10 +223,20 @@ Minor move changes:
 - Cut and Rock Smash are 50 base power and now have a 100% chance of
   lowering foe's Def
 
-- Snore's Base Power is now 100
+- Snore's Base Power is now 100, and it's now a Physical attack dealing
+  Special damage (like a reverse Psyshock)
 
 - Drill Peck, Needle Arm, Attack Order, Leaf Blade, and Crabhammers's Base
   Powers are now 100
+
+- Stomp and Steamroller now have 100 Base Power and perfect accuracy to
+  reflect their thematic status as counters to Minimize
+
+- Bide now gives the user Endure (the user survives all move damage with
+  at least 1 HP) for its duration. Bide fails if the user has 1 HP when it's
+  used, or if the user's last move used was Bide.
+
+- Withdraw gives +1 SpD as well as +1 Def
 
 - Muddy Water is now 85 base power and 100% accurate
 
@@ -250,6 +267,8 @@ Minor move changes:
 
 Minor learnset changes:
 
+- Azumarill now gets Belly Drum with no incompatibilities
+
 - Masquerain gets Surf
 
 - Bug/Flying Quiver Dancers (Butterfree, Beautifly, Masquerain, Mothim) get
@@ -272,12 +291,20 @@ Minor learnset changes:
   - Rotom-Heat: Heat Wave
   - Rotom-Mow: Magical Leaf
 
-- Azumarill now gets Belly Drum with no incompatibilities
-
 Minor ability changes:
 
-- Weak Armor, Magma Armor, Shell Armor, and Battle Armor all reduce incoming
-  move damage by 1/16 of the user's max HP, in addition to their usual effects
+- Weak Armor reduces incoming move damage by 1/8 of the user's max HP
+  and increases the user's Speed for the first hit after switch-in (and
+  does not activate again until the next switch-in) instead of its
+  previous effect
+
+- Shell Armor and Battle Armor reduce incoming move damage by 1/8 of
+  the user's max HP in addition to their crit negation (also, Shell
+  Armor is removed when using Shell Smash)
+
+- Magma Armor reduces incoming move damage by 1/8 of the user's max HP,
+  provides immunity to Hail and freeze, and provides a one-time immunity
+  to Water and Ice, after which it turns into Shell Armor
 
 - Compoundeyes now grants 1.6x accuracy, Victory Star grants 1.5x
 
@@ -291,6 +318,10 @@ Minor ability changes:
 
 - Slow Start now only lasts 2 turns instead of 5
 
+- Truant will only activate if a move succeeds (e.g. not if it misses, fails,
+  or is Protected against), and will heal the user by 33% during its Truant
+  turn
+
 - Clear Body prevents all stat lowering (relevant: the Regis' Superpower and
   Metagross' Hammer Arm)
 
@@ -299,9 +330,14 @@ Minor ability changes:
 - Aftermath no longer requires contact, and its damage is buffed to 1/3 of the
   foe's max HP
 
+- Gluttony allows a Pokemon to use a Berry twice.
+
 - Guts, Quick Feet, and Toxic Boost take half damage from poisoning
 
 - Guts, Quick Feet, and Flare Boost take half damage from burns
+
+- Water Veil and Sand Veil grant 20% damage reduction in rain and sand,
+  respectively (this replaces Sand Veil's usual effect, but not Water Veil's)
 
 Minor item changes:
 

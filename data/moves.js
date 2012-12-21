@@ -178,7 +178,16 @@ exports.BattleMovedex = {
 		pp: 15,
 		priority: 0,
 		isNotProtectable: true,
-		onTryHit: false, // After You will always fail when used in a single battle
+		onHit: function(target) {
+			if (target.side.active.length < 2) return false; // fails in singles
+			var decision = this.willMove(target);
+			if (decision) {
+				this.cancelMove(target);
+				this.queue.unshift(decision);
+			} else {
+				return false;
+			}
+		},
 		secondary: false,
 		target: "normal",
 		type: "Normal"
@@ -1091,22 +1100,19 @@ exports.BattleMovedex = {
 		effect: {
 			duration: 2,
 			onLockMove: 'bounce',
-			onSourceModifyMove: function(move) {
-
-				// warning: does not work the same way as Fly
-
-				if (move.target === 'foeSide') return;
+			onAccuracy: function(accuracy, target, source, move) {
 				if (move.id === 'gust' || move.id === 'twister') {
-					// should not normally be done in ModifyMove event,
-					// but these moves have static base power, and
-					// it's faster to do this  here than in
-					// BasePower event
-					move.basePower *= 2;
-					return;
-				} else if (move.id === 'skyuppercut' || move.id === 'thunder' || move.id === 'hurricane' || move.id === 'smackdown') {
 					return;
 				}
-				move.accuracy = 0;
+				if (move.id === 'skyuppercut' || move.id === 'thunder' || move.id === 'hurricane' || move.id === 'smackdown') {
+					return;
+				}
+				return 0;
+			},
+			onBasePower: function(basePower, target, source, move) {
+				if (move.id === 'gust' || move.id === 'twister') {
+					return basePower * 2;
+				}
 			}
 		},
 		secondary: {
@@ -2332,17 +2338,16 @@ exports.BattleMovedex = {
 			onImmunity: function(type, pokemon) {
 				if (type === 'sandstorm' || type === 'hail') return false;
 			},
-			onSourceModifyMove: function(move) {
-				if (move.target === 'foeSide') return;
+			onAccuracy: function(accuracy, target, source, move) {
 				if (move.id === 'earthquake' || move.id === 'magnitude') {
-					// should not normally be done in ModifyMove event,
-					// but it's faster to do this here than in
-					// onFoeBasePower
-					if (!move.basePowerModifier) move.basePowerModifier = 1;
-					move.basePowerModifier *= 2;
 					return;
 				}
-				move.accuracy = 0;
+				return 0;
+			},
+			onBasePower: function(basePower, target, source, move) {
+				if (move.id === 'earthquake' || move.id === 'magnitude') {
+					return basePower * 2;
+				}
 			}
 		},
 		secondary: false,
@@ -2462,17 +2467,16 @@ exports.BattleMovedex = {
 			onImmunity: function(type, pokemon) {
 				if (type === 'sandstorm' || type === 'hail') return false;
 			},
-			onSourceModifyMove: function(move) {
-				if (move.target === 'foeSide') return;
+			onAccuracy: function(accuracy, target, source, move) {
 				if (move.id === 'surf' || move.id === 'whirlpool') {
-					// should not normally be done in ModifyMove event,
-					// but Surf and Whirlpool have static base power, and
-					// it's faster to do this here than in
-					// onFoeBasePower
-					move.basePower *= 2;
 					return;
 				}
-				move.accuracy = 0;
+				return 0;
+			},
+			onBasePower: function(basePower, target, source, move) {
+				if (move.id === 'surf' || move.id === 'whirlpool') {
+					return basePower * 2;
+				}
 			}
 		},
 		secondary: false,
@@ -3907,20 +3911,19 @@ exports.BattleMovedex = {
 		effect: {
 			duration: 2,
 			onLockMove: 'fly',
-			onSourceModifyMove: function(move) {
-				if (move.target === 'foeSide') return;
-				// warning: does not work the same way as Bounce
+			onAccuracy: function(accuracy, target, source, move) {
 				if (move.id === 'gust' || move.id === 'twister') {
-					// should not normally be done in MovifyMove event,
-					// but Gust and Twister have static base power, and
-					// it's faster to do this  here than in
-					// BasePower event
-					move.basePower *= 2;
-					return;
-				} else if (move.id === 'skyuppercut' || move.id === 'thunder' || move.id === 'hurricane' || move.id === 'smackdown') {
 					return;
 				}
-				move.accuracy = 0;
+				if (move.id === 'skyuppercut' || move.id === 'thunder' || move.id === 'hurricane' || move.id === 'smackdown') {
+					return;
+				}
+				return 0;
+			},
+			onBasePower: function(basePower, target, source, move) {
+				if (move.id === 'gust' || move.id === 'twister') {
+					return basePower * 2;
+				}
 			}
 		},
 		secondary: false,
@@ -4022,6 +4025,7 @@ exports.BattleMovedex = {
 		priority: 3,
 		volatileStatus: 'followme',
 		effect: {
+			duration: 1,
 			onFoeRedirectTarget: function(target, source, source2, move) {
 				if (this.validTarget(this.effectData.target, source, move.target)) {
 					return this.effectData.target;
@@ -4659,6 +4663,32 @@ exports.BattleMovedex = {
 		name: "Guard Split",
 		pp: 10,
 		priority: 0,
+		onHit: function(target, source) {
+			if (!target.volatiles.guardsplit) {
+				target.addVolatile('guardsplit');
+				target.volatiles.guardsplit.def = target.unmodifiedStats.def;
+				target.volatiles.guardsplit.spd = target.unmodifiedStats.spd;
+			}
+			if (!source.volatiles.guardsplit) {
+				source.addVolatile('guardsplit');
+				source.volatiles.guardsplit.def = source.unmodifiedStats.def;
+				source.volatiles.guardsplit.spd = source.unmodifiedStats.spd;
+			}
+			var newdef = Math.floor((target.volatiles.guardsplit.def + source.volatiles.guardsplit.def)/2);
+			target.volatiles.guardsplit.def = newdef;
+			source.volatiles.guardsplit.def = newdef;
+			var newspd = Math.floor((target.volatiles.guardsplit.spd + source.volatiles.guardsplit.spd)/2);
+			target.volatiles.guardsplit.spd = newspd;
+			source.volatiles.guardsplit.spd = newspd;
+			this.add('-activate', source, 'Guard Split', '[of] '+target);
+		},
+		effect: {
+			onModifyStatsPriority: 100,
+			onModifyStats: function(stats) {
+				stats.def = this.effectData.def;
+				stats.spd = this.effectData.spd;
+			}
+		},
 		secondary: false,
 		target: "normal",
 		type: "Psychic"
@@ -8180,6 +8210,32 @@ exports.BattleMovedex = {
 		name: "Power Split",
 		pp: 10,
 		priority: 0,
+		onHit: function(target, source) {
+			if (!target.volatiles.powersplit) {
+				target.addVolatile('powersplit');
+				target.volatiles.powersplit.atk = target.unmodifiedStats.atk;
+				target.volatiles.powersplit.spa = target.unmodifiedStats.spa;
+			}
+			if (!source.volatiles.powersplit) {
+				source.addVolatile('powersplit');
+				source.volatiles.powersplit.atk = source.unmodifiedStats.atk;
+				source.volatiles.powersplit.spa = source.unmodifiedStats.spa;
+			}
+			var newatk = Math.floor((target.volatiles.powersplit.atk + source.volatiles.powersplit.atk)/2);
+			target.volatiles.powersplit.atk = newatk;
+			source.volatiles.powersplit.atk = newatk;
+			var newspa = Math.floor((target.volatiles.powersplit.spa + source.volatiles.powersplit.spa)/2);
+			target.volatiles.powersplit.spa = newspa;
+			source.volatiles.powersplit.spa = newspa;
+			this.add('-activate', source, 'Power Split', '[of] '+target);
+		},
+		effect: {
+			onModifyStatsPriority: 100,
+			onModifyStats: function(stats) {
+				stats.atk = this.effectData.atk;
+				stats.spa = this.effectData.spa;
+			}
+		},
 		secondary: false,
 		target: "normal",
 		type: "Psychic"
@@ -8338,7 +8394,9 @@ exports.BattleMovedex = {
 				var lockedmove = source.getVolatile('lockedmove');
 				if (lockedmove) {
 					// Outrage counter is reset
-					source.volatiles['lockedmove'].duration = lockedmove.durationCallback.call(this);
+					if (source.volatiles['lockedmove'].duration === 2) {
+						delete source.volatiles['lockedmove'];
+					}
 				}
 				return null;
 			}
@@ -8578,8 +8636,7 @@ exports.BattleMovedex = {
 		},
 		effect: {
 			duration: 1,
-			onSwitchOutPriority: 10,
-			onSwitchOut: function(pokemon) {
+			onBeforeSwitchOut: function(pokemon) {
 				this.debug('Pursuit start');
 				var sources = this.effectData.sources;
 				for (var i=0; i<sources.length; i++) {
@@ -8603,6 +8660,21 @@ exports.BattleMovedex = {
 		name: "Quash",
 		pp: 15,
 		priority: 0,
+		onHit: function(target) {
+			if (target.side.active.length < 2) return false; // fails in singles
+			var decision = this.willMove(target);
+			if (decision) {
+				this.cancelMove(target);
+				for (var i=this.queue.length-1; i>=0; i--) {
+					if (this.queue[i].choice === 'residual') {
+						this.queue.splice(i,0,decision)
+						break;
+					}
+				}
+			} else {
+				return false;
+			}
+		},
 		secondary: false,
 		target: "normal",
 		type: "Dark"
@@ -8656,8 +8728,8 @@ exports.BattleMovedex = {
 		},
 		effect: {
 			duration: 1,
-			onStart: function(target) {
-				this.add('-singleturn', target, 'Quick Guard');
+			onStart: function(target, source) {
+				this.add('-singleturn', source, 'Quick Guard');
 			},
 			onTryHitPriority: 1,
 			onTryHit: function(target, source, effect) {
@@ -8670,7 +8742,9 @@ exports.BattleMovedex = {
 				var lockedmove = source.getVolatile('lockedmove');
 				if (lockedmove) {
 					// Outrage counter is reset
-					source.volatiles['lockedmove'].duration = lockedmove.durationCallback.call(this);
+					if (source.volatiles['lockedmove'].duration === 2) {
+						delete source.volatiles['lockedmove'];
+					}
 				}
 				return null;
 			}
@@ -9886,9 +9960,8 @@ exports.BattleMovedex = {
 		effect: {
 			duration: 2,
 			onLockMove: 'shadowforce',
-			onSourceModifyMove: function(move) {
-				if (move.target === 'foeSide') return;
-				move.accuracy = 0;
+			onAccuracy: function(accuracy, target, source, move) {
+				return 0;
 			}
 		},
 		secondary: false,
@@ -10314,24 +10387,31 @@ exports.BattleMovedex = {
 					return null;
 				}
 			},
-			onAnyModifyMove: function(move, attacker, defender) {
-				if (defender !== this.effectData.target && defender !== this.effectData.source) {
+			onAnyAccuracy: function(accuracy, target, source, move) {
+				if (target !== this.effectData.target && target !== this.effectData.source) {
 					return;
 				}
-				if (attacker === this.effectData.target && defender === this.effectData.source) {
+				if (source === this.effectData.target && target === this.effectData.source) {
 					return;
 				}
 				if (move.id === 'gust' || move.id === 'twister') {
-					// should not normally be done in MovifyMove event,
-					// but Gust and Twister have static base power, and
-					// it's faster to do this  here than in
-					// BasePower event
-					move.basePower *= 2;
-					return;
-				} else if (move.id === 'gust' || move.id === 'hurricane' || move.id === 'skyuppercut' || move.id === 'thunder' || move.id === 'smackdown') {
 					return;
 				}
-				move.accuracy = 0;
+				if (move.id === 'skyuppercut' || move.id === 'thunder' || move.id === 'hurricane' || move.id === 'smackdown') {
+					return;
+				}
+				return 0;
+			},
+			onAnyBasePower: function(basePower, target, source, move) {
+				if (target !== this.effectData.target && target !== this.effectData.source) {
+					return;
+				}
+				if (source === this.effectData.target && target === this.effectData.source) {
+					return;
+				}
+				if (move.id === 'gust' || move.id === 'twister') {
+					return basePower * 2;
+				}
 			}
 		},
 		secondary: false,
@@ -10650,8 +10730,8 @@ exports.BattleMovedex = {
 			onStart: function(pokemon) {
 				this.add('-singleturn', pokemon, 'Snatch');
 			},
-			onAnyTryHit: function(target, source, move) {
-				if (move && move.isSnatchable) {
+			onAnyTryMove: function(source, target, move) {
+				if (move && move.isSnatchable && move.sourceEffect !== 'snatch') {
 					var snatchUser = this.effectData.source;
 					snatchUser.removeVolatile('snatch');
 					this.add('-activate', snatchUser, 'Snatch', '[of] '+source);
@@ -12870,8 +12950,8 @@ exports.BattleMovedex = {
 		},
 		effect: {
 			duration: 1,
-			onStart: function(target) {
-				this.add('-singleturn', target, 'Wide Guard');
+			onStart: function(target, source) {
+				this.add('-singleturn', source, 'Wide Guard');
 			},
 			onTryHitPriority: 1,
 			onTryHit: function(target, source, effect) {
@@ -12883,7 +12963,9 @@ exports.BattleMovedex = {
 				var lockedmove = source.getVolatile('lockedmove');
 				if (lockedmove) {
 					// Outrage counter is reset
-					source.volatiles['lockedmove'].duration = lockedmove.durationCallback.call(this);
+					if (source.volatiles['lockedmove'].duration === 2) {
+						delete source.volatiles['lockedmove'];
+					}
 				}
 				return null;
 			}

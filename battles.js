@@ -30,13 +30,26 @@ if (config.crashguard) {
  * Otherwise, an empty string will be returned.
  */
 toId = function(text) {
-	if (typeof text === 'number') text = ''+text;
 	if (text && text.id) text = text.id;
-	text = string(text);
-	if (typeof text !== 'string') return ''; //???
-	return text.toLowerCase().replace(/[^a-z0-9]+/g, '');
+	else if (text && text.userid) text = text.userid;
+
+	return string(text).toLowerCase().replace(/[^a-z0-9]+/g, '');
 };
 toUserid = toId;
+
+/**
+ * Validates a username or Pokemon nickname
+ */
+var bannedNameStartChars = {'~':1, '&':1, '@':1, '%':1, '+':1, '-':1, '!':1, '?':1, '#':1};
+toName = function(name) {
+	name = string(name).trim();
+	name = name.replace(/(\||\n|\[|\]|\,)/g, '');
+	while (bannedNameStartChars[name.substr(0,1)]) {
+		name = name.substr(1);
+	}
+	if (name.length > 18) name = name.substr(0,18);
+	return name;
+};
 
 /**
  * Escapes a string for HTML
@@ -341,8 +354,10 @@ function BattlePokemon(set, side) {
 			selfP.boosts[i] = selfP.baseBoosts[i];
 		}
 		selfB.natureModify(selfP.stats, selfP.set.nature);
+		selfP.unmodifiedStats = {};
 		for (var i in selfP.stats) {
 			selfP.stats[i] = Math.floor(selfP.stats[i]);
+			selfP.unmodifiedStats[i] = selfP.stats[i];
 		}
 		if (init) return;
 
@@ -591,7 +606,6 @@ function BattlePokemon(set, side) {
 		selfP.movedThisTurn = false;
 		selfP.newlySwitched = true;
 		selfP.beingCalledBack = false;
-		selfP.illusion = null;
 		selfP.update(init);
 	};
 
@@ -733,6 +747,12 @@ function BattlePokemon(set, side) {
 		selfP.status = status.id;
 		selfP.statusData = {id: status.id, target: selfP};
 		if (source) selfP.statusData.source = source;
+		if (status.duration) {
+			selfP.statusData.duration = status.duration;
+		}
+		if (status.durationCallback) {
+			selfP.statusData.duration = status.durationCallback.call(selfB, selfP, source, sourceEffect);
+		}
 
 		if (status.id && !selfB.singleEvent('Start', status, selfP.statusData, selfP, source, sourceEffect)) {
 			selfB.debug('status start ['+status.id+'] interrupted');
@@ -774,7 +794,7 @@ function BattlePokemon(set, side) {
 		return false;
 	};
 	this.useItem = function(source, sourceEffect) {
-		if (!selfP.hp || !selfP.isActive) return false;
+		if (!selfP.isActive) return false;
 		if (!selfP.item) return false;
 		if (!sourceEffect && selfB.effect) sourceEffect = selfB.effect;
 		if (!source && selfB.event && selfB.event.target) source = selfB.event.target;
@@ -1130,7 +1150,7 @@ function Battle(roomid, format, rated) {
 	this.pseudoWeather = {};
 
 	this.format = toId(format);
-	this.formatData = {id:''};
+	this.formatData = {id:this.format};
 
 	this.ended = false;
 	this.started = false;
@@ -1343,7 +1363,7 @@ function Battle(roomid, format, rated) {
 		for (var i=0; i<selfB.sides.length;i++) {
 			var side = selfB.sides[i];
 			for (var j=0; j<side.active.length; j++) {
-				actives.push(side.active[j]);
+				if (side.active[j]) actives.push(side.active[j]);
 			}
 		}
 		actives.sort(function(a, b) {
@@ -1353,7 +1373,9 @@ function Battle(roomid, format, rated) {
 			return Math.random()-0.5;
 		});
 		for (var i=0; i<actives.length; i++) {
-			if (actives[i].isStarted) selfB.runEvent(eventid, actives[i], null, effect, relayVar);
+			if (actives[i].isStarted) {
+				selfB.runEvent(eventid, actives[i], null, effect, relayVar);
+			}
 		}
 	};
 	this.residualEvent = function(eventid, relayVar) {
@@ -1523,19 +1545,20 @@ function Battle(roomid, format, rated) {
 		var order = false;
 		var priority = 0;
 		var subOrder = 0;
-		var status = statuses[statuses.length-1].status;
-		if (status[callbackType+'Order']) {
-			order = status[callbackType+'Order'];
+		var status = statuses[statuses.length-1];
+		if (status.status[callbackType+'Order']) {
+			order = status.status[callbackType+'Order'];
 		}
-		if (status[callbackType+'Priority']) {
-			priority = status[callbackType+'Priority'];
-		} else if (status[callbackType+'SubOrder']) {
-			subOrder = -status[callbackType+'SubOrder'];
+		if (status.status[callbackType+'Priority']) {
+			priority = status.status[callbackType+'Priority'];
+		} else if (status.status[callbackType+'SubOrder']) {
+			subOrder = status.status[callbackType+'SubOrder'];
 		}
 
-		statuses[statuses.length-1].order = order;
-		statuses[statuses.length-1].priority = priority;
-		statuses[statuses.length-1].subOrder = subOrder;
+		status.order = order;
+		status.priority = priority;
+		status.subOrder = subOrder;
+		if (status.thing && status.thing.stats) status.speed = status.thing.stats.spe;
 	};
 	// bubbles up to parents
 	this.getRelevantEffects = function(thing, callbackType, foeCallbackType, foeThing, checkChildren) {
@@ -1560,6 +1583,11 @@ function Battle(roomid, format, rated) {
 			status = selfB.getWeather();
 			if (typeof status[callbackType] !== 'undefined' || (getAll && thing.weatherData[getAll])) {
 				statuses.push({status: status, callback: status[callbackType], statusData: selfB.weatherData, end: selfB.clearWeather, thing: thing, priority: status[callbackType+'Priority']||0});
+				selfB.resolveLastPriority(statuses,callbackType);
+			}
+			status = selfB.getFormat();
+			if (typeof status[callbackType] !== 'undefined' || (getAll && thing.formatData[getAll])) {
+				statuses.push({status: status, callback: status[callbackType], statusData: selfB.formatData, end: function(){}, thing: thing, priority: status[callbackType+'Priority']||0});
 				selfB.resolveLastPriority(statuses,callbackType);
 			}
 			if (bubbleDown) {
@@ -1826,6 +1854,15 @@ function Battle(roomid, format, rated) {
 		if (!pokemon || pokemon.isActive) return false;
 		if (!pos) pos = 0;
 		var side = pokemon.side;
+		if (side.active[pos]) {
+			var oldActive = side.active[pos];
+			var lastMove = null;
+			lastMove = selfB.getMove(oldActive.lastMove);
+			if (oldActive.switchCopyFlag === 'copyvolatile') {
+				delete oldActive.switchCopyFlag;
+				pokemon.copyVolatileFrom(oldActive);
+			}
+		}
 		selfB.runEvent('BeforeSwitchIn', pokemon);
 		if (side.active[pos]) {
 			var oldActive = side.active[pos];
@@ -1835,15 +1872,7 @@ function Battle(roomid, format, rated) {
 			pokemon.position = pos;
 			side.pokemon[pokemon.position] = pokemon;
 			side.pokemon[oldActive.position] = oldActive;
-		}
-		var lastMove = null;
-		if (side.active[pos]) {
-			lastMove = selfB.getMove(side.active[pos].lastMove);
-			if (side.active[pos].switchCopyFlag === 'copyvolatile') {
-				delete side.active[pos].switchCopyFlag;
-				pokemon.copyVolatileFrom(side.active[pos]);
-			}
-			side.active[pos].clearVolatile();
+			oldActive.clearVolatile();
 		}
 		side.active[pos] = pokemon;
 		pokemon.isActive = true;
@@ -1917,11 +1946,6 @@ function Battle(roomid, format, rated) {
 	};
 	this.nextTurn = function() {
 		selfB.turn++;
-		if (selfB.turn === 1) {
-			// I GIVE UP, WILL WRESTLE WITH EVENT SYSTEM LATER
-			var beginCallback = selfB.getFormat().onBegin;
-			if (beginCallback) beginCallback.call(selfB);
-		}
 		for (var i=0; i<selfB.sides.length; i++) {
 			for (var j=0; j<selfB.sides[i].active.length; j++) {
 				var pokemon = selfB.sides[i].active[j];
@@ -2378,6 +2402,7 @@ function Battle(roomid, format, rated) {
 	};
 	this.checkFainted = function() {
 		function isFainted(a) {
+			if (!a) return false;
 			if (a.fainted) {
 				a.switchFlag = true;
 				return true;
@@ -2540,6 +2565,10 @@ function Battle(roomid, format, rated) {
 		// returns whether or not we ended in a callback
 		switch (decision.choice) {
 		case 'start':
+			// I GIVE UP, WILL WRESTLE WITH EVENT SYSTEM LATER
+			var beginCallback = selfB.getFormat().onBegin;
+			if (beginCallback) beginCallback.call(selfB);
+
 			selfB.add('start');
 			for (var pos=0; pos<selfB.p1.active.length; pos++) {
 				selfB.switchIn(selfB.p1.pokemon[pos], pos);
@@ -2610,18 +2639,18 @@ function Battle(roomid, format, rated) {
 				decision.pokemon.beingCalledBack = true;
 				var lastMove = selfB.getMove(decision.pokemon.lastMove);
 				if (lastMove.selfSwitch !== 'copyvolatile') {
-					// Don't run any event handlers if Baton Pass was used.
-					if (!selfB.runEvent('SwitchOut', decision.pokemon)) {
-						// Warning: DO NOT interrupt a switch-out
-						// if you just want to trap a pokemon.
-						// To trap a pokemon and prevent it from switching out,
-						// (e.g. Mean Look, Magnet Pull) use the 'trapped' flag
-						// instead.
+					selfB.runEvent('BeforeSwitchOut', decision.pokemon);
+				}
+				if (!selfB.runEvent('SwitchOut', decision.pokemon)) {
+					// Warning: DO NOT interrupt a switch-out
+					// if you just want to trap a pokemon.
+					// To trap a pokemon and prevent it from switching out,
+					// (e.g. Mean Look, Magnet Pull) use the 'trapped' flag
+					// instead.
 
-						// Note: Nothing in BW or earlier interrupts
-						// a switch-out.
-						break;
-					}
+					// Note: Nothing in BW or earlier interrupts
+					// a switch-out.
+					break;
 				}
 			}
 			if (decision.pokemon && !decision.pokemon.hp && !decision.pokemon.fainted) {
@@ -2654,6 +2683,7 @@ function Battle(roomid, format, rated) {
 		// phazing (Roar, etc)
 
 		function checkForceSwitchFlag(a) {
+			if (!a) return false;
 			if (a.hp && a.forceSwitchFlag) {
 				selfB.dragIn(a.side, a.position);
 			}
@@ -2671,8 +2701,8 @@ function Battle(roomid, format, rated) {
 
 		if (!selfB.queue.length) selfB.checkFainted();
 
-		function hasSwitchFlag(a) { return a.switchFlag; }
-		function removeSwitchFlag(a) { a.switchFlag = false; }
+		function hasSwitchFlag(a) { return a?a.switchFlag:false; }
+		function removeSwitchFlag(a) { if (a) a.switchFlag = false; }
 		var p1switch = selfB.p1.active.any(hasSwitchFlag);
 		var p2switch = selfB.p2.active.any(hasSwitchFlag);
 
@@ -2811,7 +2841,7 @@ function Battle(roomid, format, rated) {
 				break;
 			case 'move':
 				if (i >= side.active.length) return false;
-				if (side.pokemon[i].fainted) {
+				if (!side.pokemon[i] || side.pokemon[i].fainted) {
 					decisions.push({
 						choice: 'pass'
 					});
@@ -2825,7 +2855,7 @@ function Battle(roomid, format, rated) {
 				break;
 			case 'switch':
 				if (i >= side.active.length) return false;
-				if (!side.active[i].switchFlag) {
+				if (!side.active[i] || !side.active[i].switchFlag) {
 					if (choice !== 'pass') choices.splice(i, 0, 'pass');
 					decisions.push({
 						choice: 'pass'

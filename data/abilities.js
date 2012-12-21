@@ -340,8 +340,10 @@ exports.BattleAbilities = {
 		desc: "While this Pokemon is active, no Pokemon on the field can use Selfdestruct or Explosion.",
 		shortDesc: "While this Pokemon is active, Selfdestruct, Explosion, and Aftermath do not work.",
 		id: "damp",
-		onAnyTryHit: function(target, source, effect) {
+		onAnyTryMove: function(target, source, effect) {
 			if (effect.id === 'selfdestruct' || effect.id === 'explosion') {
+				this.attrLastMove('[still]');
+				this.add('-activate', this.effectData.target, 'ability: Damp');
 				return false;
 			}
 		},
@@ -375,7 +377,7 @@ exports.BattleAbilities = {
 		desc: "Raises the user's Attack stat by two stages when a stat is lowered, including the Attack stat. This does not include self-induced stat drops like those from Close Combat.",
 		shortDesc: "This Pokemon's Attack is boosted by 2 for each of its stats that is lowered by a foe.",
 		onAfterEachBoost: function(boost, target, source) {
-			if (!source || target === source) {
+			if (!source || target.side === source.side) {
 				return;
 			}
 			var statsLowered = false;
@@ -1755,11 +1757,11 @@ exports.BattleAbilities = {
 		onImmunity: function(type, pokemon) {
 			if (type === 'sandstorm') return false;
 		},
-		onSourceModifyMove: function(move) {
-			if (typeof move.accuracy !== 'number') return;
+		onAccuracy: function(accuracy) {
+			if (typeof accuracy !== 'number') return;
 			if (this.isWeather('sandstorm')) {
-				this.debug('sand veil - decreasing accuracy');
-				move.accuracy *= 0.8;
+				this.debug('Sand Veil - decreasing accuracy');
+				return accuracy * 0.8;
 			}
 		},
 		id: "sandveil",
@@ -1945,11 +1947,11 @@ exports.BattleAbilities = {
 		onImmunity: function(type, pokemon) {
 			if (type === 'hail') return false;
 		},
-		onSourceModifyMove: function(move) {
-			if (typeof move.accuracy !== 'number') return;
+		onAccuracy: function(accuracy) {
+			if (typeof accuracy !== 'number') return;
 			if (this.isWeather('hail')) {
-				this.debug('snow cloak - decreasing accuracy');
-				move.accuracy *= 0.8;
+				this.debug('Snow Cloak - decreasing accuracy');
+				return accuracy * 0.8;
 			}
 		},
 		id: "snowcloak",
@@ -2202,9 +2204,11 @@ exports.BattleAbilities = {
 	"tangledfeet": {
 		desc: "When this Pokemon is confused, its opponent's attacks have a 50% chance of missing.",
 		shortDesc: "This Pokemon's evasion is doubled as long as it is confused.",
-		onSourceModifyMove: function(move, source, target) {
-			if (target && target.volatiles['confusion'] && move.accuracy !== true) {
-				move.accuracy /= 2;
+		onAccuracy: function(accuracy, target) {
+			if (typeof accuracy !== 'number') return;
+			if (target && target.volatiles['confusion']) {
+				this.debug('Tangled Feet - decreasing accuracy');
+				return accuracy * 0.5;
 			}
 		},
 		id: "tangledfeet",
@@ -2230,6 +2234,12 @@ exports.BattleAbilities = {
 	"telepathy": {
 		desc: "If a Pokemon has Telepathy, it will not take damage from its teammates' moves in double and triple battles.",
 		shortDesc: "This Pokemon does not take damage from its allies' attacks.",
+		onTryHit: function(target, source, move) {
+			if (target.side === source.side && move.category !== 'Status') {
+				this.add('-activate', target, 'ability: Telepathy');
+				return null;
+			}
+		},
 		id: "telepathy",
 		name: "Telepathy",
 		rating: 0,
@@ -2560,11 +2570,11 @@ exports.BattleAbilities = {
 	"wonderskin": {
 		desc: "Causes the chance of a status move working to be halved. It does not affect moves that inflict status as a secondary effect like Thunder's chance to paralyze.",
 		shortDesc: "All status moves with a set % accuracy are 50% accurate if used on this Pokemon.",
-		onSourceModifyMovePriority: 10,
-		onSourceModifyMove: function(move) {
+		onAccuracyPriority: 10,
+		onAccuracy: function(accuracy, target, source, move) {
 			if (move.category === 'Status' && typeof move.accuracy === 'number') {
-				this.debug('setting move accuracy to 50%');
-				move.accuracy = 50;
+				this.debug('Wonder Skin - setting accuracy to 50');
+				return 50;
 			}
 		},
 		id: "wonderskin",

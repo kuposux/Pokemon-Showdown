@@ -151,6 +151,10 @@ module.exports = (function () {
 		if (!move || typeof move === 'string') {
 			var name = (move||'').trim();
 			var id = toId(name);
+			if (this.data.Aliases[id]) {
+				name = this.data.Aliases[id];
+				id = toId(name);
+			}
 			move = {};
 			if (id.substr(0,12) === 'HiddenPower[') {
 				var hptype = id.substr(12);
@@ -667,7 +671,7 @@ module.exports = (function () {
 		}
 		set.species = template.species;
 
-		set.name = string(set.name).trim().replace(/\|/g,'');
+		set.name = toName(set.name).trim().replace(/\|/g,'');
 		var item = this.getItem(string(set.item));
 		set.item = item.name;
 		var ability = this.getAbility(string(set.ability));
@@ -739,6 +743,9 @@ module.exports = (function () {
 					lsetData.sources = ['5D'];
 				}
 			}
+		}
+		if (set.moves && Array.isArray(set.moves)) {
+			set.moves = set.moves.filter(function(val){ return val; });
 		}
 		if (!set.moves || !set.moves.length) {
 			problems.push(name+" has no moves.");

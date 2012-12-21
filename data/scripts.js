@@ -28,6 +28,7 @@ exports.BattleScripts = {
 		this.runEvent('AfterMoveSelf', pokemon, target, move);
 	},
 	useMove: function(move, pokemon, target, sourceEffect) {
+		if (!sourceEffect && this.effect.id) sourceEffect = this.effect;
 		move = this.getMove(move);
 		baseMove = move;
 		move = this.getMoveCopy(move);
@@ -35,6 +36,7 @@ exports.BattleScripts = {
 		if (move.target === 'self' || move.target === 'allies') {
 			target = pokemon;
 		}
+		if (sourceEffect) move.sourceEffect = sourceEffect.id;
 
 		this.setActiveMove(move, pokemon, target);
 
@@ -60,41 +62,15 @@ exports.BattleScripts = {
 			attrs = '|[still]'; // suppress the default move animation
 		}
 
-		var boostTable = [1, 4/3, 5/3, 2, 7/3, 8/3, 3];
-
-		// calculate true accuracy
-		var accuracy = move.accuracy;
-		if (accuracy !== true) {
-			if (!move.ignoreAccuracy) {
-				if (pokemon.boosts.accuracy > 0) {
-					accuracy *= boostTable[pokemon.boosts.accuracy];
-				} else {
-					accuracy /= boostTable[-pokemon.boosts.accuracy];
-				}
-			}
-			if (!move.ignoreEvasion) {
-				if (target.boosts.evasion > 0 && !move.ignorePositiveEvasion) {
-					accuracy /= boostTable[target.boosts.evasion];
-				} else if (target.boosts.evasion < 0) {
-					accuracy *= boostTable[-target.boosts.evasion];
-				}
-			}
-		}
-		if (move.ohko) { // bypasses accuracy modifiers
-			if (!target.volatiles['bounce'] && !target.volatiles['dig'] && !target.volatiles['dive'] && !target.volatiles['fly'] && !target.volatiles['shadowforce'] && !target.volatiles['skydrop']) {
-				accuracy = 30;
-				if (pokemon.level > target.level) accuracy += (pokemon.level - target.level);
-			}
-		}
-		if (move.alwaysHit) accuracy = true; // bypasses ohko accuracy modifiers
-		move.accuracy = accuracy;
-
 		var movename = move.name;
 		if (move.id === 'hiddenpower') movename = 'Hidden Power';
-		if (sourceEffect) attrs += '[from]'+this.getEffect(sourceEffect);
+		if (sourceEffect) attrs += '|[from]'+this.getEffect(sourceEffect);
 		this.addMove('move', pokemon, movename, target+attrs);
 
 		if (!this.singleEvent('Try', move, null, pokemon, target, move)) {
+			return true;
+		}
+		if (!this.runEvent('TryMove', pokemon, target, move)) {
 			return true;
 		}
 
@@ -110,7 +86,7 @@ exports.BattleScripts = {
 			if (move.target === 'allAdjacent') {
 				var allyActive = pokemon.side.active;
 				for (var i=0; i<allyActive.length; i++) {
-					if (Math.abs(i-pokemon.position)<=1 && i != pokemon.position && !allyActive[i].fainted) {
+					if (allyActive[i] && Math.abs(i-pokemon.position)<=1 && i != pokemon.position && !allyActive[i].fainted) {
 						if (!atLeastOne) {
 							damage = 0;
 							atLeastOne = true;
@@ -122,7 +98,7 @@ exports.BattleScripts = {
 			var foeActive = pokemon.side.foe.active;
 			var foePosition = foeActive.length-pokemon.position-1;
 			for (var i=0; i<foeActive.length; i++) {
-				if (Math.abs(i-foePosition)<=1 && !foeActive[i].fainted) {
+				if (foeActive[i] && Math.abs(i-foePosition)<=1 && !foeActive[i].fainted) {
 					if (!atLeastOne) {
 						damage = 0;
 						atLeastOne = true;
@@ -138,6 +114,7 @@ exports.BattleScripts = {
 				}
 				return true;
 			}
+			if (!pokemon.hp) pokemon.faint();
 		} else {
 			if (target.fainted && target.side !== pokemon.side) {
 				// if a targeted foe faints, the move is retargeted
@@ -167,10 +144,38 @@ exports.BattleScripts = {
 	},
 	rollMoveHit: function(target, pokemon, move, spreadHit) {
 		if (move.selfdestruct && spreadHit) {
-			this.faint(pokemon, pokemon, move);
+			pokemon.hp = 0;
 		}
 
-		if (move.accuracy !== true && this.random(100) >= move.accuracy) {
+		var boostTable = [1, 4/3, 5/3, 2, 7/3, 8/3, 3];
+
+		// calculate true accuracy
+		var accuracy = move.accuracy;
+		if (accuracy !== true) {
+			if (!move.ignoreAccuracy) {
+				if (pokemon.boosts.accuracy > 0) {
+					accuracy *= boostTable[pokemon.boosts.accuracy];
+				} else {
+					accuracy /= boostTable[-pokemon.boosts.accuracy];
+				}
+			}
+			if (!move.ignoreEvasion) {
+				if (target.boosts.evasion > 0 && !move.ignorePositiveEvasion) {
+					accuracy /= boostTable[target.boosts.evasion];
+				} else if (target.boosts.evasion < 0) {
+					accuracy *= boostTable[-target.boosts.evasion];
+				}
+			}
+		}
+		if (move.ohko) { // bypasses accuracy modifiers
+			if (!target.volatiles['bounce'] && !target.volatiles['dig'] && !target.volatiles['dive'] && !target.volatiles['fly'] && !target.volatiles['shadowforce'] && !target.volatiles['skydrop']) {
+				accuracy = 30;
+				if (pokemon.level > target.level) accuracy += (pokemon.level - target.level);
+			}
+		}
+		if (move.alwaysHit) accuracy = true; // bypasses ohko accuracy modifiers
+		accuracy = this.runEvent('Accuracy', target, pokemon, move, accuracy);
+		if (accuracy !== true && this.random(100) >= accuracy) {
 			if (!spreadHit) this.attrLastMove('[miss]');
 			this.add('-miss', pokemon);
 			return false;
@@ -207,7 +212,7 @@ exports.BattleScripts = {
 			damage = this.moveHit(target, pokemon, move);
 		}
 
-		target.gotAttacked(move, damage, pokemon);
+		if (move.category !== 'Status') target.gotAttacked(move, damage, pokemon);
 
 		if (!damage && damage !== 0) return false;
 
@@ -284,13 +289,17 @@ exports.BattleScripts = {
 			}
 			// only run the hit events for the hit itself, not the secondary or self hits
 			if (!isSelf && !isSecondary) {
-				if (move.target !== 'all' && move.target !== 'foeSide' && move.target !== 'allySide') {
+				if (move.target === 'all') {
+					hitResult = this.runEvent('TryHitField', target, pokemon, move);
+				} else if (move.target === 'foeSide' || move.target === 'allySide') {
+					hitResult = this.runEvent('TryHitSide', target, pokemon, move);
+				} else {
 					hitResult = this.runEvent('TryHit', target, pokemon, move);
-					if (!hitResult) {
-						if (hitResult === false) this.add('-fail', target);
-						if (hitResult !== 0) { // special Substitute hit flag
-							return false;
-						}
+				}
+				if (!hitResult) {
+					if (hitResult === false) this.add('-fail', target);
+					if (hitResult !== 0) { // special Substitute hit flag
+						return false;
 					}
 				}
 				if (!this.runEvent('TryFieldHit', target, pokemon, move)) {
@@ -1220,6 +1229,41 @@ exports.BattleScripts = {
 
 		for (var i=0; i<6; i++) {
 			var set = this.randomSet(seasonalPokemonList[i], i);
+
+			set.level = 100;
+
+			team.push(set);
+		}
+
+		return team;
+	},
+	randomSeasonalWWTeam: function(side) {
+		var seasonalPokemonList = ['raichu', 'nidoqueen', 'nidoking', 'clefable', 'wigglytuff', 'rapidash', 'dewgong', 'cloyster', 'exeggutor', 'starmie', 'jynx', 'lapras', 'snorlax', 'articuno', 'azumarill', 'granbull', 'delibird', 'stantler', 'miltank', 'blissey', 'swalot', 'lunatone', 'castform', 'chimecho', 'glalie', 'walrein', 'regice', 'jirachi', 'bronzong', 'chatot', 'abomasnow', 'weavile', 'togekiss', 'glaceon', 'probopass', 'froslass', 'rotom-frost', 'uxie', 'mesprit', 'azelf', 'victini', 'vanilluxe', 'sawsbuck', 'beartic', 'cryogonal', 'chandelure'];
+
+		var shouldHavePresent = {raichu:1,clefable:1,wigglytuff:1,azumarill:1,granbull:1,miltank:1,blissey:1,togekiss:1,delibird:1};
+
+		seasonalPokemonList = seasonalPokemonList.randomize();
+
+		var team = [];
+
+		for (var i=0; i<6; i++) {
+			var template = this.getTemplate(seasonalPokemonList[i]);
+
+			// we're gonna modify the default template
+			template = Object.clone(template, true);
+			delete template.viableMoves.ironhead;
+			delete template.viableMoves.fireblast;
+			delete template.viableMoves.overheat;
+			delete template.viableMoves.vcreate;
+			delete template.viableMoves.blueflare;
+			if (template.id === 'chandelure') {
+				template.viableMoves.flameburst = 1;
+				template.abilities.DW = 'Flash Fire';
+			}
+
+			var set = this.randomSet(template, i);
+
+			if (template.id in shouldHavePresent) set.moves[0] = 'Present';
 
 			set.level = 100;
 
