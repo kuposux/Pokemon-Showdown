@@ -70,7 +70,7 @@ function connectUser(name, socket, token, room) {
 		if (err) return;
 		var announcement = data.toString().replace(/\"/g, '\\"');
 		emit(socket, 'console', {
-			rawMessage: '<script type="text/javascript">$("#simheader").html("' + announcement + '");</script>'
+			evalRawMessage: '$("#simheader").html("' + announcement + '");'
 		});
 	});
 	
