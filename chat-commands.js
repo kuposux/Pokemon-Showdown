@@ -168,6 +168,15 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return false;
 		break;
 
+	//added - announcement stuff
+	fs.readFile('config/announcement.txt', function(err, data) {
+		if (err) return;
+		var announcement = data.toString().replace(/\"/g, '\\"');
+		emit(socket, 'console', {
+			evalRawMessage: '$("#simheader").html("' + announcement + '");'
+		});
+	});
+
 	case 'remind':
 	case '!remind':
 		if (tour.status != 1) {
