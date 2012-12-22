@@ -457,7 +457,52 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 
 	case 'switch':
-
+		if (!user.can('broadcast')) {
+			emit(socket, 'console', 'You do not have enough authority to use this command.');
+			return false;
+		}
+		if (tour[room.id].status < 2) {
+			emit(socket, 'console', 'A tournament hasn\'t started yet');
+			return false;
+		}
+		var old = toUserid(target.split(',')[0]);
+		var tar = toUserid(target.split(',')[1]);
+		for (var i in tour[room.id].round) {
+			var current = tour[room.id].round[i].split('|');
+			if (current[0] == old) {
+				var id = i;
+				var p = 0;
+			}
+			if (current[1] == old) {
+				var id = i;
+				var p = 1;
+			}
+		}
+		if (!id) {
+			emit(socket, 'console', 'There is no such user in the tournament.');
+			return false;
+		}
+		var ray = tour[room.id].round[id].split('|');
+		for (var i in tour[room.id].losers) {
+			if (tour[room.id].losers[i] == ray[p]) {
+				tour[room.id].losers[i] = tar;
+			}
+		}
+		for (var i in tour[room.id].winners) {
+			if (tour[room.id].winners[i] == ray[p]) {
+				tour[room.id].winners[i] = tar;
+			}
+		}
+		for (var i in tour[room.id].overallLoser) {
+			if (tour[room.id].overallLoser[i] == ray[p]) {
+				tour[room.id].overallLoser[i] = tar;
+			}
+		}
+		room.addRaw("<b>" + ray[p] + " was replaced with " + tar + " by " + user.name + " in the tournament.</b>");
+		ray[p] = tar;
+		ray = ray.join('|');
+		tour[room.id].round[id] = ray;
+		return false;
 		break;
 
 	case 'viewround':
