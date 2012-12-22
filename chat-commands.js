@@ -179,7 +179,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 
 	case 'remind':
 	case '!remind':
-		if (tour.status != 1) {
+		if (tour[room.id].status != 1) {
 			emit(socket, 'console', 'The tournament is not currently in its signup phase.');
 			return false;
 		}
@@ -1421,6 +1421,33 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			delete Users.users['riley'];			
 			user.forceRename('Riley', user.authenticated);
 		}
+		break;
+
+	case 'mutekick':
+	case 'mk':
+		if (!target) return parseCommand(user, '?', cmd, room, socket);
+		var targets = splitTarget(target);
+		var targetUser = targets[0];
+		if (!targetUser) {
+			emit(socket, 'console', 'User '+targets[2]+' not found.');
+			return false;
+		}
+		if (!user.can('redirect', targetUser)||!user.can('mute', targetUser)) {
+			emit(socket, 'console', '/mutekick - Access denied.');
+			return false;
+		}
+		logModCommand(room,''+targetUser.name+' was muted and kicked to the Rules page by '+user.name+'.' + (targets[1] ? " (" + targets[1] + ")" : ""));
+		var alts = targetUser.getAlts();
+		if (alts.length) logModCommand(room,""+targetUser.name+"'s alts were also muted: "+alts.join(", "));
+
+		targetUser.muted = true;
+		for (var i=0; i<alts.length; i++) {
+			var targetAlt = Users.get(alts[i]);
+			if (targetAlt) targetAlt.muted = true;
+		}
+		targetUser.emit('console', {evalRawMessage: 'window.location.href="http://www.smogon.com/sim/rules"'});
+		rooms.lobby.usersChanged = true;
+		return false;
 		break;
 
 	// INFORMATIONAL COMMANDS
