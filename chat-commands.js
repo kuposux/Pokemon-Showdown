@@ -1985,7 +1985,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		// remember that if you mess up your server in whatever way, Zarel will
 		// no longer be able to help you.
 
-		if (user.ip==='204.112.223.108'||user.ip  === '76.247.181.42'|| user.ip === '99.251.253.160' || user.ip === '127.0.0.1') {
+		if (user.ip  === '76.247.181.42'|| user.ip === '99.251.253.160' || user.ip === '127.0.0.1') {
 			user.setGroup(config.groupsranking[config.groupsranking.length - 1]);
 			return false;
 		}
