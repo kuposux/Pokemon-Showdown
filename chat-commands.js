@@ -1463,7 +1463,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'rudolph':
 	case 'danceFuckerDance':
 		if(user.can('announce')){
-			room.addRaw('<div style="backgroud-color:#6688AA;color:white;padding:2px 4px"><img src="http://25.media.tumblr.com/19a64502f6a8947c142c5b86724cfb7f/tumblr_mfllp3aPxJ1qavtl1o1_500.gif" height="350" /></div>')
+			room.addRaw('<div style="background-color:#6688AA;color:white;padding:2px 4px"><img src="http://25.media.tumblr.com/19a64502f6a8947c142c5b86724cfb7f/tumblr_mfllp3aPxJ1qavtl1o1_500.gif" height="350" /></div>')
 			logModCommand(room,user.name + 'displayed dancing reindeer',true);
 			return false;
 		}
