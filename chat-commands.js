@@ -1259,6 +1259,17 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return false;
 		break;
 
+		case 'gitpull':
+		if (!user.can('hotpatch')) {
+			socket.emit('console', '/gitpull - Access denied.');
+			return false;
+		}
+		var args = splitArgs('git, pull');
+		logModCommand(room,user.name+' Pulled from git',true);
+		runCommand(args.shift(), args, socket);
+		return false;
+		break;
+
 	case 'savelearnsets':
 		if (user.can('hotpatch')) {
 			emit(socket, 'console', '/savelearnsets - Access denied.');
