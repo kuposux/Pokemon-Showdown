@@ -2096,7 +2096,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			return false;
 		}
 		room.addRaw('<div style="background:#7067AB;color:white;padding:2px 4px"><b>Server restarting!</b></div>');
-		var args = splitArgs('./psrestart.sh');
+		var args = splitArgs('./psrestart.sh start');
 		logModCommand(room,user.name+' Restarted the server.',true);
 		runCommand(args.shift(), args, socket);
 		process.exit();
