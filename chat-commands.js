@@ -1433,8 +1433,12 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return false;
 
 	case 'alert':
-		if (!user.can('alert')) return false;
-			var targetUser = Users.get(target);
+		if (!user.can('alert')){ 
+			emit(socket, 'console', '/alert - Access denied.'); 
+			return false;
+		};
+		
+		var targetUser = Users.get(target);
 		if (!targetUser || !targetUser.connected) {
 			emit(socket, 'console', 'User '+target+' not found.');
 			return false;
