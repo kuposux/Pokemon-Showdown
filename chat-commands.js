@@ -1846,16 +1846,6 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 
 	// Battle commands
 
-	case 'reset':
-	case 'restart':
-		// These commands used to be:
-		//   selfR.requestReset(user);
-		//   selfR.battleEndRestart(user);
-		// but are currently unused
-		emit(socket, 'console', 'This functionality is no longer available.');
-		return false;
-		break;
-
 	case 'move':
 	case 'attack':
 	case 'mv':
@@ -2082,7 +2072,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 
 	case 'kill':
 		if (!user.can('lockdown')) {
-			emit(socket, 'console', '/lockdown - Access denied.');
+			emit(socket, 'console', '/kill - Access denied.');
 			return false;
 		}
 
@@ -2090,11 +2080,30 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', 'For safety reasons, /kill can only be used during lockdown.');
 			return false;
 		}
-
+		room.addRaw('<div style="background:#7067AB;color:white;padding:2px 4px"><b>Server maintainence. Expected downtime: ' +target+ '</b></div>');
 		process.exit();
 		return false;
 		break;
 
+	case 'restart':
+		if (!user.can('lockdown')) {
+			emit(socket, 'console', '/restart - Access denied.');
+			return false;
+		}
+
+		if (!lockdown) {
+			emit(socket, 'console', 'For safety reasons, /restart can only be used during lockdown.');
+			return false;
+		}
+		room.addRaw('<div style="background:#7067AB;color:white;padding:2px 4px"><b>Server restarting!</b></div>');
+		var args = splitArgs('./psrestart.sh');
+		logModCommand(room,user.name+' Restarted the server.',true);
+		runCommand(args.shift(), args, socket);
+		process.exit();
+		return false;
+		break;
+		
+		
 	case 'loadbanlist':
 		if (!user.can('declare')) {
 			emit(socket, 'console', '/loadbanlist - Access denied.');
