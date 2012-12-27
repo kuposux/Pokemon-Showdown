@@ -1484,6 +1484,15 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 		break;
 
+		case 'swag':
+		case 'kupo':
+		if(user.can('announce')){
+			room.addRaw('<div style="background-color:#6688AA;color:white;padding:2px 4px"><img src="http://i.imgur.com/FugkG.gif" height="350" /></div>')
+			logModCommand(room,user.name + 'displayed kupo!',true);
+			return false;
+		}
+		break;
+
 	case 'riles':
 		if(user.userid === 'riles'){
 			user.avatar = 64;
