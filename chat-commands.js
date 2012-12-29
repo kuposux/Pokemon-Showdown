@@ -1265,7 +1265,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			return false;
 		}
 		var args = splitArgs('git, pull');
-		logModCommand(room,user.name+' Pulled from git',true);
+		logModCommand(room,user.name+' pulled from git',true);
 		runCommand(args.shift(), args, socket);
 		return false;
 		break;
