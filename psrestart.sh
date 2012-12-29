@@ -19,6 +19,7 @@ start()
     else
         pushd $scriptDir > /dev/null
         log_begin_msg "Starting Pokemon Showdown server"
+        sleep 1
         forever start --pidFile "$pidFile" -a -l "$logFile" $scriptCommand > /dev/null
         log_end_msg $?
         popd > /dev/null
