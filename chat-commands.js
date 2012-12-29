@@ -1478,7 +1478,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		case 'fatty':
 		case 'fatteh':
                 if (user.can('announce')) {
-                        room.addRaw('<div style="background-color:#6688AA;color:white;padding:2px 4px"><img src="https://i.chzbgr.com/maxW500/6894049536/h2A87A4D9/" width="475" /></div>');
+                        room.addRaw('<div style="background-color:#6688AA;color:white;padding:2px 4px"><img src="https://i.chzbgr.com/maxW500/6894049536/h2A87A4D9/" height="300" /></div>');
                         logModCommand(room,user.name+' displayed a fatty!',true);
                         return false;
                 }
