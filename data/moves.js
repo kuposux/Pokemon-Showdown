@@ -1104,7 +1104,7 @@ exports.BattleMovedex = {
 				if (move.id === 'gust' || move.id === 'twister') {
 					return;
 				}
-				if (move.id === 'skyuppercut' || move.id === 'thunder' || move.id === 'hurricane' || move.id === 'smackdown') {
+				if (move.id === 'skyuppercut' || move.id === 'thunder' || move.id === 'hurricane' || move.id === 'smackdown' || move.id === 'helpinghand') {
 					return;
 				}
 				return 0;
@@ -1128,14 +1128,14 @@ exports.BattleMovedex = {
 		basePower: 120,
 		category: "Physical",
 		desc: "Deals damage to one adjacent or non-adjacent target. If the target lost HP, the user takes recoil damage equal to 33% that HP, rounded half up, but not less than 1HP. Makes contact.",
-		shortDesc: "Has 1/3 recoil.",
+		shortDesc: "Has 33% recoil.",
 		id: "bravebird",
 		isViable: true,
 		name: "Brave Bird",
 		pp: 15,
 		priority: 0,
 		isContact: true,
-		recoil: [1,3],
+		recoil: [33,100],
 		secondary: false,
 		target: "any",
 		type: "Flying"
@@ -2339,7 +2339,7 @@ exports.BattleMovedex = {
 				if (type === 'sandstorm' || type === 'hail') return false;
 			},
 			onAccuracy: function(accuracy, target, source, move) {
-				if (move.id === 'earthquake' || move.id === 'magnitude') {
+				if (move.id === 'earthquake' || move.id === 'magnitude' || move.id === 'helpinghand') {
 					return;
 				}
 				return 0;
@@ -2468,7 +2468,7 @@ exports.BattleMovedex = {
 				if (type === 'sandstorm' || type === 'hail') return false;
 			},
 			onAccuracy: function(accuracy, target, source, move) {
-				if (move.id === 'surf' || move.id === 'whirlpool') {
+				if (move.id === 'surf' || move.id === 'whirlpool' || move.id === 'helpinghand') {
 					return;
 				}
 				return 0;
@@ -2545,14 +2545,14 @@ exports.BattleMovedex = {
 		basePower: 120,
 		category: "Physical",
 		desc: "Deals damage to one adjacent target. If the target lost HP, the user takes recoil damage equal to 33% that HP, rounded half up, but not less than 1HP. Makes contact.",
-		shortDesc: "Has 1/3 recoil.",
+		shortDesc: "Has 33% recoil.",
 		id: "doubleedge",
 		isViable: true,
 		name: "Double-Edge",
 		pp: 15,
 		priority: 0,
 		isContact: true,
-		recoil: [1,3],
+		recoil: [33,100],
 		secondary: false,
 		target: "normal",
 		type: "Normal"
@@ -3756,7 +3756,7 @@ exports.BattleMovedex = {
 		basePower: 120,
 		category: "Physical",
 		desc: "Deals damage to one adjacent target with a 10% chance to burn it. If the target lost HP, the user takes recoil damage equal to 33% that HP, rounded half up, but not less than 1HP. If the user is frozen, it will defrost before using this move. Makes contact.",
-		shortDesc: "Has 1/3 recoil. 10% chance to burn. Thaws user.",
+		shortDesc: "Has 33% recoil. 10% chance to burn. Thaws user.",
 		id: "flareblitz",
 		isViable: true,
 		name: "Flare Blitz",
@@ -3764,7 +3764,7 @@ exports.BattleMovedex = {
 		priority: 0,
 		isContact: true,
 		thawsUser: true,
-		recoil: [1,3],
+		recoil: [33,100],
 		secondary: {
 			chance: 10,
 			status: 'brn'
@@ -3915,7 +3915,7 @@ exports.BattleMovedex = {
 				if (move.id === 'gust' || move.id === 'twister') {
 					return;
 				}
-				if (move.id === 'skyuppercut' || move.id === 'thunder' || move.id === 'hurricane' || move.id === 'smackdown') {
+				if (move.id === 'skyuppercut' || move.id === 'thunder' || move.id === 'hurricane' || move.id === 'smackdown' || move.id === 'helpinghand') {
 					return;
 				}
 				return 0;
@@ -4457,23 +4457,23 @@ exports.BattleMovedex = {
 		accuracy: 100,
 		basePower: false,
 		basePowerCallback: function(pokemon, target) {
-			if (target.weightkg > 200) {
+			if (target.weightkg >= 200) {
 				this.debug('120 bp');
 				return 120;
 			}
-			if (target.weightkg > 100) {
+			if (target.weightkg >= 100) {
 				this.debug('100 bp');
 				return 100;
 			}
-			if (target.weightkg > 50) {
+			if (target.weightkg >= 50) {
 				this.debug('80 bp');
 				return 80;
 			}
-			if (target.weightkg > 25) {
+			if (target.weightkg >= 25) {
 				this.debug('60 bp');
 				return 60;
 			}
-			if (target.weightkg > 10) {
+			if (target.weightkg >= 10) {
 				this.debug('40 bp');
 				return 40;
 			}
@@ -6528,19 +6528,19 @@ exports.BattleMovedex = {
 		basePower: false,
 		basePowerCallback: function(pokemon, target) {
 			var targetWeight = target.weightkg;
-			if (target.weightkg > 200) {
+			if (target.weightkg >= 200) {
 				return 120;
 			}
-			if (target.weightkg > 100) {
+			if (target.weightkg >= 100) {
 				return 100;
 			}
-			if (target.weightkg > 50) {
+			if (target.weightkg >= 50) {
 				return 80;
 			}
-			if (target.weightkg > 25) {
+			if (target.weightkg >= 25) {
 				return 60;
 			}
-			if (target.weightkg > 10) {
+			if (target.weightkg >= 10) {
 				return 40;
 			}
 			return 20;
@@ -7961,8 +7961,13 @@ exports.BattleMovedex = {
 			this.add('-fieldactivate', 'move: Perish Song');
 			for (var i=0; i<this.sides.length; i++) {
 				for (var j=0; j<this.sides[i].active.length; j++) {
-					if (this.sides[i].active[j].runImmunity('sound')) this.sides[i].active[j].addVolatile('perishsong');
-					else this.add('-end', this.sides[i].active[j], 'Perish Song');
+					if (this.sides[i].active[j].ability !== 'soundproof') {
+						this.sides[i].active[j].addVolatile('perishsong');
+					}
+					else {
+						this.add('-immune', this.sides[i].active[j], '[msg]');
+						this.add('-end', this.sides[i].active[j], 'Perish Song');
+					}
 				}
 			}
 		},
@@ -9961,6 +9966,9 @@ exports.BattleMovedex = {
 			duration: 2,
 			onLockMove: 'shadowforce',
 			onAccuracy: function(accuracy, target, source, move) {
+				if (move.id === 'helpinghand') {
+					return;
+				}
 				return 0;
 			}
 		},
@@ -10345,12 +10353,12 @@ exports.BattleMovedex = {
 			if (attacker.removeVolatile(move.id)) {
 				return;
 			}
-			if (defender.volatiles['substitute']) {
-				this.add('-fail', target);
+			if (defender.volatiles['substitute'] || defender.side === attacker.side) {
+				this.add('-fail', defender);
 				return null;
 			}
 			if (defender.volatiles['protect']) {
-				this.add('-activate', target, 'Protect');
+				this.add('-activate', defender, 'Protect');
 				return null;
 			}
 			if (defender.volatiles['bounce'] || defender.volatiles['dig'] || defender.volatiles['dive'] || defender.volatiles['fly'] || defender.volatiles['shadowforce']) {
@@ -10397,7 +10405,7 @@ exports.BattleMovedex = {
 				if (move.id === 'gust' || move.id === 'twister') {
 					return;
 				}
-				if (move.id === 'skyuppercut' || move.id === 'thunder' || move.id === 'hurricane' || move.id === 'smackdown') {
+				if (move.id === 'skyuppercut' || move.id === 'thunder' || move.id === 'hurricane' || move.id === 'smackdown' || move.id === 'helpinghand') {
 					return;
 				}
 				return 0;
@@ -11407,6 +11415,7 @@ exports.BattleMovedex = {
 				this.effectData.hp = Math.floor(target.maxhp/4);
 				delete target.volatiles['partiallytrapped'];
 			},
+			onTryHitPriority: -1,
 			onTryHit: function(target, source, move) {
 				if (target === source) {
 					this.debug('sub bypass: self hit');
@@ -11440,7 +11449,7 @@ exports.BattleMovedex = {
 					this.add('-activate', target, 'Substitute', '[damage]');
 				}
 				if (move.recoil) {
-					this.damage(damage * move.recoil[0] / move.recoil[1], source, target, 'recoil');
+					this.damage(Math.round(damage * move.recoil[0] / move.recoil[1]), source, target, 'recoil');
 				}
 				if (move.drain) {
 					this.heal(Math.ceil(damage * move.drain[0] / move.drain[1]), source, target, 'drain');
@@ -12696,14 +12705,14 @@ exports.BattleMovedex = {
 		basePower: 120,
 		category: "Physical",
 		desc: "Deals damage to one adjacent target with a 10% chance to paralyze it. If the target lost HP, the user takes recoil damage equal to 33% that HP, rounded half up, but not less than 1HP. Makes contact.",
-		shortDesc: "Has 1/3 recoil. 10% chance to paralyze target.",
+		shortDesc: "Has 33% recoil. 10% chance to paralyze target.",
 		id: "volttackle",
 		isViable: true,
 		name: "Volt Tackle",
 		pp: 15,
 		priority: 0,
 		isContact: true,
-		recoil: [1,3],
+		recoil: [33,100],
 		secondary: {
 			chance: 10,
 			status: 'par'
@@ -13122,14 +13131,14 @@ exports.BattleMovedex = {
 		basePower: 120,
 		category: "Physical",
 		desc: "Deals damage to one adjacent target. If the target lost HP, the user takes recoil damage equal to 33% that HP, rounded half up, but not less than 1HP. Makes contact.",
-		shortDesc: "Has 1/3 recoil.",
+		shortDesc: "Has 33% recoil.",
 		id: "woodhammer",
 		isViable: true,
 		name: "Wood Hammer",
 		pp: 15,
 		priority: 0,
 		isContact: true,
-		recoil: [1,3],
+		recoil: [33,100],
 		secondary: false,
 		target: "normal",
 		type: "Grass"
