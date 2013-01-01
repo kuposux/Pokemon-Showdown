@@ -2074,6 +2074,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 
 		lockdown = true;
+		logModCommand(room,user.name+' started a lockdown.',true);
 		for (var id in rooms) {
 			rooms[id].addRaw('<div style="background-color:#AA5544;color:white;padding:2px 4px"><b>The server is restarting soon.</b><br />Please finish your battles quickly. No new battles can be started until the server resets in a few minutes.</div>');
 		}
@@ -2087,6 +2088,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 
 		lockdown = false;
+		logModCommand(room,user.name+' ended the lockdown.',true);
 		for (var id in rooms) {
 			rooms[id].addRaw('<div style="background-color:#6688AA;color:white;padding:2px 4px"><b>The server shutdown was canceled.</b></div>');
 		}
@@ -2104,6 +2106,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			return false;
 		}
 		room.addRaw('<div style="background:#7067AB;color:white;padding:2px 4px"><b>Server maintainence. Expected downtime: ' +target+ '</b></div>');
+		logModCommand(room,user.name+' killed the server.',true);
 		process.exit();
 		return false;
 		break;
