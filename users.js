@@ -475,7 +475,7 @@ var User = (function () {
 				else if (userid === "jd") avatar = 25;
 				else if (userid === "kupo") avatar = 1006;
 				else if (userid === "lightblue")avatar = 285;
-				else if (userid === "energ218") avatar = 192;
+				else if (userid === "energ218") avatar = 1005;
 				else if (userid === "wiitle") avatar = 218;
 				else if (userid === "loong") avatar = 1005;
 				else if (userid === "noir") avatar = 164;
