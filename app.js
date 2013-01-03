@@ -1,4 +1,5 @@
-const LOGIN_SERVER_TIMEOUT = 10000;
+const LOGIN_SERVER_TIMEOUT = 15000;
+const LOGIN_SERVER_BATCH_TIME = 1000;
 
 try {
 	require('nodetime').profile({
@@ -62,10 +63,15 @@ LoginServer = {
 		req.end();
 	},
 	requestQueue: [],
+	disabled: false,
 	request: function(action, data, callback) {
 		if (typeof data === 'function') {
 			callback = data;
 			data = null;
+		}
+		if (this.disabled) {
+			callback(null, null, 'disabled');
+			return;
 		}
 		if (!data) data = {};
 		data.act = action;
@@ -82,8 +88,7 @@ LoginServer = {
 		// if we already have it going or the request queue is empty no need to do anything
 		if (this.openRequests || this.requestTimer || !this.requestQueue.length) return;
 
-		// 100
-		this.requestTimer = setTimeout(this.makeRequests.bind(this), 500);
+		this.requestTimer = setTimeout(this.makeRequests.bind(this), LOGIN_SERVER_BATCH_TIME);
 	},
 	makeRequests: function() {
 		this.requestTimer = null;
