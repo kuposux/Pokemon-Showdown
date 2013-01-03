@@ -468,7 +468,6 @@ var User = (function () {
 				else if (userid === "greatsage") avatar = 1005;
 				else if (userid === "bojangles") avatar = 1006;
 				else if (userid === "dtc") avatar = 30;
-<<<<<<< HEAD
 				else if (userid === "panpaw" || userid === "pandaw") avatar = 7;
 				else if (userid === "godhand")avatar = 45;
 				else if (userid === "jd") avatar = 1005;
@@ -482,11 +481,9 @@ var User = (function () {
 				else if (userid === "leader") avatar = 1008;
 				else if (userid === "leaderwolf") avatar = 1009;
 				else if (userid === "dragonmasterx") avatar = 1009;
-=======
 				else if (userid === "hugendugen") avatar = 1009;
 				else if (userid === "fatecrashers") avatar = 18;
 
->>>>>>> upstream/master
 				if (usergroups[userid]) {
 					group = usergroups[userid].substr(0,1);
 				}
