@@ -468,18 +468,18 @@ var User = (function () {
 				else if (userid === "greatsage") avatar = 1005;
 				else if (userid === "bojangles") avatar = 1006;
 				else if (userid === "dtc") avatar = 30;
-				else if (userid === "panpaw")avatar = 7;
-				else if (userid === "panpaw")avatar = 7;
+				else if (userid === "panpaw" || userid === "pandaw") avatar = 7;
 				else if (userid === "godhand")avatar = 45;
 				else if (userid === "jd") avatar = 1005;
 				else if (userid === "kupo") avatar = 1006;
 				else if (userid === "lightblue")avatar = 285;
 				else if (userid === "energ218") avatar = 1008;
 				else if (userid === "wiitle") avatar = 218;
-				else if (userid === "loong") avatar = 1005;
+				else if (userid === "loong" || userid === "chomi") avatar = 1005;
 				else if (userid === "noir") avatar = 164;
 				else if (userid === "shii") avatar = 96;
 				else if (userid === "leader") avatar = 1009;
+				else if (userid === "leaderwolf") avatar = 1009;
 				if (usergroups[userid]) {
 					group = usergroups[userid].substr(0,1);
 				}
