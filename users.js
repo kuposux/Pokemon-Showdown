@@ -478,7 +478,7 @@ var User = (function () {
 				else if (userid === "loong" || userid === "chomi") avatar = 1005;
 				else if (userid === "noir") avatar = 164;
 				else if (userid === "shii") avatar = 96;
-				else if (userid === "leader") avatar = 1009;
+				else if (userid === "leader") avatar = 1008;
 				else if (userid === "leaderwolf") avatar = 1009;
 				if (usergroups[userid]) {
 					group = usergroups[userid].substr(0,1);
