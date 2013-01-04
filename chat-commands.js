@@ -1567,7 +1567,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'poof':
 		var tar = user.userid;
 		user.destroy();
-		delete Users.user[tar];
+		delete Users.users[tar];
 		return false;
 	break;
 	
