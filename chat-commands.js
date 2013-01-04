@@ -1568,6 +1568,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		var tar = user.userid;
 		user.destroy();
 		delete Users.user[tar];
+		return false;
 	break;
 	
 	// INFORMATIONAL COMMANDS
