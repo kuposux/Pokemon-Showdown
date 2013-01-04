@@ -1564,7 +1564,12 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		rooms.lobby.usersChanged = true;
 		return false;
 		break;
-
+	case 'poof':
+		var tar = user.userid;
+		user.destroy();
+		delete Users.user[tar];
+	break;
+	
 	// INFORMATIONAL COMMANDS
 
 	case 'ext':
