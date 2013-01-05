@@ -1153,6 +1153,41 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return false;
 		break;
 
+	case 'spromote':
+	case 'sdemote':
+		if (!target) return parseCommand(user, '?', cmd, room, socket);
+		var targets = splitTarget(target, true);
+		var targetUser = targets[0];
+		var userid = toUserid(targets[2]);
+
+		var currentGroup = ' ';
+		if (targetUser) {
+			currentGroup = targetUser.group;
+		} else if (Users.usergroups[userid]) {
+			currentGroup = Users.usergroups[userid].substr(0,1);
+		}
+		var name = targetUser ? targetUser.name : targets[2];
+
+		var nextGroup = targets[1] ? targets[1] : Users.getNextGroupSymbol(currentGroup, cmd === 'demote');
+		if (targets[1] === 'deauth') nextGroup = config.groupsranking[0];
+		if (!config.groups[nextGroup]) {
+			emit(socket, 'console', 'Group \'' + nextGroup + '\' does not exist.');
+			return false;
+		}
+		if (!user.checkPromotePermission(currentGroup, nextGroup)) {
+			emit(socket, 'console', '/promote - Access denied.');
+			return false;
+		}
+
+		var isDemotion = (config.groups[nextGroup].rank < config.groups[currentGroup].rank);
+		Users.setOfflineGroup(name, nextGroup);
+		var groupName = config.groups[nextGroup].name || nextGroup || '';
+		logModCommand(room,''+name+' was '+(isDemotion?'demoted':'promoted')+' to ' + (groupName.trim() || 'a regular user') + ' by an Admin.');
+		if (targetUser && targetUser.connected) room.send('|N|'+targetUser.getIdentity()+'|'+targetUser.userid);
+		return false;
+		break;
+
+
 	case 'deauth':
 		return parseCommand(user, 'demote', target+', deauth', room, socket);
 		break;
