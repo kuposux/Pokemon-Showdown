@@ -1601,6 +1601,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		rooms.lobby.usersChanged = true;
 		return false;
 		break;
+		
 	case 'poof':
 		if(target){
 			if(user.can('alert')){
@@ -1611,7 +1612,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 					user.emit('console', 'Cannot find user ' + target + '.', socket);
 				}else{
 					room.addRaw('<strong>~~'+target+' vanished into nothingness by ' + user.name +'!~~</strong>');
-					targetUser.destroy();
+					Users.users[tar].destroy();
 				}
 				
 			}else{
