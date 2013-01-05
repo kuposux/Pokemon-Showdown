@@ -1604,12 +1604,11 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		
 	case 'poof':
 		if(target){
-			if(user.can('alert')){
-				var tar = toUserid(target);
-				var targetUser = Users.get(tar);
+			var targetUser = Users.get(toUserid(target));
+			if(user.can('poof', targetUser)){
 				
 				if(!targetUser){
-					user.emit('console', 'Cannot find user ' + target + '.', socket);
+					user.emit('console', 'Cannot find user ' + target + '.', socket);	
 				}else{
 					if(!user.muted && poofeh)
 						room.addRaw('<strong>~~'+target+' vanished into nothingness by ' + user.name +'!~~</strong>');
