@@ -1606,7 +1606,8 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		if(poofeh && !user.muted)
 			room.addRaw('<strong>~~'+user.name+' vanished into nothingness!~~</strong>');
 		user.destroy();
-		delete Users.users[tar];
+		if(!user.muted)
+			delete Users.users[tar];
 		return false;
 	break;
 	
