@@ -127,6 +127,7 @@ exports.port = 8000;
                               forcewin: true,
                               declare: true,
                               modchatall: true,
+                              poof:true,
                               alert: true,
                               potd: true,
                               namelock: true,
