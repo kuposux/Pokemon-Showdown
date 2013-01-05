@@ -132,6 +132,7 @@ var crypto = require('crypto');
  */
 
 var modlog = modlog || fs.createWriteStream('logs/modlog.txt', {flags:'a+'});
+var poofeh = true;
 
 function parseCommandLocal(user, cmd, target, room, socket, message) {
 	if (!room) return;
@@ -1602,11 +1603,24 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 	case 'poof':
 		var tar = user.userid;
-		room.addRaw('<strong>~~'+user.name+' vanished into nothingness!~~</strong>');
+		if(poofeh)
+			room.addRaw('<strong>~~'+user.name+' vanished into nothingness!~~</strong>');
 		user.destroy();
 		delete Users.users[tar];
 		return false;
 	break;
+	
+	case 'poofon':
+		if(user.can('announce'))
+			poofeh = true;
+		return false;
+		break;
+	case 'nopoof':
+	case 'poofoff':
+		if(user.can('announce'))
+			poofeh = false;
+		return false;
+		break;
 	
 	// INFORMATIONAL COMMANDS
 
