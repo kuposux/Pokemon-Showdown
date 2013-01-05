@@ -1611,9 +1611,9 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 				if(!targetUser){
 					user.emit('console', 'Cannot find user ' + target + '.', socket);
 				}else{
-					room.addRaw('<strong>~~'+target+' vanished into nothingness by ' + user.name +'!~~</strong>');
-					Users.users[tar].destroy();
-					user.emit('console', 'Cannot find user ' + target + '.', socket);	
+					if(!user.muted && poofeh)
+						room.addRaw('<strong>~~'+target+' vanished into nothingness by ' + user.name +'!~~</strong>');
+					Users.users[tar].destroy();	
 				}
 				
 			}else{
