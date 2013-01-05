@@ -1306,12 +1306,12 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		room.addRaw('<div style="background:#7067AB;color:white;padding:2px 4px"><b>Server updating... Lag Incoming!</b></div>');
 		runCommand(args.shift(), args, socket);
 		for (var i in require.cache) delete require.cache[i];
-		Tools = require('./tools.js');
+		//Tools = require('./tools.js');
 		parseCommand = require('./chat-commands.js').parseCommand;
-		sim = require('./battles.js');
-		BattlePokemon = sim.BattlePokemon;
-		BattleSide = sim.BattleSide;
-		Battle = sim.Battle;
+		//sim = require('./battles.js');
+		//BattlePokemon = sim.BattlePokemon;
+		//BattleSide = sim.BattleSide;
+		//Battle = sim.Battle;
 		emit(socket, 'console', 'The game engine has been hot-patched.');
 		room.addRaw('<div style="background:#7067AB;color:white;padding:2px 4px"><b>Server update finished.</b></div>');
 		return false;
