@@ -1780,7 +1780,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			'<br />- Language: JavaScript'+
 			'<br />- <a href="https://github.com/Zarel/Pokemon-Showdown/commits/master" target="_blank">What\'s new?</a>'+
 			'<br />- <a href="https://github.com/Zarel/Pokemon-Showdown" target="_blank">Zarel\'s Source</a>'+
-			'<br />- <a href="https://github.com/kupochu/Pokemon-Showdown/commits/master" target="blank>What\'s new with TBT?</a>'+
+			'<br />- <a href="https://github.com/kupochu/Pokemon-Showdown/commits/master" target="blank">What\'s new with TBT?</a>'+
 			'<br />- <a href="https://github.com/kupochu/Pokemon-Showdown" target="_blank">TBT\'s Source</a>'+
 			'</div>');
 		return false;
