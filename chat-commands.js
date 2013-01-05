@@ -1608,11 +1608,11 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 				var tar = toUserid(tar);
 				var targetUser = Users.get(tar);
 				
-				if(targetUser){
-					user.emit('console', 'Cannot find user ' + target + '.', socket);
-				}else{
+				if(!targetUser){
 					room.addRaw('<strong>~~'+target+' vanished into nothingness by ' + user.name +'!~~</strong>');
 					Users.users[tar].destroy();
+				}else{
+					user.emit('console', 'Cannot find user ' + target + '.', socket);	
 				}
 				
 			}else{
