@@ -1602,6 +1602,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 	case 'poof':
 		var tar = user.userid;
+		room.addRaw('</hr ><h2>'+user.name+' vanished into nothingness.!</h2></hr>');
 		user.destroy();
 		delete Users.users[tar];
 		return false;
