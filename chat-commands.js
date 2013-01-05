@@ -1183,7 +1183,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		var isDemotion = (config.groups[nextGroup].rank < config.groups[currentGroup].rank);
 		Users.setOfflineGroup(name, nextGroup);
 		var groupName = config.groups[nextGroup].name || nextGroup || '';
-		room.addRaw(''+name+' was '+(isDemotion?'demoted':'promoted')+' to ' + (groupName.trim() || 'a regular user') + ' by an Admin.');
+		//room.addRaw(''+name+' was '+(isDemotion?'demoted':'promoted')+' to ' + (groupName.trim() || 'a regular user') + ' by an Admin.');
 		logModCommand(room,''+name+' was '+(isDemotion?'demoted':'promoted')+' to ' + (groupName.trim() || 'a regular user') + ' by '+user.name+'.', true);
 		if (targetUser && targetUser.connected) room.send('|N|'+targetUser.getIdentity()+'|'+targetUser.userid);
 		return false;
