@@ -1634,7 +1634,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 		var tar = user.userid;
 		if(poofeh && !user.muted)
-			room.addRaw('<strong>~~'+user.name+' vanished into nothingness!~~</strong>');
+			room.addRaw(getRandMessage(user));
 		user.destroy();
 		if(!user.muted)
 			delete Users.users[tar];
@@ -2706,6 +2706,42 @@ function splitTarget(target, exactName) {
 function logModCommand(room, result, noBroadcast) {
 	if (!noBroadcast) room.add(result);
 	modlog.write('['+(new Date().toJSON())+'] ('+room.id+') '+result+'\n');
+}
+
+function getRandMessage(user){
+	var numMessages = 13; // numMessages will always be the highest case # + 1
+	var message = '<strong>~~ ';
+	switch(Math.floor(Math.random()*numMessages)){
+		case 0: message = message + user.name + ' has vanished into nothingness!';
+			break;
+		case 1: message = message + user.name + ' visited kupo\'s bedroom and never returned!';
+			break;
+		case 2: message = message + user.name + ' used Explosion!';
+			break;
+		case 3: message = message + user.name + ' fell into the void.';
+			break;
+		case 4: message = message + user.name + ' was squished by pandaw\'s large behind!';
+			break;	
+		case 5: message = message + user.name + ' became EnerG\'s slave!';
+			break;
+		case 6: message = message + user.name + ' became kupo\'s love slave!';
+			break;
+		case 7: message = message + user.name + ' has left the building.';
+			break;
+		case 8: message = message + user.name + ' felt Thundurus\'s wrath!';
+			break;
+		case 9: message = message + user.name + ' died of a broken heart.';
+			break;
+		case 10: message = message + user.name + ' got lost in a maze!';
+			break;
+		case 11: message = message + user.name + ' was hit by Magikarp\'s Revenge!';
+			break;
+		case 12: message = message + user.name + ' was sucked into a whirlpool!';
+			break;
+		default: message = message + user.name + ' was unfortunate and didn\'t get a cool message.';
+	};
+	message = message + ' ~~</strong>';
+	return message;
 }
 
 exports.parseCommand = parseCommandLocal;
