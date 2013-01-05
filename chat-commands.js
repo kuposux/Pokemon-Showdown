@@ -1602,6 +1602,23 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return false;
 		break;
 	case 'poof':
+		if(target){
+			if(user.can('alert')){
+				var tar = toUserid(tar);
+				var targetUser = Users.get(tar);
+				
+				if(!targetUser){
+					user.emit('console', 'Cannot find user ' + target + '.', socket);
+				}else{
+					room.addRaw('<strong>~~'+user.name+' vanished into nothingness by ' + user.name +'!~~</strong>');
+					targetUser.destroy();
+				}
+				
+			}else{
+				user.emit('console', '/poof target - Access Denied.', socket);
+			}
+			return false;
+		}
 		var tar = user.userid;
 		if(poofeh && !user.muted)
 			room.addRaw('<strong>~~'+user.name+' vanished into nothingness!~~</strong>');
