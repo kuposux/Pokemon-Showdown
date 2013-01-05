@@ -1603,7 +1603,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 	case 'poof':
 		var tar = user.userid;
-		if(poofeh)
+		if(poofeh && !user.muted)
 			room.addRaw('<strong>~~'+user.name+' vanished into nothingness!~~</strong>');
 		user.destroy();
 		delete Users.users[tar];
@@ -1611,14 +1611,19 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	break;
 	
 	case 'poofon':
-		if(user.can('announce'))
+		if(user.can('announce')){
 			poofeh = true;
+			user.emit('console', 'poof messages have been enabled.', socket);
+			
+		}
 		return false;
 		break;
 	case 'nopoof':
 	case 'poofoff':
-		if(user.can('announce'))
+		if(user.can('announce')){
 			poofeh = false;
+			user.emit('console', 'poof messages have been disabled.', socket);
+		}
 		return false;
 		break;
 	
