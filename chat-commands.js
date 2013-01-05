@@ -1614,7 +1614,8 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		
 	case 'poof':
 		if(target){
-			var targetUser = Users.get(toUserid(target));
+			var tar = toUserid(target);
+			var targetUser = Users.get(tar);
 			if(user.can('poof', targetUser)){
 				
 				if(!targetUser){
