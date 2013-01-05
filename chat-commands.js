@@ -2750,6 +2750,8 @@ function getRandMessage(user){
 			break;
 		case 18: message = message + user.name + ' tried to touch RisingPokeStar!';
 			break;
+		case 19: message = message + user.name + ' got their sausage smoked by Charmanderp!';
+			break;
 		default: message = message + user.name + ' was unfortunate and didn\'t get a cool message.';
 	};
 	message = message + ' ~~</strong>';
