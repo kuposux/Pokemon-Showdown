@@ -2709,7 +2709,7 @@ function logModCommand(room, result, noBroadcast) {
 }
 
 function getRandMessage(user){
-	var numMessages = 13; // numMessages will always be the highest case # + 1
+	var numMessages = 14; // numMessages will always be the highest case # + 1
 	var message = '<strong>~~ ';
 	switch(Math.floor(Math.random()*numMessages)){
 		case 0: message = message + user.name + ' has vanished into nothingness!';
@@ -2737,6 +2737,8 @@ function getRandMessage(user){
 		case 11: message = message + user.name + ' was hit by Magikarp\'s Revenge!';
 			break;
 		case 12: message = message + user.name + ' was sucked into a whirlpool!';
+			break;
+		case 13: message = message + user.name + ' got scared and left the server!';
 			break;
 		default: message = message + user.name + ' was unfortunate and didn\'t get a cool message.';
 	};
