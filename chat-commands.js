@@ -1611,7 +1611,8 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		rooms.lobby.usersChanged = true;
 		return false;
 		break;
-		
+	
+	case 'd':
 	case 'poof':
 		if(!user.muted && target){
 			var tar = toUserid(target);
