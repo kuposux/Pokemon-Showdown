@@ -1612,19 +1612,30 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	break;
 	
 	case 'poofon':
-		if(!poofeh && user.can('announce')){
-			poofeh = true;
-			user.emit('console', 'poof messages have been enabled.', socket);
-			
+		if(user.can('announce')){
+			if(!poofeh){
+				poofeh = true;
+				user.emit('console', 'poof messages have been enabled.', socket);
+			}else{
+				user.emit('console', 'poof messages are already enabled.', socket);
+			}
+		}else{
+			user.emit('console','/poofon - Access Denied.', socket);
 		}
 		return false;
 		break;
 		
 	case 'nopoof':
 	case 'poofoff':
-		if(poofeh && user.can('announce')){
-			poofeh = false;
-			user.emit('console', 'poof messages have been disabled.', socket);
+		if(user.can('announce')){
+			if(poofeh){
+				poofeh = false;
+				user.emit('console', 'poof messages have been disabled.', socket);
+			}else{
+				user.emit('console', 'poof messages are already disabled.', socket);
+			}
+		}else{
+			user.emit('console','/poofoff - Access Denied.', socket);
 		}
 		return false;
 		break;
