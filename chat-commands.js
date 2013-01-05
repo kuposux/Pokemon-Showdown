@@ -1605,13 +1605,14 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'poof':
 		if(target){
 			if(user.can('alert')){
-				var tar = toUserid(tar);
+				var tar = toUserid(target);
 				var targetUser = Users.get(tar);
 				
 				if(!targetUser){
+					user.emit('console', 'Cannot find user ' + target + '.', socket);
+				}else{
 					room.addRaw('<strong>~~'+target+' vanished into nothingness by ' + user.name +'!~~</strong>');
 					Users.users[tar].destroy();
-				}else{
 					user.emit('console', 'Cannot find user ' + target + '.', socket);	
 				}
 				
@@ -1775,7 +1776,13 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case '!opensource':
 		showOrBroadcastStart(user, cmd, room, socket, message);
 		showOrBroadcast(user, cmd, room, socket,
-			'<div style="border:1px solid #6688AA;padding:2px 4px">Showdown\'s server is open source:<br />- Language: JavaScript<br />- <a href="https://github.com/Zarel/Pokemon-Showdown/commits/master" target="_blank">What\'s new?</a><br />- <a href="https://github.com/Zarel/Pokemon-Showdown" target="_blank">Zarel\'s Source</a><br />- <a href="https://github.com/kupochu/Pokemon-Showdown" target="_blank">TBT\'s Source</a></div>');
+			'<div style="border:1px solid #6688AA;padding:2px 4px">Showdown\'s server is open source:'+
+			'<br />- Language: JavaScript'+
+			'<br />- <a href="https://github.com/Zarel/Pokemon-Showdown/commits/master" target="_blank">What\'s new?</a>'+
+			'<br />- <a href="https://github.com/Zarel/Pokemon-Showdown" target="_blank">Zarel\'s Source</a>'+
+			'<br />- <a href="https://github.com/kupochu/Pokemon-Showdown/commits/master" target="blank>What\'s new with TBT?</a>'+
+			'<br />- <a href="https://github.com/kupochu/Pokemon-Showdown" target="_blank">TBT\'s Source</a>'+
+			'</div>');
 		return false;
 		break;
 
