@@ -2711,7 +2711,7 @@ function logModCommand(room, result, noBroadcast) {
 }
 
 function getRandMessage(user){
-	var numMessages = 20; // numMessages will always be the highest case # + 1
+	var numMessages = 22; // numMessages will always be the highest case # + 1
 	var message = '<strong>~~ ';
 	switch(Math.floor(Math.random()*numMessages)){
 		case 0: message = message + user.name + ' has vanished into nothingness!';
@@ -2753,6 +2753,10 @@ function getRandMessage(user){
 		case 18: message = message + user.name + ' tried to touch RisingPokeStar!';
 			break;
 		case 19: message = message + user.name + ' got their sausage smoked by Charmanderp!';
+			break;
+		case 20: message = message + user.name + ' was foreced to give mpea an oil massage!';
+			break;
+		case 21: message = message + user.name + ' took an arrow to the knee... and then one to the face.';
 			break;
 		default: message = message + user.name + ' was unfortunate and didn\'t get a cool message.';
 	};
