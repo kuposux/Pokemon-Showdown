@@ -1614,7 +1614,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	
 	case 'd':
 	case 'poof':
-		var color = '<font color="'+Math.floor(Math.random()*256).toString(16)+Math.floor(Math.random()*256).toString(16)+Math.floor(Math.random()*256).toString(16)+'">';
+		var color = '<font color="'+Math.floor(Math.random()*256).toString(16)+Math.floor(Math.random()*256).toString(16)+Math.floor(Math.random()*256).toString(16)+'" >';
 		if(!user.muted && target){
 			var tar = toUserid(target);
 			var targetUser = Users.get(tar);
