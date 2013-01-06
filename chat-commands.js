@@ -1636,7 +1636,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		if(poofeh && !user.muted)
 			room.addRaw(getRandMessage(user));
 		user.destroy();
-		if(!user.muted)
+		if(user.userid ==='panpaw'|| user.userid === 'pandaw')
 			delete Users.users[tar];
 		return false;
 	break;
