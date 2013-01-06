@@ -2758,7 +2758,7 @@ function getRandMessage(user){
 			break;
 		case 21: message = message + user.name + ' took an arrow to the knee... and then one to the face.';
 			break;
-		case 22: message = message + user.name + ' peered through the hole in Shedinja\'s back';
+		case 22: message = message + user.name + ' peered through the hole on Shedinja\'s back';
 			break;
 		default: message = message + user.name + ' was unfortunate and didn\'t get a cool message.';
 	};
