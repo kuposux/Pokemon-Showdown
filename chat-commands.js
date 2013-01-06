@@ -2713,7 +2713,7 @@ function logModCommand(room, result, noBroadcast) {
 }
 
 function getRandMessage(user){
-	var numMessages = 23; // numMessages will always be the highest case # + 1
+	var numMessages = 26; // numMessages will always be the highest case # + 1
 	var message = '~~ ';
 	switch(Math.floor(Math.random()*numMessages)){
 		case 0: message = message + user.name + ' has vanished into nothingness!';
@@ -2761,6 +2761,12 @@ function getRandMessage(user){
 		case 21: message = message + user.name + ' took an arrow to the knee... and then one to the face.';
 			break;
 		case 22: message = message + user.name + ' peered through the hole on Shedinja\'s back';
+			break;
+		case 23: message = message + user.name + ' recieved judgment from the almighty Arceus!';
+			break;
+		case 24: message = message + user.name + ' used Final Gambit and missed!';
+			break;
+		case 25: message = message + user.name + ' pissed off a Gyarados!';
 			break;
 		default: message = message + user.name + ' was unfortunate and didn\'t get a cool message.';
 	};
