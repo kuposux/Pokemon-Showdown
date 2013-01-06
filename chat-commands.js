@@ -1627,7 +1627,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 					Users.users[tar].destroy();	
 				}
 				
-			}else{
+			} else {
 				user.emit('console', '/poof target - Access Denied.', socket);
 			}
 			return false;
@@ -1647,10 +1647,10 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 				poofeh = true;
 				user.emit('console', 'poof messages have been enabled.', socket);
 				logModCommand(room, user.name+" enabled poof.", true);
-			}else{
+			} else {
 				user.emit('console', 'poof messages are already enabled.', socket);
 			}
-		}else{
+		} else {
 			user.emit('console','/poofon - Access Denied.', socket);
 		}
 		return false;
@@ -1663,10 +1663,10 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 				poofeh = false;
 				user.emit('console', 'poof messages have been disabled.', socket);
 				logModCommand(room,user.name+" disabled poof.", true);
-			}else{
+			} else {
 				user.emit('console', 'poof messages are already disabled.', socket);
 			}
-		}else{
+		} else {
 			user.emit('console','/poofoff - Access Denied.', socket);
 		}
 		return false;
