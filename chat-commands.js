@@ -1646,6 +1646,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			if(!poofeh){
 				poofeh = true;
 				user.emit('console', 'poof messages have been enabled.', socket);
+				logModCommand(room, user.name+" enabled poof.");
 			}else{
 				user.emit('console', 'poof messages are already enabled.', socket);
 			}
@@ -1661,6 +1662,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			if(poofeh){
 				poofeh = false;
 				user.emit('console', 'poof messages have been disabled.', socket);
+				logModCommand(room,user.name+" disabled poof.");
 			}else{
 				user.emit('console', 'poof messages are already disabled.', socket);
 			}
