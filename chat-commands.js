@@ -2714,7 +2714,7 @@ function logModCommand(room, result, noBroadcast) {
 }
 
 function getRandMessage(user){
-	var numMessages = 26; // numMessages will always be the highest case # + 1
+	var numMessages = 27; // numMessages will always be the highest case # + 1
 	var message = '~~ ';
 	switch(Math.floor(Math.random()*numMessages)){
 		case 0: message = message + user.name + ' has vanished into nothingness!';
@@ -2768,6 +2768,8 @@ function getRandMessage(user){
 		case 24: message = message + user.name + ' used Final Gambit and missed!';
 			break;
 		case 25: message = message + user.name + ' pissed off a Gyarados!';
+			break;
+		case 26: message = message + user.name + ' was taken away in Neku\'s black van!';
 			break;
 		default: message = message + user.name + ' was unfortunate and didn\'t get a cool message.';
 	};
