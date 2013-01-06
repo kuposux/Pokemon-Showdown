@@ -2712,7 +2712,7 @@ function logModCommand(room, result, noBroadcast) {
 
 function getRandMessage(user){
 	var numMessages = 23; // numMessages will always be the highest case # + 1
-	var message = '<strong>~~ ';
+	var message = '<strong><font color="'+Math.floor(Math.random()*256).toString(16)+Math.floor(Math.random()*256).toString(16)+Math.floor(Math.random()*256).toString(16)+'">~~ ';
 	switch(Math.floor(Math.random()*numMessages)){
 		case 0: message = message + user.name + ' has vanished into nothingness!';
 			break;
@@ -2762,7 +2762,7 @@ function getRandMessage(user){
 			break;
 		default: message = message + user.name + ' was unfortunate and didn\'t get a cool message.';
 	};
-	message = message + ' ~~</strong>';
+	message = message + ' ~~</font></strong>';
 	return message;
 }
 
