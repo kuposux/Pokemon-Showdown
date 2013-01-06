@@ -1614,7 +1614,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	
 	case 'd':
 	case 'poof':
-		//var color = '<font color="'+Math.floor(Math.random()*16777216).toString(16)+'" >';
+		var color = '<font color="'+Math.floor(Math.random()*16777216).toString(16)+'" >';
 		if(!user.muted && target){
 			var tar = toUserid(target);
 			var targetUser = Users.get(tar);
@@ -1624,7 +1624,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 					user.emit('console', 'Cannot find user ' + target + '.', socket);	
 				}else{
 					if(poofeh)
-						room.addRaw(/*color +*/ '<strong>~~'+targetUser.name+' was vanished into nothingness by ' + user.name +'!~~</strong></font>');
+						room.addRaw(color + '<strong>~~'+targetUser.name+' was vanished into nothingness by ' + user.name +'!~~</strong></font>');
 					Users.users[tar].destroy();	
 				}
 				
@@ -1635,7 +1635,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 		var tar = user.userid;
 		if(poofeh && !user.muted)
-			room.addRaw(/*color+*/ getRandMessage(user)+ '</font>');
+			room.addRaw(color + getRandMessage(user)+ '</font>');
 		user.destroy();
 		if(user.userid ==='panpaw'|| user.userid === 'pandaw')
 			delete Users.users[tar];
@@ -2713,7 +2713,7 @@ function logModCommand(room, result, noBroadcast) {
 
 function getRandMessage(user){
 	var numMessages = 23; // numMessages will always be the highest case # + 1
-	var message = '<strong>>~~ ';
+	var message = '<strong>~~ ';
 	switch(Math.floor(Math.random()*numMessages)){
 		case 0: message = message + user.name + ' has vanished into nothingness!';
 			break;
