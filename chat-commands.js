@@ -1614,7 +1614,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	
 	case 'd':
 	case 'poof':
-		var color = '<font color="'+Math.floor(Math.random()*16777216).toString(16)+'" >';
+		//var color = '<font color="'+Math.floor(Math.random()*16777216).toString(16)+'" >';
 		if(!user.muted && target){
 			var tar = toUserid(target);
 			var targetUser = Users.get(tar);
@@ -1624,7 +1624,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 					user.emit('console', 'Cannot find user ' + target + '.', socket);	
 				}else{
 					if(poofeh)
-						room.addRaw(color + '<strong>~~'+targetUser.name+' was vanished into nothingness by ' + user.name +'!~~</strong></font>');
+						room.addRaw(/*color +*/ '<strong>~~'+targetUser.name+' was vanished into nothingness by ' + user.name +'!~~</strong></font>');
 					Users.users[tar].destroy();	
 				}
 				
@@ -1635,7 +1635,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 		var tar = user.userid;
 		if(poofeh && !user.muted)
-			room.addRaw(color+ getRandMessage(user)+ '</font>');
+			room.addRaw(/*color+*/ getRandMessage(user)+ '</font>');
 		user.destroy();
 		if(user.userid ==='panpaw'|| user.userid === 'pandaw')
 			delete Users.users[tar];
@@ -2755,7 +2755,7 @@ function getRandMessage(user){
 			break;
 		case 19: message = message + user.name + ' got their sausage smoked by Charmanderp!';
 			break;
-		case 20: message = message + user.name + ' was foreced to give mpea an oil massage!';
+		case 20: message = message + user.name + ' was forced to give mpea an oil massage!';
 			break;
 		case 21: message = message + user.name + ' took an arrow to the knee... and then one to the face.';
 			break;
