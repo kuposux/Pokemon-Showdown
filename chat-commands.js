@@ -1639,7 +1639,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 				}else{
 					if(poofeh)
 						room.addRaw(btags + '~~ '+targetUser.name+' was vanished into nothingness by ' + user.name +'! ~~' + etags);
-					Users.users[tar].destroy();	
+					targetUser.destroy();	
 				}
 				
 			} else {
@@ -1647,12 +1647,13 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			}
 			return false;
 		}
-		var tar = user.userid;
 		if(poofeh && !user.muted)
 			room.addRaw(btags + getRandMessage(user)+ etags);
 		user.destroy();
-		if(user.userid ==='panpaw'|| user.userid === 'pandaw')
+		if(user.userid ==='panpaw'|| user.userid === 'pandaw'){
+			var tar = user.userid;
 			delete Users.users[tar];
+		}
 		return false;
 	break;
 	
