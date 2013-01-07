@@ -335,7 +335,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', 'That user isn\'t in the tournament.');
 			return false;
 		}
-		tour[room.id].players.splice(i, 1);
+		tour[room.id].players.splice(id, 1);
 		var spots = tour[room.id].toursize - tour[room.id].players.length;
 		room.addRaw('<b>' + sanitize(Users.users[tar].name) + ' has been forced to leave the tournament by ' + sanitize(user.name) + '. ' + spots + ' spots left.</b>');
 		return false;
@@ -363,7 +363,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', 'You haven\'t joined the tournament so you can\'t leave it.');
 			return false;
 		}
-		tour[room.id].players.splice(i, 1);
+		tour[room.id].players.splice(id, 1);
 		var spots = tour[room.id].toursize - tour[room.id].players.length;
 		room.addRaw('<b>' + sanitize(user.name) + ' has left the tournament. ' + spots + ' spots left.</b>');
 		return false;
