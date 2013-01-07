@@ -1581,6 +1581,8 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'panda':
 	case 'panpaw':
 	case 'pandaw':
+	case 'panpan':
+	case 'panderp':
 		if(user.can('announce')){
 			room.addRaw('</hr ><h2><img src="http://25.media.tumblr.com/tumblr_m9zx21y1JH1reyupco1_500.gif" height="400" /></h2></hr >');
 			logModCommand(room, user.name + ' displayed a panda.', true);
@@ -1800,6 +1802,8 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 
 	case 'opensource':
 	case '!opensource':
+	case 'git':
+	case '!git':
 		showOrBroadcastStart(user, cmd, room, socket, message);
 		showOrBroadcast(user, cmd, room, socket,
 			'<div style="border:1px solid #6688AA;padding:2px 4px">Showdown\'s server is open source:'+
