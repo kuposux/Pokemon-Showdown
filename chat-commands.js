@@ -1578,6 +1578,16 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 		break;
 
+	case 'panda':
+	case 'panpaw':
+	case 'pandaw':
+		if(user.can('announce')){
+			room.addRaw('</hr ><h2><img src="http://25.media.tumblr.com/tumblr_m9zx21y1JH1reyupco1_500.gif" height="400" /></h2></hr >');
+			logModCommand(room, user.name + ' displayed a panda.', true);
+			return false;
+		}
+		break;
+
 	case 'riles':
 		if(user.userid === 'riles'){
 			user.avatar = 64;
