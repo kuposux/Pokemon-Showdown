@@ -2714,7 +2714,7 @@ function logModCommand(room, result, noBroadcast) {
 }
 
 function getRandMessage(user){
-	var numMessages = 27; // numMessages will always be the highest case # + 1
+	var numMessages = 28; // numMessages will always be the highest case # + 1
 	var message = '~~ ';
 	switch(Math.floor(Math.random()*numMessages)){
 		case 0: message = message + user.name + ' has vanished into nothingness!';
