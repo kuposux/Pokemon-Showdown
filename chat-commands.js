@@ -1535,7 +1535,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'woo':
 	case 'wooper':
 		if (user.can('announce')) {
-			room.addRaw('<div style="background-color:#6688AA;color::white;padding:2px 4px"><img src="white;padding:2px 4px"><img src="http://25.media.tumblr.com/tumblr_m8yte8ejcq1rulhyto1_500.gif" width="475" /></div>');
+			room.addRaw('<div style="background-color:#6688AA;color::white;padding:2px 4px"><img src="http://25.media.tumblr.com/tumblr_m8yte8ejcq1rulhyto1_500.gif" width="475" /></div>');
 			logModCommand(room,user.name+' used woooooper!',true);
 			return false;
 		}
