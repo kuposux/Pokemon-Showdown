@@ -1695,7 +1695,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		};
 		
 		if (!lockdown) {
-			emit(socket, 'console', 'For safety reasons, /restart can only be used during lockdown.');
+			emit(socket, 'console', 'For safety reasons, /alertall can only be used during lockdown.');
 			return false;
 		}
 
