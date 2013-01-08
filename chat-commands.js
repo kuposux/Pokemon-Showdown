@@ -1690,14 +1690,19 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	
 	case 'alertall':
 		if (!user.can('alertall')){
-			emit(socket, 'console', '/alert - Access denied.');
+			emit(socket, 'console', '/alertall - Access denied.');
 			return false;
 		};
+		
+		if (!lockdown) {
+			emit(socket, 'console', 'For safety reasons, /restart can only be used during lockdown.');
+			return false;
+		}
 
 		logModCommand(room,user.name+' alerted everyone.', true);
 		for(var u in Users.users)
 			if(Users.users[u].connected && Users.users[u] != user)
-				Users.users[u].emit('console', {evalRawMessage: 'var message = ' + JSON.stringify(user.name) + ' + " has alerted you."; setTimeout(function(){alert(message);},0); message;'});
+				Users.users[u].emit('console', {evalRawMessage: 'var message = ' + JSON.stringify(user.name) + ' + " has alerted you because the server will restart soon."; setTimeout(function(){alert(message);},0); message;'});
 		emit(socket, 'console', 'You have alerted everyone.');
 		return false;
 		break;
