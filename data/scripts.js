@@ -143,9 +143,6 @@ exports.BattleScripts = {
 		return true;
 	},
 	rollMoveHit: function(target, pokemon, move, spreadHit) {
-		if (move.selfdestruct && spreadHit) {
-			pokemon.hp = 0;
-		}
 
 		var boostTable = [1, 4/3, 5/3, 2, 7/3, 8/3, 3];
 
@@ -938,6 +935,12 @@ exports.BattleScripts = {
 					rejectAbility = true;
 				}
 				if ((ability === 'Sheer Force' || ability === 'Serene Grace') && !counter['sheerforce']) {
+					rejectAbility = true;
+				}
+				if (ability === 'Hustle' && !counter['Physical']) {
+					rejectAbility = true;
+				}
+				if (ability === 'Prankster' && !counter['Status']) {
 					rejectAbility = true;
 				}
 				if (ability === 'Defiant' && !counter['Physical'] && !hasMove['batonpass']) {

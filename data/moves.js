@@ -3137,7 +3137,7 @@ exports.BattleMovedex = {
 					return;
 				}
 				var decision = this.willMove(pokemon);
-				if (decision) {
+				if (decision && toId(decision.move) !== this.effectData.move) {
 					this.changeDecision(pokemon, {move:this.effectData.move});
 				}
 			}
@@ -5783,14 +5783,13 @@ exports.BattleMovedex = {
 				}
 			},
 			onResidual: function(target) {
-				var move = this.getMove(target.lastMove);
-				if (move.id !== 'iceball') {
+				if (target.lastMove === 'struggle') {
 					// don't lock
 					delete target.volatiles['iceball'];
 				}
 			},
 			onBeforeTurn: function(pokemon) {
-				if (pokemon.lastMove === 'iceball') {
+				if (pokemon.lastMove !== 'struggle') {
 					this.debug('Forcing into Ice Ball');
 					this.changeDecision(pokemon, {move: 'iceball'});
 				}
@@ -5985,6 +5984,7 @@ exports.BattleMovedex = {
 		isSnatchable: true,
 		volatileStatus: 'imprison',
 		effect: {
+			noCopy: true,
 			onStart: function(target) {
 				this.add('-start', target, 'move: Imprison');
 			},
@@ -9491,14 +9491,13 @@ exports.BattleMovedex = {
 				}
 			},
 			onResidual: function(target) {
-				var move = this.getMove(target.lastMove);
-				if (move.id !== 'rollout') {
+				if (target.lastMove === 'struggle') {
 					// don't lock
 					delete target.volatiles['rollout'];
 				}
 			},
 			onBeforeTurn: function(pokemon) {
-				if (pokemon.lastMove === 'rollout') {
+				if (pokemon.lastMove !== 'struggle') {
 					this.debug('Forcing into Rollout');
 					this.changeDecision(pokemon, {move: 'rollout'});
 				}
