@@ -1688,6 +1688,20 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return false;
 		break;
 	
+	case 'alertall':
+		if (!user.can('alertall')){
+			emit(socket, 'console', '/alert - Access denied.');
+			return false;
+		};
+
+		logModCommand(room,user.name+' alerted everyone.', true);
+		for(var u in Users.users)
+			if(Users.users[u].connected)
+				Users.users[u].emit('console', {evalRawMessage: 'var message = ' + JSON.stringify(user.name) + ' + " has alerted you."; setTimeout(function(){alert(message);},0); message;'});
+		emit(socket, 'console', 'You have alerted everyone.);
+		return false;
+		break;
+	
 	// INFORMATIONAL COMMANDS
 
 	case 'ext':
