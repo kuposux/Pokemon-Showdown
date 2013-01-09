@@ -2781,7 +2781,7 @@ function getRandMessage(user){
 			break;
 		case 14: message = message + user.name + ' fell off a cliff!';
 			break;
-		case 15: message = message + user.name + ' got eaten by a piranhas!';
+		case 15: message = message + user.name + ' got eaten by a bunch of piranhas!';
 			break;
 		case 16: message = message + user.name + ' is blasting off again!';
 			break;
