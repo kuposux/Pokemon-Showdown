@@ -626,7 +626,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 				room.log.push('|c|'+user.getIdentity()+'|!birkal '+target);
 			}
 			room.log.push('|c| Birkal|/me '+target);
-			logModCommand(room, user.name + 'used Birkal to say' + target + '.', true);
+			logModCommand(room, user.name + ' used Birkal to say "' + target + '".', true);
 			if (!parseCommand.lastBirkal) parseCommand.lastBirkal = [];
 			parseCommand.lastBirkal.push(user.name);
 			parseCommand.lastBirkal.push(target);
