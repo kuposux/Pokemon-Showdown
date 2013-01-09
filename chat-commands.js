@@ -1640,7 +1640,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 					if(poofeh)
 						room.addRaw(btags + '~~ '+targetUser.name+' was vanished into nothingness by ' + user.name +'! ~~' + etags);
 					targetUser.destroy();
-					logModCommand(room, targetUser.name+ ' was poofed by ' + user, true);
+					logModCommand(room, targetUser.name+ ' was poofed by ' + user.name, true);
 				}
 				
 			} else {
