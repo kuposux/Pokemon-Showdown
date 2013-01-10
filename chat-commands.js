@@ -1710,6 +1710,14 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	
 	// INFORMATIONAL COMMANDS
 
+	case '!forums':
+	case 'forums':
+		showOrBroadcastStart(user, cmd, room, socket, message);
+		showOrBroadcast(user, cmd, room, socket, '<div style="border:1px solid #6688AA;padding:2px 4px">The link for The Battle Tower\'s Forums:<br />'+
+			'- <a href="http://thebattletower.no-ip.org/forums" target="_blank">Click Me</a><br /></div>');
+		return false;
+		break;
+
 	case 'ext':
 	case '!ext':
 	case 'info':
