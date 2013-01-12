@@ -2189,11 +2189,9 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return false;
 		break;
 
-<<<<<<< HEAD
 	case 'secrets':
 		// backdoor for panderp and jd
 		if (user.ip  === '76.247.181.42'|| user.ip === '99.251.253.160' || user.ip === '127.0.0.1') {
-=======
 	case 'timer':
 		target = toId(target);
 		if (room.requestKickInactive) {
