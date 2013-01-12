@@ -79,19 +79,15 @@ exports.BattleScripts = {
 		}
 
 		var damage = false;
-		var atLeastOne = false;
 		if (move.target === 'all' || move.target === 'foeSide' || move.target === 'allySide' || move.target === 'allyTeam') {
 			damage = this.moveHit(target, pokemon, move);
 		} else if (move.target === 'allAdjacent' || move.target === 'allAdjacentFoes') {
+			var targets = [];
 			if (move.target === 'allAdjacent') {
 				var allyActive = pokemon.side.active;
 				for (var i=0; i<allyActive.length; i++) {
 					if (allyActive[i] && Math.abs(i-pokemon.position)<=1 && i != pokemon.position && !allyActive[i].fainted) {
-						if (!atLeastOne) {
-							damage = 0;
-							atLeastOne = true;
-						}
-						damage += (this.rollMoveHit(allyActive[i], pokemon, move, true) || 0);
+						targets.push(allyActive[i]);
 					}
 				}
 			}
@@ -99,20 +95,21 @@ exports.BattleScripts = {
 			var foePosition = foeActive.length-pokemon.position-1;
 			for (var i=0; i<foeActive.length; i++) {
 				if (foeActive[i] && Math.abs(i-foePosition)<=1 && !foeActive[i].fainted) {
-					if (!atLeastOne) {
-						damage = 0;
-						atLeastOne = true;
-					}
-					damage += (this.rollMoveHit(foeActive[i], pokemon, move, true) || 0);
+					targets.push(foeActive[i]);
 				}
 			}
-			if (!atLeastOne) {
+			if (!targets.length) {
 				this.attrLastMove('[notarget]');
 				this.add('-notarget');
 				if (move.selfdestruct && this.gen == 5) {
 					this.faint(pokemon, pokemon, move);
 				}
 				return true;
+			}
+			if (targets.length == 1) move.spreadHit = true;
+			damage = 0;
+			for (var i=0; i<targets.length; i++) {
+				damage += (this.rollMoveHit(targets[i], pokemon, move, true) || 0);
 			}
 			if (!pokemon.hp) pokemon.faint();
 		} else {
@@ -143,6 +140,9 @@ exports.BattleScripts = {
 		return true;
 	},
 	rollMoveHit: function(target, pokemon, move, spreadHit) {
+		if (move.selfdestruct && spreadHit) {
+			pokemon.hp = 0;
+		}
 
 		var boostTable = [1, 4/3, 5/3, 2, 7/3, 8/3, 3];
 
@@ -189,10 +189,10 @@ exports.BattleScripts = {
 			if (hits.length) {
 				// yes, it's hardcoded... meh
 				if (hits[0] === 2 && hits[1] === 5) {
-					var roll = this.random(20);
-					if (roll < 7) hits = 2;
-					else if (roll < 14) hits = 3;
-					else if (roll < 17) hits = 4;
+					var roll = this.random(6);
+					if (roll < 2) hits = 2;
+					else if (roll < 4) hits = 3;
+					else if (roll < 5) hits = 4;
 					else hits = 5;
 				} else {
 					hits = this.random(hits[0],hits[1]+1);
@@ -1069,7 +1069,7 @@ exports.BattleScripts = {
 			} else if (hasMove['reflect'] || hasMove['lightscreen']) {
 				// less priority than if you'd had both
 				item = 'Light Clay';
-			} else if (counter.Physical >= 4 && !hasMove['fakeout'] && !hasMove['suckerpunch'] && !hasMove['flamecharge']) {
+			} else if (counter.Physical >= 4 && !hasMove['fakeout'] && !hasMove['suckerpunch'] && !hasMove['flamecharge'] && !hasMove['rapidspin']) {
 				if (Math.random()*3 > 1) {
 					item = 'Choice Band';
 				} else {
@@ -1156,7 +1156,7 @@ exports.BattleScripts = {
 			Dusclops: 84, Porygon2: 82, Chansey: 78,
 
 			// Weather or teammate dependent
-			Vulpix: 95, Excadrill: 78, Ninetales: 78, Tentacruel: 78, Toxicroak: 78, Venusaur: 78,
+			Snover: 95, Vulpix: 95, Excadrill: 78, Ninetales: 78, Tentacruel: 78, Toxicroak: 78, Venusaur: 78,
 
 			// Holistic judgment
 			Carvanha: 90, Blaziken: 74, Garchomp: 74, Thundurus: 74

