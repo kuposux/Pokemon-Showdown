@@ -2056,7 +2056,6 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	// Battle commands
 
 	case 'reset':
-	case 'restart':
 		emit(socket, 'console', 'This functionality is no longer available.');
 		return false;
 		break;
