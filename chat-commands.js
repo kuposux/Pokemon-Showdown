@@ -2894,7 +2894,7 @@ runCommand = function(command, args, socket) {
 					parseCommand = require('./chat-commands.js').parseCommand;
 					emit(socket, 'console', 'The game engine has been hot-patched.');
 					gitpulling = false;
-					room.addRaw('<div style="background:#7067AB;color:white;padding:2px 4px"><b>Server update finished.</b></div>');
+					rooms.lobby.addRaw('<div style="background:#7067AB;color:white;padding:2px 4px"><b>Server update finished.</b></div>');
 				}
 				else {
 					emit(socket, 'console', 'test3');
