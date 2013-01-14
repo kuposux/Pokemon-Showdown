@@ -353,7 +353,7 @@ runCommand = function(command, args, socket) {
 			//BattleSide = sim.BattleSide;
 			//Battle = sim.Battle;
 			emit(socket, 'console', 'The game engine has been hot-patched.');
-			gitpulling = false;
+			exports.gitpulling = false;
 			Rooms.lobby.addRaw('<div style="background:#7067AB;color:white;padding:2px 4px"><b>Server update finished.</b></div>');
 		}
 		});
