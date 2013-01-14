@@ -2885,11 +2885,9 @@ runCommand = function(command, args, socket) {
 		process.nextTick(function() {
 				pushBuffer('child process exited with code ' + code);
 				emit(socket, 'console', buffer);
-				//stevo was here and jd
+				//stevo was here and jd and pandaw
 				//if (command === "git," && args[1] === "pull") {
-				emit(socket, 'console', 'test1');
 				if (gitpulling) {
-					emit(socket, 'console', 'test2');
 					for (var i in require.cache) delete require.cache[i];
 					//Tools = require('./tools.js');
 					parseCommand = require('./chat-commands.js').parseCommand;
@@ -2898,7 +2896,7 @@ runCommand = function(command, args, socket) {
 					rooms.lobby.addRaw('<div style="background:#7067AB;color:white;padding:2px 4px"><b>Server update finished.</b></div>');
 				}
 				else {
-					emit(socket, 'console', 'test3');
+					emit(socket, 'console', 'hotpatch unsuccessful.');
 				}
 	
 			
