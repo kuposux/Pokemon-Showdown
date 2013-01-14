@@ -1306,6 +1306,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		var args = splitArgs('git, pull');
 		logModCommand(room,user.name+' pulled from git',true);
 		room.addRaw('<div style="background:#7067AB;color:white;padding:2px 4px"><b>Server updating... there might be some lag.</b></div>');
+		exports.gitpulling = true;
 		runCommand(args.shift(), args, socket);
 		//for (var i in require.cache) delete require.cache[i];
 		//Tools = require('./tools.js');
