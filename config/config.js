@@ -156,6 +156,7 @@ exports.port = 8000;
                               announce: true,
                               warn: true,
                               mute: true,
+                              modlog: true,
                               forcerename: true,
                               rank: 2
                       },
