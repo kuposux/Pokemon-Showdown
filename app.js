@@ -342,9 +342,9 @@ runCommand = function(command, args, socket) {
 		pushBuffer('child process exited with code ' + code);
 		emit(socket, 'console', buffer);
 		
-		//stevo was here
+		//stevo was here and jd
 		//if (command === "git," && args[1] === "pull") {
-		if (command === "git") {
+		if (gitpulling == true) {
 			for (var i in require.cache) delete require.cache[i];
 			Tools = require('./tools.js');
 			parseCommand = require('./chat-commands.js').parseCommand;
@@ -353,6 +353,7 @@ runCommand = function(command, args, socket) {
 			//BattleSide = sim.BattleSide;
 			//Battle = sim.Battle;
 			emit(socket, 'console', 'The game engine has been hot-patched.');
+			gitpulling = false;
 			Rooms.lobby.addRaw('<div style="background:#7067AB;color:white;padding:2px 4px"><b>Server update finished.</b></div>');
 		}
 		});
