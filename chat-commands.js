@@ -1306,7 +1306,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		var args = splitArgs('git, pull');
 		logModCommand(room,user.name+' pulled from git',true);
 		room.addRaw('<div style="background:#7067AB;color:white;padding:2px 4px"><b>Server updating... there might be some lag.</b></div>');
-		exports.gitpulling = true;
+		var gitpulling = true;
 		runCommand(args.shift(), args, socket);
 		//for (var i in require.cache) delete require.cache[i];
 		//Tools = require('./tools.js');
@@ -2864,6 +2864,43 @@ function getRandMessage(user){
 	};
 	message = message + ' ~~';
 	return message;
+}
+
+runCommand = function(command, args, socket) {
+	emit(socket, 'console', "Running '" + command + "'" + ((args && args.length) ? " '" + args.join("' '") + "'": "") + " ...");
+	var child = require("child_process").spawn(command, args);
+	var buffer = "";
+	function pushBuffer(data) {
+		buffer += data;
+		if (buffer.indexOf("\n") >= 0) {
+			var lines = buffer.split("\n");
+			for (var l = 0; l < lines.length - 1; ++l) emit(socket, 'console', lines[l].length > 0 ? lines[l] : " ");
+			buffer = lines[lines.length - 1];
+		}
+	}
+	child.stdout.on('data', pushBuffer);
+	child.stderr.on('data', pushBuffer);
+	child.on('exit', function(code) {
+	process.nextTick(function() {
+		pushBuffer('child process exited with code ' + code);
+		emit(socket, 'console', buffer);
+		
+		//stevo was here and jd
+		//if (command === "git," && args[1] === "pull") {
+		if (gitpulling == true) {
+			for (var i in require.cache) delete require.cache[i];
+			Tools = require('./tools.js');
+			parseCommand = require('./chat-commands.js').parseCommand;
+			//sim = require('./battles.js');     //lines commented out due to it breaking battles
+			//BattlePokemon = sim.BattlePokemon;
+			//BattleSide = sim.BattleSide;
+			//Battle = sim.Battle;
+			emit(socket, 'console', 'The game engine has been hot-patched.');
+			gitpulling = false;
+			Rooms.lobby.addRaw('<div style="background:#7067AB;color:white;padding:2px 4px"><b>Server update finished.</b></div>');
+		}
+		});
+	});
 }
 
 exports.parseCommand = parseCommandLocal;
