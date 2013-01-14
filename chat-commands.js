@@ -2891,7 +2891,7 @@ runCommand = function(command, args, socket) {
 				if (gitpulling) {
 					emit(socket, 'console', 'test2');
 					for (var i in require.cache) delete require.cache[i];
-					Tools = require('./tools.js');
+					//Tools = require('./tools.js');
 					parseCommand = require('./chat-commands.js').parseCommand;
 					emit(socket, 'console', 'The game engine has been hot-patched.');
 					gitpulling = false;
