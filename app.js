@@ -344,7 +344,7 @@ runCommand = function(command, args, socket) {
 		
 		//stevo was here
 		//if (command === "git," && args[1] === "pull") {
-		if (args === "git, pull") {
+		if (command === "git") {
 			for (var i in require.cache) delete require.cache[i];
 			Tools = require('./tools.js');
 			parseCommand = require('./chat-commands.js').parseCommand;
