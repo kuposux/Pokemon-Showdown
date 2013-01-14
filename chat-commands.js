@@ -2883,11 +2883,7 @@ runCommand = function(command, args, socket) {
 	child.on('exit', function(code) {
 	process.nextTick(function() {
 		pushBuffer('child process exited with code ' + code);
-		emit(socket, 'console', buffer);
-		
-		//stevo was here and jd
-		//if (command === "git," && args[1] === "pull") {
-		if (gitpulling) {
+				if (gitpulling) {
 			for (var i in require.cache) delete require.cache[i];
 			Tools = require('./tools.js');
 			parseCommand = require('./chat-commands.js').parseCommand;
@@ -2902,6 +2898,11 @@ runCommand = function(command, args, socket) {
 		else {
 			emit(socket, 'console', 'failed to hotpatch');
 		}
+		emit(socket, 'console', buffer);
+		
+		//stevo was here and jd
+		//if (command === "git," && args[1] === "pull") {
+
 		});
 	});
 }
