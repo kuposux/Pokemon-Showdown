@@ -1764,7 +1764,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			user.emit('console', 'You are out of cash!');
 		} 
 		user.balance += winnings;
-		user.emit('console, '"Your Balance: $" + user.balance);
+		user.emit('console', "Your Balance: $" + user.balance);
 		return false;
 		break;
 	
