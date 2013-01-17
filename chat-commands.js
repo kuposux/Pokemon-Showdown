@@ -1764,12 +1764,18 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			user.emit('console', 'You are out of cash!');
 		} 
 		user.balance += winnings;
-		user.emit('console, '"Your Balance: $" + this.balance);
+		user.emit('console, '"Your Balance: $" + user.balance);
 		return false;
 		break;
 	
 	case 'balance':
 		user.emit('console', 'Your current balance is ' + user.balance);
+		return false;
+		break;
+	
+	case 'maxwin':
+		user.emit('console', 'The Maximum you have won is ' + user.maxWin);
+		user.emit('console', 'The maximum amount of money you have held is ' + user.maxBalance);
 		return false;
 		break;
 	
