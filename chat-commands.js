@@ -1757,7 +1757,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			this.maxBalance = this.balance;
 		} 
 		
-		user.emit('console', 'you' + ((winnings < 0) ? " lost":" won") + " $" + Math.abs(winnings) + "!"); 
+		user.emit('console', 'You' + ((winnings < 0) ? " lost":" won") + " $" + Math.abs(winnings) + "!"); 
 		
 		if (user.balance + winnings <= 0) {
 			user.balance = 0; 
@@ -1774,7 +1774,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 	
 	case 'maxwin':
-		user.emit('console', 'The Maximum you have won is ' + user.maxWin);
+		user.emit('console', 'The maximum you have won is ' + user.maxWin);
 		user.emit('console', 'The maximum amount of money you have held is ' + user.maxBalance);
 		return false;
 		break;
