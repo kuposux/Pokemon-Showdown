@@ -1775,7 +1775,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	
 	case 'maxwin':
 		user.emit('console', 'The maximum you have won is $' + user.maxWin);
-		user.emit('console', 'The maximum amount of money you have held is ' + user.maxBalance);
+		user.emit('console', 'The maximum amount of money you have held is $' + user.maxBalance);
 		return false;
 		break;
 	
