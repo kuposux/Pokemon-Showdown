@@ -2274,6 +2274,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'allowchallenges':
 	case 'back':
 	case 'ac':
+	case 'unidle':
 		user.allowChallenges = true;
 		emit(socket, 'console', 'You are available for challenges from now on.');
 		return false;
