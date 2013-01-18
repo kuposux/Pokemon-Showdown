@@ -844,7 +844,10 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		barn = true;
 	case 'ban':
 	case 'b':
-		if (!target) return parseCommand(user, '?', cmd, room, socket);
+		if (!target){
+			barn = false;
+			 return parseCommand(user, '?', cmd, room, socket);
+		}
 		var targets = splitTarget(target);
 		var targetUser = targets[0];
 		if (!targetUser) {
@@ -943,7 +946,10 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'unbarn':
 		unbarn = true;
 	case 'unban':
-		if (!target) return parseCommand(user, '?', cmd, room, socket);
+		if (!target){ 
+			unbarn = false;
+			return parseCommand(user, '?', cmd, room, socket);
+		}
 		if (!user.can('ban')) {
 			emit(socket, 'console', '/unban - Access denied.');
 			unbarn = false;
