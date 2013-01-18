@@ -841,6 +841,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 
 	case 'ban':
 	case 'b':
+	case 'barn':
 		if (!target) return parseCommand(user, '?', cmd, room, socket);
 		var targets = splitTarget(target);
 		var targetUser = targets[0];
