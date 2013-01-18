@@ -722,6 +722,12 @@ exports.BattleMovedex = {
 			duration: 1,
 			onStart: function(pokemon) {
 				this.effectData.index = 0;
+				while (pokemon.side.pokemon[this.effectData.index] !== pokemon &&
+					(!pokemon.side.pokemon[this.effectData.index] ||
+					pokemon.side.pokemon[this.effectData.index].fainted ||
+					pokemon.side.pokemon[this.effectData.index].status)) {
+					this.effectData.index++;
+				}
 			},
 			onRestart: function(pokemon) {
 				do {
@@ -2284,21 +2290,10 @@ exports.BattleMovedex = {
 		name: "Detect",
 		pp: 5,
 		priority: 4,
-		stallingMove: true, // decrease success of repeated use to 50%
+		stallingMove: true, // Note: stallingMove is not used anywhere.
 		volatileStatus: 'protect',
 		onTryHit: function(pokemon) {
-			if (!this.willAct()) {
-				return false;
-			}
-			var counter = 1;
-			if (pokemon.volatiles['stall']) {
-				counter = pokemon.volatiles['stall'].counter || 1;
-			}
-			if (counter >= 256) {
-				return (this.random()*4294967296 < 1); // 2^32 - special-cased because Battle.random(n) can't handle n > 2^16 - 1
-			}
-			this.debug("Success chance: "+Math.round(100/counter)+"%");
-			return (this.random(counter) === 0);
+			return this.willAct() && this.runEvent('StallMove', pokemon);
 		},
 		onHit: function(pokemon) {
 			pokemon.addVolatile('stall');
@@ -3180,21 +3175,10 @@ exports.BattleMovedex = {
 		name: "Endure",
 		pp: 10,
 		priority: 4,
-		stallingMove: true, // decrease success of repeated use to 50%
+		stallingMove: true, // Note: stallingMove is not used anywhere.
 		volatileStatus: 'endure',
 		onTryHit: function(pokemon) {
-			if (!this.willAct()) {
-				return false;
-			}
-			var counter = 1;
-			if (pokemon.volatiles['stall']) {
-				counter = pokemon.volatiles['stall'].counter || 1;
-			}
-			if (counter >= 256) {
-				return (this.random()*4294967296 < 1); // 2^32 - special-cased because Battle.random(n) can't handle n > 2^16 - 1
-			}
-			this.debug("Success chance: "+Math.round(100/counter)+"%");
-			return (this.random(counter) === 0);
+			return this.willAct() && this.runEvent('StallMove', pokemon);
 		},
 		onHit: function(pokemon) {
 			pokemon.addVolatile('stall');
@@ -5268,7 +5252,7 @@ exports.BattleMovedex = {
 		isContact: true,
 		hasCustomRecoil: true,
 		onMoveFail: function(target, source, move) {
-			this.damage(source.maxhp/2, source);
+			this.damage(source.maxhp/2, source, source, {id:'hijumpkick'});
 		},
 		secondary: false,
 		target: "normal",
@@ -6172,7 +6156,7 @@ exports.BattleMovedex = {
 		isContact: true,
 		hasCustomRecoil: true,
 		onMoveFail: function(target, source, move) {
-			this.damage(source.maxhp/2, source);
+			this.damage(source.maxhp/2, source, source, {id:'jumpkick'});
 		},
 		secondary: false,
 		target: "normal",
@@ -6393,7 +6377,7 @@ exports.BattleMovedex = {
 		},
 		onTryHit: function(target) {
 			if (target.hasType('Grass')) {
-				this.add('-immune', target.id, '[msg]');
+				this.add('-immune', target, '[msg]');
 				return null;
 			}
 		},
@@ -6463,7 +6447,8 @@ exports.BattleMovedex = {
 			onFoeBasePower: function(basePower, attacker, defender, move) {
 				if (move.category === 'Special' && defender.side === this.effectData.target) {
 					if (!move.crit && attacker.ability !== 'infiltrator') {
-						this.debug('Light Screen weaken');
+						this.debug('Light Screen weaken')
+						if (attacker.side.active.length > 1) return basePower*2/3;
 						return basePower/2;
 					}
 				}
@@ -8363,21 +8348,10 @@ exports.BattleMovedex = {
 		name: "Protect",
 		pp: 10,
 		priority: 4,
-		stallingMove: true, // decrease success of repeated use to 50%
+		stallingMove: true, // Note: stallingMove is not used anywhere.
 		volatileStatus: 'protect',
 		onTryHit: function(pokemon) {
-			if (!this.willAct()) {
-				return false;
-			}
-			var counter = 1;
-			if (pokemon.volatiles['stall']) {
-				counter = pokemon.volatiles['stall'].counter || 1;
-			}
-			if (counter >= 256) {
-				return (this.random()*4294967296 < 1); // 2^32 - special-cased because Battle.random(n) can't handle n > 2^16 - 1
-			}
-			this.debug("Success chance: "+Math.round(100/counter)+"%");
-			return (this.random(counter) === 0);
+			return this.willAct() && this.runEvent('StallMove', pokemon);
 		},
 		onHit: function(pokemon) {
 			pokemon.addVolatile('stall');
@@ -8713,19 +8687,9 @@ exports.BattleMovedex = {
 		priority: 3,
 		isSnatchable: true,
 		sideCondition: 'quickguard',
+		stallingMove: true, // Note: stallingMove is not used anywhere.
 		onTryHitSide: function(side, source) {
-			if (!this.willAct()) {
-				return false;
-			}
-			var counter = 1;
-			if (source.volatiles['stall']) {
-				counter = source.volatiles['stall'].counter || 1;
-			}
-			if (counter >= 256) {
-				return (this.random()*4294967296 < 1); // 2^32 - special-cased because Battle.random(n) can't handle n > 2^16 - 1
-			}
-			this.debug("Success chance: "+Math.round(100/counter)+"%");
-			return (this.random(counter) === 0);
+			return this.willAct() && this.runEvent('StallMove', source);
 		},
 		onHitSide: function(side, source) {
 			source.addVolatile('stall');
@@ -8999,6 +8963,7 @@ exports.BattleMovedex = {
 				if (move.category === 'Physical' && defender.side === this.effectData.target) {
 					if (!move.crit && attacker.ability !== 'infiltrator') {
 						this.debug('Reflect weaken');
+						if (attacker.side.active.length > 1) return basePower*2/3;
 						return basePower/2;
 					}
 				}
@@ -12944,19 +12909,9 @@ exports.BattleMovedex = {
 		priority: 3,
 		isSnatchable: true,
 		sideCondition: 'wideguard',
+		stallingMove: true, // Note: stallingMove is not used anywhere.
 		onTryHitSide: function(side, source) {
-			if (!this.willAct()) {
-				return false;
-			}
-			var counter = 1;
-			if (source.volatiles['stall']) {
-				counter = source.volatiles['stall'].counter || 1;
-			}
-			if (counter >= 256) {
-				return (this.random()*4294967296 < 1); // 2^32 - special-cased because Battle.random(n) can't handle n > 2^16 - 1
-			}
-			this.debug("Success chance: "+Math.round(100/counter)+"%");
-			return (this.random(counter) === 0);
+			return this.willAct() && this.runEvent('StallMove', source);
 		},
 		onHitSide: function(side, source) {
 			source.addVolatile('stall');

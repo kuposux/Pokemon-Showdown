@@ -1488,6 +1488,7 @@ function Battle(roomid, format, rated) {
 					BeforeMove: 1,
 					BasePower: 1,
 					Immunity: 1,
+					Accuracy: 1,
 					Damage: 1,
 					SubDamage: 1,
 					Heal: 1,
@@ -1505,7 +1506,7 @@ function Battle(roomid, format, rated) {
 					Boost: 1,
 					DragOut: 1
 				};
-				if (AttackingEvents[eventid]) {
+				if (eventid in AttackingEvents) {
 					if (eventid !== 'ModifyPokemon' && eventid !== 'ModifyStats') {
 						selfB.debug(eventid+' handler suppressed by Mold Breaker');
 					}
@@ -1730,6 +1731,7 @@ function Battle(roomid, format, rated) {
 				return !a.fainted;
 			}
 			function shouldSwitch(a) {
+				if (!a) return false;
 				if (!switchablesLeft) {
 					a.switchFlag = false;
 					return false;

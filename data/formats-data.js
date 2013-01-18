@@ -966,7 +966,7 @@ exports.BattleFormatsData = {
 			{"generation":3,"level":39,"gender":"F","moves":["sweetkiss","thunderbolt","softboiled","skillswap"]}
 		],
 		dreamWorldRelease: true,
-		tier: "UU"
+		tier: "BL"
 	},
 	blissey: {
 		viableMoves: {"wish":1,"softboiled":1,"protect":1,"toxic":1,"aromatherapy":1,"seismictoss":1,"counter":1,"thunderwave":1,"stealthrock":1,"flamethrower":1,"icebeam":1},
@@ -2924,7 +2924,7 @@ exports.BattleFormatsData = {
 		tier: "UU"
 	},
 	latias: {
-		viableMoves: {"dragonpulse":1,"surf":1,"hiddenpowerfire":1,"roost":1,"calmmind":1,"healingwish":1},
+		viableMoves: {"dragonpulse":1,"surf":1,"thunderbolt":1,"roost":1,"calmmind":1,"healingwish":1},
 		eventPokemon: [
 			{"generation":3,"level":50,"gender":"F","moves":["charm","recover","psychic","mistball"]},
 			{"generation":3,"level":70,"gender":"F","moves":["mistball","psychic","recover","charm"]},
@@ -2933,7 +2933,7 @@ exports.BattleFormatsData = {
 		tier: "OU"
 	},
 	latios: {
-		viableMoves: {"dracometeor":1,"dragonpulse":1,"surf":1,"hiddenpowerfire":1,"psyshock":1,"roost":1},
+		viableMoves: {"dracometeor":1,"dragonpulse":1,"surf":1,"thunderbolt":1,"psyshock":1,"roost":1},
 		eventPokemon: [
 			{"generation":3,"level":50,"gender":"M","moves":["dragondance","recover","psychic","lusterpurge"]},
 			{"generation":3,"level":70,"gender":"M","moves":["lusterpurge","psychic","recover","dragondance"]},
@@ -4510,7 +4510,7 @@ exports.BattleFormatsData = {
 	},
 	tornadustherian: {
 		viableMoves: {"hurricane":1,"airslash":1,"focusblast":1,"uturn":1,"heatwave":1},
-		tier: "OU"
+		tier: "Uber"
 	},
 	thundurus: {
 		viableMoves: {"thunderwave":1,"nastyplot":1,"thunderbolt":1,"hiddenpowerice":1,"focusblast":1,"grassknot":1,"substitute":1},

@@ -17,6 +17,9 @@ function getUser(name, exactName) {
 	}
 	return users[userid];
 }
+function getExactUser(name) {
+	return getUser(name, true);
+}
 function searchUser(name) {
 	var userid = toUserid(name);
 	while (userid && !users[userid]) {
@@ -146,6 +149,7 @@ var User = (function () {
 		this.balance = 0;
 		this.maxBalance = 0;
 		this.maxWin = 0;
+		this.allowChallenges = true;
 
 		var trainersprites = [1, 2, 101, 102, 169, 170, 265, 266];
 		this.avatar = trainersprites[Math.floor(Math.random()*trainersprites.length)];
@@ -839,6 +843,9 @@ var User = (function () {
 		if (!user || this.challengeTo) {
 			return false;
 		}
+		if (!user.allowChallenges) {
+			return false;
+		}
 		if (new Date().getTime() < this.lastChallenge + 10000) {
 			// 10 seconds ago
 			return false;
@@ -1009,6 +1016,7 @@ function ipSearch(ip, table) {
 }
 
 exports.get = getUser;
+exports.getExact = getExactUser;
 exports.searchUser = searchUser;
 exports.connectUser = connectUser;
 exports.users = users;

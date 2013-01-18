@@ -1108,6 +1108,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 
 	case 'unmute':
+	case 'um':
 		if (!target) return parseCommand(user, '?', cmd, room, socket);
 		var targetid = toUserid(target);
 		var targetUser = Users.get(target);
@@ -1991,7 +1992,9 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			'- <a href="http://www.smogon.com/forums/showthread.php?t=3463764" target="_blank">Balanced Hackmons</a><br />' +
 			'- <a href="http://www.smogon.com/forums/showthread.php?t=3471810" target="_blank">Dream World OU</a><br />' +
 			'- <a href="http://www.smogon.com/forums/showthread.php?t=3467120" target="_blank">Glitchmons</a><br />' +
-			'- <a href="http://www.smogon.com/forums/showthread.php?t=3476006" target="_blank">Seasonal: Winter Wonderland</a>' +
+			'- <a href="http://www.smogon.com/forums/showthread.php?t=3476006" target="_blank">Seasonal: Winter Wonderland</a><br />' +
+			'- <a href="http://www.smogon.com/forums/showthread.php?t=3476469" target="_blank">Smogon Doubles</a><br />' +
+			'- <a href="http://www.smogon.com/forums/showthread.php?t=3471161" target="_blank">VGC 2013</a>' +
 			'</div>');
 		return false;
 		break;
@@ -2005,6 +2008,45 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			'<div style="border:1px solid #6688AA;padding:2px 4px">Please follow the rules:<br />' +
 			'- <a href="http://www.smogon.com/sim/rules" target="_blank">Rules</a><br />' +
 			'</div>');
+		return false;
+		break;
+		
+	case 'faq':
+	case '!faq':
+		target = target.toLowerCase();
+		var buffer = '<div style="border:1px solid #6688AA;padding:2px 4px">';
+		var matched = false;
+		if (!target || target === 'all') {
+			matched = true;
+			buffer += '<a href="http://www.smogon.com/sim/faq" target="_blank">Frequently Asked Questions</a><br />';
+		}
+		if (target === 'all' || target === 'deviation') {
+			matched = true;
+			buffer += '<a href="http://www.smogon.com/sim/faq#deviation" target="_blank">Why did this user gain or lose so many points?</a><br />';
+		}
+		if (target === 'all' || target === 'doubles' || target === 'triples' || target === 'rotation') {
+			matched = true;
+			buffer += '<a href="http://www.smogon.com/sim/faq#doubles" target="_blank">Can I play doubles/triples/rotation battles here?</a><br />';
+		}
+		if (target === 'all' || target === 'randomcap') {
+			matched = true;
+			buffer += '<a href="http://www.smogon.com/sim/faq#randomcap" target="_blank">What is this fakemon and what is it doing in my random battle?</a><br />';
+		}
+		if (target === 'all' || target === 'restarts') {
+			matched = true;
+			buffer += '<a href="http://www.smogon.com/sim/faq#restarts" target="_blank">Why is the server restarting?</a><br />';
+		}
+		if (target === 'all' || target === 'staff') {
+			matched = true;
+			buffer += '<a href="http://www.smogon.com/sim/staff_faq" target="_blank">Staff FAQ</a><br />';
+		}
+		if (!matched) {
+			emit(socket, 'console', 'The FAQ entry "'+target+'" was not found. Try /faq for general help.');
+			return false;
+		}
+		buffer += '</div>';
+		showOrBroadcastStart(user, cmd, room, socket, message);
+		showOrBroadcast(user, cmd, room, socket, buffer);
 		return false;
 		break;
 
@@ -2207,6 +2249,10 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'message', "The user '"+targets[2]+"' was not found.");
 			return false;
 		}
+		if (!targetUser.allowChallenges) {
+			emit(socket, 'message', "The user '"+targets[2]+"' is not accepting challenges right now.");
+			return false;
+		}
 		if (typeof target !== 'string') target = 'debugmode';
 		var problems = Tools.validateTeam(user.team, target);
 		if (problems) {
@@ -2214,6 +2260,22 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			return false;
 		}
 		user.makeChallenge(targetUser, target);
+		return false;
+		break;
+		
+	case 'blockchallenges':
+	case 'idle':
+	case 'bc':
+		user.allowChallenges = false;
+		emit(socket, 'console', 'You are now blocking all incoming challenge requests.');
+		return false;
+		break;
+
+	case 'allowchallenges':
+	case 'back':
+	case 'ac':
+		user.allowChallenges = true;
+		emit(socket, 'console', 'You are available for challenges from now on.');
 		return false;
 		break;
 
@@ -2630,11 +2692,19 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', '/calc - Provides a link to a damage calculator');
 			emit(socket, 'console', '!calc - Shows everyone a link to a damage calculator. Requires: + % @ & ~');
 		}
-		if (target === '@' || target === 'altcheck' || target === 'alt' || target === 'alts' || target === 'getalts') {
+		if (target === 'all' || target === 'blockchallenges' || target === 'bc' || target === 'idle') {
+			matched = true;
+			emit(socket, 'console', '/blockchallenges OR /bc OR /idle - Blocks challenges so no one can challenge you.');
+		}
+		if (target === 'all' || target === 'allowchallenges' || target === 'ac' || target === 'back') {
+			matched = true;
+			emit(socket, 'console', '/allowchallenges OR /ac OR /back - Unlocks challenges so you can be challenged again.');
+		}
+		if (target === '%' || target === 'altcheck' || target === 'alt' || target === 'alts' || target === 'getalts') {
 			matched = true;
 			emit(socket, 'console', '/alts OR /altcheck OR /alt OR /getalts [username] - Get a user\'s alts. Requires: @ & ~');
 		}
-		if (target === '@' || target === 'forcerename' || target === 'fr') {
+		if (target === '%' || target === 'forcerename' || target === 'fr') {
 			matched = true;
 			emit(socket, 'console', '/forcerename OR /fr [username], [reason] - Forcibly change a user\'s name and shows them the [reason]. Requires: @ & ~');
 		}
@@ -2734,7 +2804,9 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 				emit(socket, 'console', 'TRIAL COMMANDS: /mute, /unmute, /forcerename, /modlog, /announce')
 				emit(socket, 'console', 'MODERATOR COMMANDS: /alts, /forcerenameto, /ban, /unban, /unbanall, /potd, /namelock, /nameunlock, /ip, /redirect, /kick');
 				emit(socket, 'console', 'LEADER COMMANDS: /promote, /demote, /forcewin, /declare');
-				emit(socket, 'console', 'For details on all moderator commands, use /help @');
+				emit(socket, 'console', 'COMMANDS: /msg, /reply, /ip, /rating, /nick, /avatar, /rooms, /whois, /help, /blockchallenges, /allowchallenges');
+				emit(socket, 'console', 'INFORMATIONAL COMMANDS: /data, /groups, /opensource, /avatars, /tiers, /intro, /learn, /analysis (replace / with ! to broadcast. (Requires: + % @ & ~))');
+				emit(socket, 'console', 'For details on all commands, use /help all');
 			}
 			emit(socket, 'console', 'For details of a specific command, use something like: /help data');
 		} else if (!matched) {
@@ -2873,7 +2945,7 @@ function splitTarget(target, exactName) {
 		return [Users.get(target, exactName), '', target];
 	}
 	var targetUser = Users.get(target.substr(0, commaIndex), exactName);
-	if (!targetUser || !targetUser.connected) {
+	if (!targetUser) {
 		targetUser = null;
 	}
 	return [targetUser, target.substr(commaIndex+1).trim(), target.substr(0, commaIndex)];

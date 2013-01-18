@@ -35,7 +35,8 @@ function BattleRoom(roomid, format, p1, p2, parentid, rated) {
 	this.p1 = p1 || '';
 	this.p2 = p2 || '';
 
-	this.sideTicksLeft = [18, 18];
+	this.sideTicksLeft = [21, 21];
+	if (!rated) this.sideTicksLeft = [28,28];
 	this.sideFreeTicks = [0, 0];
 	this.maxTicksLeft = 0;
 
@@ -109,9 +110,9 @@ function BattleRoom(roomid, format, p1, p2, parentid, rated) {
 			}
 
 			var p1 = rated.p1;
-			if (Users.get(rated.p1)) p1 = Users.get(rated.p1).name;
+			if (Users.getExact(rated.p1)) p1 = Users.getExact(rated.p1).name;
 			var p2 = rated.p2;
-			if (Users.get(rated.p2)) p2 = Users.get(rated.p2).name;
+			if (Users.getExact(rated.p2)) p2 = Users.getExact(rated.p2).name;
 
 			//update.updates.push('[DEBUG] uri: '+config.loginserver+'action.php?act=ladderupdate&serverid='+config.serverid+'&p1='+encodeURIComponent(p1)+'&p2='+encodeURIComponent(p2)+'&score='+p1score+'&format='+toId(rated.format)+'&servertoken=[token]');
 
@@ -448,11 +449,12 @@ function BattleRoom(roomid, format, p1, p2, parentid, rated) {
 
 		// a tick is 10 seconds
 
-		var maxTicksLeft = 12; // 2 minutes
+		var maxTicksLeft = 15; // 2 minutes 30 seconds
 		if (!selfR.battle.p1 || !selfR.battle.p2) {
 			// if a player has left, don't wait longer than 6 ticks (1 minute)
 			maxTicksLeft = 6;
 		}
+		if (!selfR.rated) maxTicksLeft = 30;
 		selfR.sideFreeTicks = [1,1];
 
 		selfR.maxTicksLeft = maxTicksLeft;
