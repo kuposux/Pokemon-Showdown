@@ -849,10 +849,12 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		var targetUser = targets[0];
 		if (!targetUser) {
 			emit(socket, 'console', 'User '+targets[2]+' not found.');
+			barn = false;
 			return false;
 		}
 		if (!user.can('ban', targetUser)) {
 			emit(socket, 'console', '/ban - Access denied.');
+			barn = false;
 			return false;
 		}
 
@@ -937,10 +939,14 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return false;
 		break;
 
+	var unbarn = false;
+	case 'unbarn':
+		unbarn = true;
 	case 'unban':
 		if (!target) return parseCommand(user, '?', cmd, room, socket);
 		if (!user.can('ban')) {
 			emit(socket, 'console', '/unban - Access denied.');
+			unbarn = false;
 			return false;
 		}
 
@@ -954,10 +960,11 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			}
 		}
 		if (success) {
-			logModCommand(room,''+target+' was unbanned by '+user.name+'.');
+			logModCommand(room,''+target+' was '+ (unbarn?'unbarned ':'unbanned ')+'by '+user.name+'.');
 		} else {
 			emit(socket, 'console', 'User '+target+' is not banned.');
 		}
+		unbarn = false;
 		return false;
 		break;
 
