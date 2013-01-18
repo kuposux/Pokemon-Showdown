@@ -838,10 +838,12 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 		return false;
 		break;
-
+	
+	var barn = false;
+	case 'barn':
+		barn = true;
 	case 'ban':
 	case 'b':
-	case 'barn':
 		if (!target) return parseCommand(user, '?', cmd, room, socket);
 		var targets = splitTarget(target);
 		var targetUser = targets[0];
@@ -854,12 +856,13 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			return false;
 		}
 
-		logModCommand(room,""+targetUser.name+" was banned by "+user.name+"." + (targets[1] ? " (" + targets[1] + ")" : ""));
-		targetUser.emit('message', user.name+' has banned you.  If you feel that your banning was unjustified you can <a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=75" target="_blank">appeal the ban</a>. '+targets[1]);
+		logModCommand(room,""+targetUser.name+" was "+ (barn?"barned":" banned ") + "by "+user.name+"." + (targets[1] ? " (" + targets[1] + ")" : ""));
+		targetUser.emit('message', user.name+' has' + (barn?"barned":" banned ") +'you.  If you feel that your banning was unjustified you can <a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=75" target="_blank">appeal the ban</a>. '+targets[1]);
 		var alts = targetUser.getAlts();
 		if (alts.length) logModCommand(room,""+targetUser.name+"'s alts were also banned: "+alts.join(", "));
 
 		targetUser.ban();
+		barn = false;
 		return false;
 		break;
 
