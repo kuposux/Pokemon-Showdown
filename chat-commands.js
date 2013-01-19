@@ -1776,12 +1776,11 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		} 
 		
 		user.emit('console', 'You' + ((winnings < 0) ? " lost":" won") + " $" + Math.abs(winnings) + "!"); 
-		
-		if (user.balance + winnings <= 0) {
+		user.balance += winnings
+		if (user.balance <= 0) {
 			user.balance = 0; 
 			user.emit('console', 'You are out of cash!');
 		} 
-		user.balance += winnings;
 		user.emit('console', "Your Balance: $" + user.balance);
 		return false;
 		break;
