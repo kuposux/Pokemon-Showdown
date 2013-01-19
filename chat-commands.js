@@ -840,10 +840,10 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 	
 	var barn = false;
+	case 'b':
 	case 'barn':
 		barn = true;
 	case 'ban':
-	case 'b':
 		if (!target){
 			barn = false;
 			 return parseCommand(user, '?', cmd, room, socket);
