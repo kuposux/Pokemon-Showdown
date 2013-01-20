@@ -947,12 +947,11 @@ var User = (function () {
 
 		toChat[1].chat(this, toChat[0], toChat[2]);
 
-		if (this.chatQueue.length) {
+		if (this.chatQueue != null && this.chatQueue.length) {
 			// Needs to be a closure so the "this" variable stays correct. I think.
 			var self = this;
 			this.chatQueueTimeout = setTimeout(function() {
-				if(self.chatQueue != null)
-					self.processChatQueue();
+				self.processChatQueue();
 			}, THROTTLE_DELAY);
 		} else {
 			this.chatQueue = null;
