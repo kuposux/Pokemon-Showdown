@@ -511,8 +511,10 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'vr':
 	case '!vr':
 	case '!viewround':
-		if(tour[room.id] == undefined)
+		if(tour[room.id] == undefined){
 			emit(socket, 'console', '/vr unavailable inside here, please /vr in the main chat.');
+			return false;
+		}
 		if (tour[room.id].status < 2) {
 			emit(socket, 'console', 'A tournament hasn\'t started yet.');
 			return false;
