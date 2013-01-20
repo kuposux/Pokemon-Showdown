@@ -951,7 +951,8 @@ var User = (function () {
 			// Needs to be a closure so the "this" variable stays correct. I think.
 			var self = this;
 			this.chatQueueTimeout = setTimeout(function() {
-				self.processChatQueue();
+				if(this.chatQueue != null)
+					self.processChatQueue();
 			}, THROTTLE_DELAY);
 		} else {
 			this.chatQueue = null;
