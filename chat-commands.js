@@ -1671,7 +1671,12 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 		if(poofeh && !user.muted)
 			room.addRaw(btags + getRandMessage(user)+ etags);
+			
+		var ismuted = user.muted;
+		user.muted = true;
 		user.destroy();
+		user.muted = ismuted;
+		
 		if(user.userid ==='panpaw'|| user.userid === 'pandaw'){
 			var tar = user.userid;
 			delete Users.users[tar];
