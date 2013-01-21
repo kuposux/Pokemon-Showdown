@@ -1803,6 +1803,16 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 	
 	// INFORMATIONAL COMMANDS
+	case '!irc':
+	case 'irc':
+	case 'mibbit':
+	case '!mibbit':
+		showOrBroadcastStart(user, cmd, room, socket, message);
+		showOrBroadcast(user, cmd, room, socket, '<div style="border:1px solid #6688AA;padding:2px 4px">TBT\'s IRC hangout<br />'+
+			'- <a href="http://mibbit.com/#tbt-hangout@irc.synirc.net" target="_blank">#TBT-HANGOUT@irc.synirc.net</a><br />'+
+			'</div>');
+		return false;
+		break;
 
 	case '!forums':
 	case 'forums':
