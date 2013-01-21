@@ -181,11 +181,12 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 
 	case 'remind':
 	case '!remind':
-		if (tour[room.id].status != 1) {
+		var roomid = room.id;if (room.battle) {roomid = room.parentid;}
+		if (tour[roomid].status != 1) {
 			emit(socket, 'console', 'The tournament is not currently in its signup phase.');
 			return false;
 		}
-		var msg = '<h2><font color="green">A ' + tour.tiers[tour[room.id].tier].name + ' Tournament is currently in its signup phase. <button onclick="emit(socket, \'chat\', {room: \'' + room.id + '\', message: \'/jt\'});"><b>Join Tournament</b></button></font></h2>';
+		var msg = '<h2><font color="green">A ' + tour.tiers[tour[roomid].tier].name + ' Tournament is currently in its signup phase. <button onclick="emit(socket, \'chat\', {room: \'' + roomid + '\', message: \'/jt\'});"><b>Join Tournament</b></button></font></h2>';
 		if (user.can('broadcast') && cmd.charAt(0) == "!") {
 			showOrBroadcastStart(user, cmd, room, socket, message);
 			showOrBroadcast(user, cmd, room, socket, msg);
@@ -196,11 +197,12 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 
 	case 'tour':
+		var roomid = room.id;if (room.battle) {roomid = room.parentid;}
 		if (!user.can('broadcast')) {
 			emit(socket, 'console', 'You do not have enough authority to use this command.');
 			return false;
 		}
-		if (tour[room.id].status > 0) {
+		if (tour[roomid].status > 0) {
 			emit(socket, 'console', 'A tournament is already running.');
 			return false;
 		}
@@ -230,10 +232,10 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', "You did not enter a valid amount of participants.");
 			return false;
 		}
-		tour[room.id].status = 1;
-		tour[room.id].toursize = part[1].split(' ').join('');
-		tour[room.id].tier = part[0];
-		room.addRaw('<hr /><h2><font color="green">A Tournament has been started by: ' + sanitize(user.name) + ' <button onclick="emit(socket, \'chat\', {room: \'' + room.id + '\', message: \'/jt\'});"><b>Join</b></button></font></h2><b><font color="blueviolet">PLAYERS:</font></b> ' + part[1] + '<br /><font color="blue"><b>TYPE:</b></font> ' + tour.tiers[part[0]].name + '<hr />');
+		tour[roomid].status = 1;
+		tour[roomid].toursize = part[1].split(' ').join('');
+		tour[roomid].tier = part[0];
+		room.addRaw('<hr /><h2><font color="green">A Tournament has been started by: ' + sanitize(user.name) + ' <button onclick="emit(socket, \'chat\', {room: \'' + roomid + '\', message: \'/jt\'});"><b>Join</b></button></font></h2><b><font color="blueviolet">PLAYERS:</font></b> ' + part[1] + '<br /><font color="blue"><b>TYPE:</b></font> ' + tour.tiers[part[0]].name + '<hr />');
 		return false;
 		break;
 
@@ -241,17 +243,18 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'jtour':
 	case 'j':
 	case 'jt':
-		if (tour[room.id].status == 0) {
+		var roomid = room.id;if (room.battle) {roomid = room.parentid;}
+		if (tour[roomid].status == 0) {
 			emit(socket, 'console', 'A tournament is not currently running.');
 			return false;
 		}
-		if (tour[room.id].status > 1) {
+		if (tour[roomid].status > 1) {
 			emit(socket, 'console', 'Too late. The tournament already started.');
 			return false;
 		}
 		var joined = false;
-		for (var i in tour[room.id].players) {
-			if (tour[room.id].players[i] == user.userid) {
+		for (var i in tour[roomid].players) {
+			if (tour[roomid].players[i] == user.userid) {
 				joined = true;
 			}
 		}
@@ -259,26 +262,27 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', 'You already joined the tournament.');
 			return false;
 		}
-		tour[room.id].players[tour[room.id].players.length] = user.userid;
-		var spots = tour[room.id].toursize - tour[room.id].players.length;
+		tour[roomid].players[tour[roomid].players.length] = user.userid;
+		var spots = tour[roomid].toursize - tour[roomid].players.length;
 		room.addRaw('<b>' + sanitize(user.name) + ' has joined the tournament. ' + spots + ' spots left.</b>');
 		if (spots == 0) {
-			tour.startTour(room.id);
+			tour.startTour(roomid);
 		}
 		return false;
 		break;
 
 	case 'forcejoin':
 	case 'fj':
+		var roomid = room.id;if (room.battle) {roomid = room.parentid;}
 		if (!user.can('broadcast')) {
 			emit(socket, 'console', 'You do not have enough authority to use this command.');
 			return false;
 		}
-		if (tour[room.id].status == 0) {
+		if (tour[roomid].status == 0) {
 			emit(socket, 'console', 'A tournament is not currently running.');
 			return false;
 		}
-		if (tour[room.id].status > 1) {
+		if (tour[roomid].status > 1) {
 			emit(socket, 'console', 'Too late. The tournament already started.');
 			return false;
 		}
@@ -288,8 +292,8 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			return false;
 		}
 		var joined = false;
-		for (var i in tour[room.id].players) {
-			if (tour[room.id].players[i] == tar) {
+		for (var i in tour[roomid].players) {
+			if (tour[roomid].players[i] == tar) {
 				joined = true;
 			}
 		}
@@ -297,26 +301,27 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', 'That user already joined the tournament.');
 			return false;
 		}
-		tour[room.id].players[tour[room.id].players.length] = tar;
-		var spots = tour[room.id].toursize - tour[room.id].players.length;
+		tour[roomid].players[tour[roomid].players.length] = tar;
+		var spots = tour[roomid].toursize - tour[roomid].players.length;
 		room.addRaw('<b>' + sanitize(Users.users[tar].name) + ' was forced to join the tournament by ' + sanitize(user.name) + '. ' + spots + ' spots left.</b>');
 		if (spots == 0) {
-			tour.startTour(room.id);
+			tour.startTour(roomid);
 		}
 		return false;
 		break;
 
 	case 'forceleave':
 	case 'fl':
+		var roomid = room.id;if (room.battle) {roomid = room.parentid;}
 		if (!user.can('broadcast')) {
 			emit(socket, 'console', 'You do not have enough authority to use this command.');
 			return false;
 		}
-		if (tour[room.id].status == 0) {
+		if (tour[roomid].status == 0) {
 			emit(socket, 'console', 'A tournament is not currently running.');
 			return false;
 		}
-		if (tour[room.id].status > 1) {
+		if (tour[roomid].status > 1) {
 			emit(socket, 'console', 'You cannot force someone to leave while the tournament is running. They are trapped. >:D');
 			return false;
 		}
@@ -326,8 +331,8 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			return false;
 		}
 		var joined = false;
-		for (var i in tour[room.id].players) {
-			if (tour[room.id].players[i] == tar) {
+		for (var i in tour[roomid].players) {
+			if (tour[roomid].players[i] == tar) {
 				joined = true;
 				var id = i;
 			}
@@ -336,8 +341,8 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', 'That user isn\'t in the tournament.');
 			return false;
 		}
-		tour[room.id].players.splice(id, 1);
-		var spots = tour[room.id].toursize - tour[room.id].players.length;
+		tour[roomid].players.splice(id, 1);
+		var spots = tour[roomid].toursize - tour[roomid].players.length;
 		room.addRaw('<b>' + sanitize(Users.users[tar].name) + ' has been forced to leave the tournament by ' + sanitize(user.name) + '. ' + spots + ' spots left.</b>');
 		return false;
 		break;
@@ -345,17 +350,18 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'leavetour':
 	case 'lt':
 	case 'ltour':
-		if (tour[room.id].status == 0) {
+		var roomid = room.id;if (room.battle) {roomid = room.parentid;}
+		if (tour[roomid].status == 0) {
 			emit(socket, 'console', 'A tournament is not currently running.');
 			return false;
 		}
-		if (tour[room.id].status > 1) {
+		if (tour[roomid].status > 1) {
 			emit(socket, 'console', 'You cannot leave while the tournament is running. You are trapped. >:D');
 			return false;
 		}
 		var joined = false;
-		for (var i in tour[room.id].players) {
-			if (tour[room.id].players[i] == user.userid) {
+		for (var i in tour[roomid].players) {
+			if (tour[roomid].players[i] == user.userid) {
 				joined = true;
 				var id = i;
 			}
@@ -364,23 +370,24 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', 'You haven\'t joined the tournament so you can\'t leave it.');
 			return false;
 		}
-		tour[room.id].players.splice(id, 1);
-		var spots = tour[room.id].toursize - tour[room.id].players.length;
+		tour[roomid].players.splice(id, 1);
+		var spots = tour[roomid].toursize - tour[roomid].players.length;
 		room.addRaw('<b>' + sanitize(user.name) + ' has left the tournament. ' + spots + ' spots left.</b>');
 		return false;
 		break;
 
 	case 'toursize':
 	case 'ts':
+		var roomid = room.id;if (room.battle) {roomid = room.parentid;}
 		if (!user.can('broadcast')) {
 			emit(socket, 'console', 'You do not have enough authority to use this command.');
 			return false;
 		}
-		if (tour[room.id].status == 0) {
+		if (tour[roomid].status == 0) {
 			emit(socket, 'console', 'A tournament is not currently running.');
 			return false;
 		}
-		if (tour[room.id].status > 1) {
+		if (tour[roomid].status > 1) {
 			emit(socket, 'console', 'The tournament already started.');
 			return false;
 		}
@@ -388,22 +395,23 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', 'You cannot change the tournament size to: ' + target);
 			return false;
 		}
-		if (target < tour[room.id].players.length) {
-			emit(socket, 'console', tour[room.id].players.length + ' players have joined already. You are trying to set the tournament size to ' + target + '.');
+		if (target < tour[roomid].players.length) {
+			emit(socket, 'console', tour[roomid].players.length + ' players have joined already. You are trying to set the tournament size to ' + target + '.');
 			return false;
 		}
-		tour[room.id].toursize = target;
-		var spots = tour[room.id].toursize - tour[room.id].players.length;
+		tour[roomid].toursize = target;
+		var spots = tour[roomid].toursize - tour[roomid].players.length;
 		room.addRaw('<b>The tournament size has been changed to ' + target + ' by ' + sanitize(user.name) + '. ' + spots + ' spots left.</b>');
 		if (spots == 0) {
-			tour.startTour(room.id);
+			tour.startTour(roomid);
 		}
 		return false;
 		break;
 
 	case 'disqualify':
 	case 'dq':
-		if (tour[room.id].status < 2) {
+		var roomid = room.id;if (room.battle) {roomid = room.parentid;}
+		if (tour[roomid].status < 2) {
 			emit(socket, 'console', 'A tournament hasn\'t started yet.');
 			return false;
 		}
@@ -418,8 +426,8 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 		var init = false;
 		var wait = false;
-		for (var i in tour[room.id].round) {
-			var current = tour[room.id].round[i].split('|');
+		for (var i in tour[roomid].round) {
+			var current = tour[roomid].round[i].split('|');
 			if (current[0] == tar) {
 				init = true;
 				var id = i;
@@ -445,32 +453,33 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', 'That player is not in the tournament');
 			return false;
 		}
-		var object = tour[room.id].round[id].split('|');
+		var object = tour[roomid].round[id].split('|');
 		object[2] = 2;
 		object[3] = opp;
-		tour[room.id].round[id] = object.join('|');
-		tour[room.id].winners[tour[room.id].winners.length] = opp;
-		tour[room.id].losers[tour[room.id].losers.length] = tar;
+		tour[roomid].round[id] = object.join('|');
+		tour[roomid].winners[tour[roomid].winners.length] = opp;
+		tour[roomid].losers[tour[roomid].losers.length] = tar;
 		room.addRaw('<b>' + sanitize(Users.users[tar].name) + ' was disqualified by ' + sanitize(user.name) + '. ' + sanitize(opp) + " won their battle by default.</b>");
-		if (tour[room.id].winners.length >= tour[room.id].round.length) {
-			tour.nextRound(room.id);
+		if (tour[roomid].winners.length >= tour[roomid].round.length) {
+			tour.nextRound(roomid);
 		}
 		return false;
 		break;
 
 	case 'switch':
+		var roomid = room.id;if (room.battle) {roomid = room.parentid;}
 		if (!user.can('broadcast')) {
 			emit(socket, 'console', 'You do not have enough authority to use this command.');
 			return false;
 		}
-		if (tour[room.id].status < 2) {
+		if (tour[roomid].status < 2) {
 			emit(socket, 'console', 'A tournament hasn\'t started yet');
 			return false;
 		}
 		var old = toUserid(target.split(',')[0]);
 		var tar = toUserid(target.split(',')[1]);
-		for (var i in tour[room.id].round) {
-			var current = tour[room.id].round[i].split('|');
+		for (var i in tour[roomid].round) {
+			var current = tour[roomid].round[i].split('|');
 			if (current[0] == old) {
 				var id = i;
 				var p = 0;
@@ -484,26 +493,26 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', 'There is no such user in the tournament.');
 			return false;
 		}
-		var ray = tour[room.id].round[id].split('|');
-		for (var i in tour[room.id].losers) {
-			if (tour[room.id].losers[i] == ray[p]) {
-				tour[room.id].losers[i] = tar;
+		var ray = tour[roomid].round[id].split('|');
+		for (var i in tour[roomid].losers) {
+			if (tour[roomid].losers[i] == ray[p]) {
+				tour[roomid].losers[i] = tar;
 			}
 		}
-		for (var i in tour[room.id].winners) {
-			if (tour[room.id].winners[i] == ray[p]) {
-				tour[room.id].winners[i] = tar;
+		for (var i in tour[roomid].winners) {
+			if (tour[roomid].winners[i] == ray[p]) {
+				tour[roomid].winners[i] = tar;
 			}
 		}
-		for (var i in tour[room.id].overallLoser) {
-			if (tour[room.id].overallLoser[i] == ray[p]) {
-				tour[room.id].overallLoser[i] = tar;
+		for (var i in tour[roomid].overallLoser) {
+			if (tour[roomid].overallLoser[i] == ray[p]) {
+				tour[roomid].overallLoser[i] = tar;
 			}
 		}
 		room.addRaw("<b>" + ray[p] + " was replaced with " + tar + " by " + user.name + " in the tournament.</b>");
 		ray[p] = tar;
 		ray = ray.join('|');
-		tour[room.id].round[id] = ray;
+		tour[roomid].round[id] = ray;
 		return false;
 		break;
 
@@ -511,17 +520,18 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'vr':
 	case '!vr':
 	case '!viewround':
-		if(tour[room.id] == undefined){
+		var roomid = room.id;if (room.battle) {roomid = room.parentid;}
+		if(tour[roomid] == undefined){
 			emit(socket, 'console', '/vr unavailable inside here, please /vr in the main chat.');
 			return false;
 		}
-		if (tour[room.id].status < 2) {
+		if (tour[roomid].status < 2) {
 			emit(socket, 'console', 'A tournament hasn\'t started yet.');
 			return false;
 		}
-		var msg = "<h3>Round " + tour[room.id].Round + " of " + tour.tiers[tour[room.id].tier].name + " tournament.</h3><small><i>** Bold means they are battling. Green means they won. Red means they lost. **</i></small><br />";
-		for (var i in tour[room.id].round) {
-			var current = tour[room.id].round[i].split('|');
+		var msg = "<h3>Round " + tour[roomid].Round + " of " + tour.tiers[tour[roomid].tier].name + " tournament.</h3><small><i>** Bold means they are battling. Green means they won. Red means they lost. **</i></small><br />";
+		for (var i in tour[roomid].round) {
+			var current = tour[roomid].round[i].split('|');
 			var p1 = current[0];
 			var p2 = current[1];
 			var status = current[2];
@@ -558,16 +568,17 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 
 	case 'endtour':
-		if (tour[room.id].status == 0) {
-			emit(socket, 'console', 'There is currently no tournament running.', room.id);
+		var roomid = room.id;if (room.battle) {roomid = room.parentid;}
+		if (tour[roomid].status == 0) {
+			emit(socket, 'console', 'There is currently no tournament running.', roomid);
 			return false;
 		}
 		if (!user.can('broadcast')) {
-			emit(socket, 'console', 'You do not have enough authority to use this command.', room.id);
+			emit(socket, 'console', 'You do not have enough authority to use this command.', roomid);
 			return false;
 		}
-		room.addRaw('<h2>The tournament was ended by ' + sanitize(user.name) + '.</h2>', room.id);
-		tour.endTour(room.id);
+		room.addRaw('<h2>The tournament was ended by ' + sanitize(user.name) + '.</h2>', roomid);
+		tour.endTour(roomid);
 		return false;
 		break;
 	
