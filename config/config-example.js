@@ -6,7 +6,7 @@ exports.port = 8000;
 exports.setuid = '';
 
 // protocol - WebSockets ("ws") or Socket.IO ("io").
-//	We recommend using WebSockets unless you have a really compelling reason not to.
+//   We recommend using WebSockets unless you have a really compelling reason not to.
 exports.protocol = 'ws';
 
 // The server ID - a unique ID describing this Showdown server
@@ -159,6 +159,7 @@ exports.groups = {
 		forcerename: true,
 		timer: true,
 		alts: '%u',
+		bypassblocks: 'u%@&~',
 		rank: 2
 	},
 	'+': {

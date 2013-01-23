@@ -179,6 +179,8 @@ var User = (function () {
 		}
 	}
 
+	User.prototype.blockChallenges = false;
+
 	User.prototype.emit = function(message, data) {
 		var roomid = false;
 		if (data && data.room) {
@@ -491,6 +493,8 @@ var User = (function () {
 				else if (userid === "hugendugen") avatar = 1009;
 				else if (userid === "fatecrashers") avatar = 18;
 				else if (userid === "exeggutor") avatar = 1010;
+				else if (userid === "mjb") avatar = 1011;
+				else if (userid === "marty") avatar = 1012;
 
 				if (usergroups[userid]) {
 					group = usergroups[userid].substr(0,1);
@@ -843,7 +847,7 @@ var User = (function () {
 		if (!user || this.challengeTo) {
 			return false;
 		}
-		if (!user.allowChallenges) {
+		if (user.blockChallenges && !this.can('bypassblocks', user)) {
 			return false;
 		}
 		if (new Date().getTime() < this.lastChallenge + 10000) {

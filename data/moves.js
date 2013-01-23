@@ -137,8 +137,8 @@ exports.BattleMovedex = {
 		accuracy: true,
 		basePower: 60,
 		category: "Physical",
-		desc: "Deals damage to one adjacent or non-adjacent target and ignores accuracy and evasion modifiers. Makes contact.",
-		shortDesc: "Ignores accuracy and evasion modifiers.",
+		desc: "Deals damage to one adjacent or non-adjacent target and does not check accuracy. Makes contact.",
+		shortDesc: "This move does not check accuracy.",
 		id: "aerialace",
 		isViable: true,
 		name: "Aerial Ace",
@@ -540,8 +540,8 @@ exports.BattleMovedex = {
 		accuracy: true,
 		basePower: 90,
 		category: "Special",
-		desc: "Deals damage to one adjacent or non-adjacent target and ignores accuracy and evasion modifiers.",
-		shortDesc: "Ignores accuracy and evasion modifiers.",
+		desc: "Deals damage to one adjacent or non-adjacent target and does not check accuracy.",
+		shortDesc: "This move does not check accuracy.",
 		id: "aurasphere",
 		isViable: true,
 		name: "Aura Sphere",
@@ -801,7 +801,7 @@ exports.BattleMovedex = {
 		accuracy: true,
 		basePower: false,
 		category: "Physical",
-		desc: "The user spends two turns locked into this move and then, on the second turn after using this move, the user attacks the last Pokemon that hit it, inflicting double the damage in HP it lost during the two turns. If the last Pokemon that hit it is no longer on the field, the user attacks a random foe instead. If the user is prevented from moving during this move's use, the effect ends. This move ignores accuracy and evasion modifiers and can hit Ghost-types. Makes contact. Priority +1.",
+		desc: "The user spends two turns locked into this move and then, on the second turn after using this move, the user attacks the last Pokemon that hit it, inflicting double the damage in HP it lost during the two turns. If the last Pokemon that hit it is no longer on the field, the user attacks a random foe instead. If the user is prevented from moving during this move's use, the effect ends. This move does not check accuracy and can hit Ghost-types. Makes contact. Priority +1.",
 		shortDesc: "Waits 2 turns; deals double the damage taken.",
 		id: "bide",
 		name: "Bide",
@@ -1524,8 +1524,8 @@ exports.BattleMovedex = {
 		accuracy: 100,
 		basePower: 70,
 		category: "Physical",
-		desc: "Deals damage to one adjacent target and ignores the target's defensive stat stage changes, including accuracy and evasion modifiers. Makes contact.",
-		shortDesc: "Ignores the target's stat modifiers.",
+		desc: "Deals damage to one adjacent target and ignores the target's stat stage changes, including evasion. Makes contact.",
+		shortDesc: "Ignores the target's stat stage changes.",
 		id: "chipaway",
 		name: "Chip Away",
 		pp: 20,
@@ -2978,7 +2978,7 @@ exports.BattleMovedex = {
 		accuracy: 100,
 		basePower: false,
 		basePowerCallback: function(pokemon, target) {
-			var ratio = (pokemon.stats.spe / target.stats.spe);
+			var ratio = (pokemon.getStat('spe') / target.getStat('spe'));
 			if (ratio >= 4) {
 				return 150;
 			}
@@ -3350,8 +3350,8 @@ exports.BattleMovedex = {
 		accuracy: true,
 		basePower: 60,
 		category: "Physical",
-		desc: "Deals damage to one adjacent target and ignores accuracy and evasion modifiers. Makes contact.",
-		shortDesc: "Ignores accuracy and evasion modifiers.",
+		desc: "Deals damage to one adjacent target and does not check accuracy. Makes contact.",
+		shortDesc: "This move does not check accuracy.",
 		id: "faintattack",
 		name: "Faint Attack",
 		pp: 20,
@@ -4011,6 +4011,7 @@ exports.BattleMovedex = {
 			duration: 1,
 			onFoeRedirectTarget: function(target, source, source2, move) {
 				if (this.validTarget(this.effectData.target, source, move.target)) {
+					this.debug("Follow Me redirected target of move");
 					return this.effectData.target;
 				}
 			}
@@ -4649,13 +4650,13 @@ exports.BattleMovedex = {
 		onHit: function(target, source) {
 			if (!target.volatiles.guardsplit) {
 				target.addVolatile('guardsplit');
-				target.volatiles.guardsplit.def = target.unmodifiedStats.def;
-				target.volatiles.guardsplit.spd = target.unmodifiedStats.spd;
+				target.volatiles.guardsplit.def = target.getStat('def', true, true);
+				target.volatiles.guardsplit.spd = target.getStat('spd', true, true);
 			}
 			if (!source.volatiles.guardsplit) {
 				source.addVolatile('guardsplit');
-				source.volatiles.guardsplit.def = source.unmodifiedStats.def;
-				source.volatiles.guardsplit.spd = source.unmodifiedStats.spd;
+				source.volatiles.guardsplit.def = source.getStat('def', true, true);
+				source.volatiles.guardsplit.spd = source.getStat('spd', true, true);
 			}
 			var newdef = Math.floor((target.volatiles.guardsplit.def + source.volatiles.guardsplit.def)/2);
 			target.volatiles.guardsplit.def = newdef;
@@ -4666,10 +4667,13 @@ exports.BattleMovedex = {
 			this.add('-activate', source, 'Guard Split', '[of] '+target);
 		},
 		effect: {
-			onModifyStatsPriority: 100,
-			onModifyStats: function(stats) {
-				stats.def = this.effectData.def;
-				stats.spd = this.effectData.spd;
+			onModifyDefPriority: 100,
+			onModifyDef: function() {
+				return this.effectData.def;
+			},
+			onModifySpDPriority: 100,
+			onModifySpD: function() {
+				return this.effectData.spd;
 			}
 		},
 		secondary: false,
@@ -4761,9 +4765,7 @@ exports.BattleMovedex = {
 		accuracy: 100,
 		basePower: false,
 		basePowerCallback: function(pokemon, target) {
-			var targetSpeed = target.stats.spe;
-			var pokemonSpeed = pokemon.stats.spe;
-			var power = (Math.floor(25 * targetSpeed / pokemonSpeed) || 1);
+			var power = (Math.floor(25 * target.getStat('spe') / pokemon.getStat('spe')) || 1);
 			if (power > 150) power = 150;
 			this.debug(''+power+' bp');
 			return power;
@@ -6679,7 +6681,7 @@ exports.BattleMovedex = {
 		accuracy: true,
 		basePower: 0,
 		category: "Status",
-		desc: "Until the end of the turn, the user is unaffected by certain non-damaging moves directed at it and will instead use such moves against the original user. Spikes, Stealth Rock, and Toxic Spikes can only be reflected once per side, by the leftmost Pokemon under this or the Ability Magic Bounce's effect. If the user has the Ability Soundproof, this move's effect happens before a sound-based move can be nullified. The Abilities Lightningrod and Storm Drain redirect their respective moves before this move takes effect. Priority +4.",
+		desc: "Until the end of the turn, the user is unaffected by certain non-damaging moves directed at it and will instead use such moves against the original user. Moves reflected in this way are unable to be reflected again by this or the Ability Magic Bounce's effect. Spikes, Stealth Rock, and Toxic Spikes can only be reflected once per side, by the leftmost Pokemon under this or the Ability Magic Bounce's effect. If the user has the Ability Soundproof, this move's effect happens before a sound-based move can be nullified. The Abilities Lightningrod and Storm Drain redirect their respective moves before this move takes effect. Priority +4.",
 		shortDesc: "Bounces back certain non-damaging moves.",
 		id: "magiccoat",
 		isViable: true,
@@ -6704,7 +6706,6 @@ exports.BattleMovedex = {
 					return;
 				}
 				if (move.isBounceable) {
-					target.removeVolatile('MagicCoat');
 					var newMove = this.getMoveCopy(move.id);
 					newMove.hasBounced = true;
 					this.add('-activate', target, 'move: Magic Coat', newMove, '[of] '+source);
@@ -6765,8 +6766,8 @@ exports.BattleMovedex = {
 		accuracy: true,
 		basePower: 60,
 		category: "Special",
-		desc: "Deals damage to one adjacent target and ignores accuracy and evasion modifiers.",
-		shortDesc: "Ignores accuracy and evasion modifiers.",
+		desc: "Deals damage to one adjacent target and does not check accuracy.",
+		shortDesc: "This move does not check accuracy.",
 		id: "magicalleaf",
 		name: "Magical Leaf",
 		pp: 20,
@@ -6797,8 +6798,8 @@ exports.BattleMovedex = {
 		accuracy: true,
 		basePower: 60,
 		category: "Physical",
-		desc: "Deals damage to one adjacent target and ignores accuracy and evasion modifiers.",
-		shortDesc: "Ignores accuracy and evasion modifiers.",
+		desc: "Deals damage to one adjacent target and does not check accuracy.",
+		shortDesc: "This move does not check accuracy.",
 		id: "magnetbomb",
 		name: "Magnet Bomb",
 		pp: 20,
@@ -8202,13 +8203,13 @@ exports.BattleMovedex = {
 		onHit: function(target, source) {
 			if (!target.volatiles.powersplit) {
 				target.addVolatile('powersplit');
-				target.volatiles.powersplit.atk = target.unmodifiedStats.atk;
-				target.volatiles.powersplit.spa = target.unmodifiedStats.spa;
+				target.volatiles.powersplit.atk = target.getStat('atk', true, true);
+				target.volatiles.powersplit.spa = target.getStat('spa', true, true);
 			}
 			if (!source.volatiles.powersplit) {
 				source.addVolatile('powersplit');
-				source.volatiles.powersplit.atk = source.unmodifiedStats.atk;
-				source.volatiles.powersplit.spa = source.unmodifiedStats.spa;
+				source.volatiles.powersplit.atk = source.getStat('atk', true, true);
+				source.volatiles.powersplit.spa = source.getStat('spa', true, true);
 			}
 			var newatk = Math.floor((target.volatiles.powersplit.atk + source.volatiles.powersplit.atk)/2);
 			target.volatiles.powersplit.atk = newatk;
@@ -8219,10 +8220,13 @@ exports.BattleMovedex = {
 			this.add('-activate', source, 'Power Split', '[of] '+target);
 		},
 		effect: {
-			onModifyStatsPriority: 100,
-			onModifyStats: function(stats) {
-				stats.atk = this.effectData.atk;
-				stats.spa = this.effectData.spa;
+			onModifyAtkPriority: 100,
+			onModifyAtk: function() {
+				return this.effectData.atk;
+			},
+			onModifySpAPriority: 100,
+			onModifySpA: function() {
+				return this.effectData.spa;
 			}
 		},
 		secondary: false,
@@ -8273,19 +8277,23 @@ exports.BattleMovedex = {
 		volatileStatus: 'powertrick',
 		effect: {
 			onStart: function(pokemon) {
+				this.effectData.atk = pokemon.getStat('def', true, true);
+				this.effectData.def = pokemon.getStat('atk', true, true);
 				this.add('-start', pokemon, 'Power Trick');
 			},
 			onEnd: function(pokemon) {
 				this.add('-end', pokemon, 'Power Trick');
 			},
 			onRestart: function(pokemon) {
-				pokemon.removeVolatile('PowerTrick');
+				pokemon.removeVolatile('Power Trick');
 			},
-			onModifyStatsPriority: -100,
-			onModifyStats: function(stats) {
-				var temp = stats.atk;
-				stats.atk = stats.def;
-				stats.def = temp;
+			onModifyAtkPriority: 100,
+			onModifyAtk: function() {
+				return this.effectData.atk;
+			},
+			onModifySpAPriority: 100,
+			onModifySpA: function() {
+				return this.effectData.spa;
 			}
 		},
 		secondary: false,
@@ -9050,16 +9058,21 @@ exports.BattleMovedex = {
 			status: 'slp'
 		},
 		onHit: function(target, pokemon) {
-			if (pokemon.baseTemplate.species !== 'Meloetta' || pokemon.transformed) {
-				return;
+			if (pokemon.baseTemplate.species === 'Meloetta' && !pokemon.transformed) {
+				pokemon.addVolatile('relicsong');
 			}
-			if (pokemon.template.speciesid==='meloettapirouette' && pokemon.transformInto('Meloetta')) {
-				this.add('-formechange', pokemon, 'Meloetta');
-			} else if (pokemon.transformInto('Meloetta-Pirouette')) {
-				this.add('-formechange', pokemon, 'Meloetta-Pirouette');
+		},
+		effect: {
+			duration: 1,
+			onAfterMoveSecondarySelf: function(pokemon, target, move) {
+				if (pokemon.template.speciesid === 'meloettapirouette' && pokemon.transformInto('Meloetta')) {
+					this.add('-formechange', pokemon, 'Meloetta');
+				} else if (pokemon.transformInto('Meloetta-Pirouette')) {
+					this.add('-formechange', pokemon, 'Meloetta-Pirouette');
+				}
+				pokemon.transformed = false;
+				pokemon.removeVolatile('relicsong');
 			}
-			// renderer takes care of this for us
-			pokemon.transformed = false;
 		},
 		target: "allAdjacentFoes",
 		type: "Normal"
@@ -9549,8 +9562,8 @@ exports.BattleMovedex = {
 		accuracy: 100,
 		basePower: 90,
 		category: "Physical",
-		desc: "Deals damage to one adjacent target and ignores the target's defensive stat stage changes, including accuracy and evasion modifiers. Makes contact.",
-		shortDesc: "Ignores the target's stat modifiers.",
+		desc: "Deals damage to one adjacent target and ignores the target's stat stage changes, including evasion. Makes contact.",
+		shortDesc: "Ignores the target's stat stage changes.",
 		id: "sacredsword",
 		isViable: true,
 		name: "Sacred Sword",
@@ -9950,8 +9963,8 @@ exports.BattleMovedex = {
 		accuracy: true,
 		basePower: 60,
 		category: "Physical",
-		desc: "Deals damage to one adjacent target and ignores accuracy and evasion modifiers. Makes contact. Damage is boosted to 1.2x by the Ability Iron Fist.",
-		shortDesc: "Ignores accuracy and evasion modifiers.",
+		desc: "Deals damage to one adjacent target and does not check accuracy. Makes contact. Damage is boosted to 1.2x by the Ability Iron Fist.",
+		shortDesc: "This move does not check accuracy.",
 		id: "shadowpunch",
 		isViable: true,
 		name: "Shadow Punch",
@@ -10066,8 +10079,8 @@ exports.BattleMovedex = {
 		accuracy: true,
 		basePower: 60,
 		category: "Special",
-		desc: "Deals damage to one adjacent target and ignores accuracy and evasion modifiers.",
-		shortDesc: "Ignores accuracy and evasion modifiers.",
+		desc: "Deals damage to one adjacent target and does not check accuracy.",
+		shortDesc: "This move does not check accuracy.",
 		id: "shockwave",
 		name: "Shock Wave",
 		pp: 20,
@@ -11586,7 +11599,7 @@ exports.BattleMovedex = {
 		},
 		onHit: function(pokemon) {
 			var healAmount = [4,2,1];
-			this.heal(pokemon.maxhp / healAmount[pokemon.volatiles['stockpile'].layers]);
+			this.heal(pokemon.maxhp / healAmount[(pokemon.volatiles['stockpile'].layers - 1)]);
 			pokemon.removeVolatile('stockpile');
 		},
 		secondary: false,
@@ -11632,8 +11645,8 @@ exports.BattleMovedex = {
 		accuracy: true,
 		basePower: 60,
 		category: "Special",
-		desc: "Deals damage to all adjacent foes and ignores accuracy and evasion modifiers.",
-		shortDesc: "Ignores accuracy and evasion modifiers of foes.",
+		desc: "Deals damage to all adjacent foes and does not check accuracy.",
+		shortDesc: "This move does not check accuracy. Hits foes.",
 		id: "swift",
 		name: "Swift",
 		pp: 20,
@@ -11833,8 +11846,8 @@ exports.BattleMovedex = {
 			onStart: function(side) {
 				this.add('-sidestart', side, 'move: Tailwind');
 			},
-			onModifyStats: function(stats) {
-				stats.spe *= 2;
+			onModifySpe: function(spe) {
+				return spe * 2;
 			},
 			onResidualOrder: 21,
 			onResidualSubOrder: 4,
@@ -12390,15 +12403,10 @@ exports.BattleMovedex = {
 			onStart: function(target, source) {
 				this.add('-fieldstart', 'move: Trick Room', '[of] '+source);
 			},
-			onModifyPokemonPriority: -100,
-			onModifyPokemon: function(pokemon) {
+			onModifySpePriority: -100,
+			onModifySpe: function(spe) {
 				// just for fun: Trick Room glitch
-				if (pokemon.stats.spe <= 1809) {
-					pokemon.stats.spe = -pokemon.stats.spe;
-				}
-				if (pokemon.unboostedStats.spe <= 1809) {
-					pokemon.unboostedStats.spe = -pokemon.unboostedStats.spe;
-				}
+				if (spe <= 1809) return -spe;
 			},
 			onResidualOrder: 23,
 			onEnd: function() {
@@ -12459,7 +12467,7 @@ exports.BattleMovedex = {
 			}
 		},
 		category: "Special",
-		desc: "Deals damage to one adjacent target and ignores accuracy and evasion modifiers. The power of this move is based on the amount of PP remaining after normal PP reduction and the Ability Pressure resolve. 200 power for 0PP, 80 power for 1PP, 60 power for 2PP, 50 power for 3PP, and 40 power for 4 or more PP. Makes contact.",
+		desc: "Deals damage to one adjacent target and does not check accuracy. The power of this move is based on the amount of PP remaining after normal PP reduction and the Ability Pressure resolve. 200 power for 0PP, 80 power for 1PP, 60 power for 2PP, 50 power for 3PP, and 40 power for 4 or more PP. Makes contact.",
 		shortDesc: "More power the fewer PP this move has left.",
 		id: "trumpcard",
 		name: "Trump Card",
@@ -12640,8 +12648,8 @@ exports.BattleMovedex = {
 		accuracy: true,
 		basePower: 70,
 		category: "Physical",
-		desc: "Deals damage to one adjacent target and ignores accuracy and evasion modifiers. Makes contact. Priority -1.",
-		shortDesc: "Ignores accuracy and evasion mods. Goes last.",
+		desc: "Deals damage to one adjacent target and does not check accuracy. Makes contact. Priority -1.",
+		shortDesc: "This move does not check accuracy. Goes last.",
 		id: "vitalthrow",
 		name: "Vital Throw",
 		pp: 10,
@@ -13069,11 +13077,13 @@ exports.BattleMovedex = {
 			onStart: function(side, source) {
 				this.add('-fieldstart', 'move: WonderRoom', '[of] '+source);
 			},
-			onModifyStatsPriority: -100,
-			onModifyStats: function(stats) {
-				var tmp = stats.spd;
-				stats.spd = stats.def;
-				stats.def = tmp;
+			onModifyDefPriority: -100,
+			onModifyDef: function(def, pokemon) {
+				return pokemon.getStat('spd', true, true);
+			},
+			onModifySpDPriority: -100,
+			onModifySpD: function(spd, pokemon) {
+				return pokemon.getStat('def', true, true);
 			},
 			onResidualOrder: 24,
 			onEnd: function() {

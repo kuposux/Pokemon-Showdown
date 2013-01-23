@@ -953,7 +953,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 
 		logModCommand(room,''+targetUser.name+' was kicked to the Rules page by '+user.name+'' + (targets[1] ? " (" + targets[1] + ")" : ""));
-		targetUser.emit('console', {evalRawMessage: 'window.location.href="http://www.smogon.com/sim/rules"'});
+		targetUser.emit('console', {evalRawMessage: 'window.location.href="http://pokemonshowdown.com/rules"'});
 		return false;
 		break;
 
@@ -2032,7 +2032,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		showOrBroadcastStart(user, cmd, room, socket, message);
 		showOrBroadcast(user, cmd, room, socket,
 			'<div style="border:1px solid #6688AA;padding:2px 4px">Please follow the rules:<br />' +
-			'- <a href="http://www.smogon.com/sim/rules" target="_blank">Rules</a><br />' +
+			'- <a href="http://pokemonshowdown.com/rules" target="_blank">Rules</a><br />' +
 			'</div>');
 		return false;
 		break;
@@ -2275,11 +2275,11 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'message', "The user '"+targets[2]+"' was not found.");
 			return false;
 		}
-		if (!targetUser.allowChallenges) {
+		if (targetUser.blockChallenges && !user.can('bypassblocks', targetUser)) {
 			emit(socket, 'message', "The user '"+targets[2]+"' is not accepting challenges right now.");
 			return false;
 		}
-		if (typeof target !== 'string') target = 'debugmode';
+		if (typeof target !== 'string') target = 'customgame';
 		var problems = Tools.validateTeam(user.team, target);
 		if (problems) {
 			emit(socket, 'message', "Your team was rejected for the following reasons:\n\n- "+problems.join("\n- "));
@@ -2289,19 +2289,20 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return false;
 		break;
 		
-	case 'blockchallenges':
+	case 'away':
 	case 'idle':
-	case 'bc':
-		user.allowChallenges = false;
+	case 'blockchallenges':
+		user.blockChallenges = true;
 		emit(socket, 'console', 'You are now blocking all incoming challenge requests.');
 		return false;
 		break;
 
-	case 'allowchallenges':
 	case 'back':
 	case 'ac':
 	case 'unidle':
 		user.allowChallenges = true;
+	case 'allowchallenges':
+		user.blockChallenges = false;
 		emit(socket, 'console', 'You are available for challenges from now on.');
 		return false;
 		break;
@@ -2719,13 +2720,19 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', '/calc - Provides a link to a damage calculator');
 			emit(socket, 'console', '!calc - Shows everyone a link to a damage calculator. Requires: + % @ & ~');
 		}
-		if (target === 'all' || target === 'blockchallenges' || target === 'bc' || target === 'idle') {
+		if (target === 'all' || target === 'blockchallenges' || target === 'away' || target === 'idle') {
 			matched = true;
-			emit(socket, 'console', '/blockchallenges OR /bc OR /idle - Blocks challenges so no one can challenge you.');
+			emit(socket, 'console', '/away - Blocks challenges so no one can challenge you.');
 		}
-		if (target === 'all' || target === 'allowchallenges' || target === 'ac' || target === 'back') {
+		if (target === 'all' || target === 'allowchallenges' || target === 'back') {
 			matched = true;
-			emit(socket, 'console', '/allowchallenges OR /ac OR /back - Unlocks challenges so you can be challenged again.');
+			emit(socket, 'console', '/back - Unlocks challenges so you can be challenged again.');
+		}
+		if (target === 'all' || target === 'faq') {
+			matched = true;
+			text = '/faq [theme] - Provides a link to the FAQ. Add deviation, doubles, randomcap, restart, or staff for a link to these questions. Add all for all of them.<br />';
+			text += '!faq [theme] - Shows everyone a link to the FAQ. Add deviation, doubles, randomcap, restart, or staff for a link to these questions. Add all for all of them. Requires: + % @ & ~';
+			emit(socket, 'console', text);
 		}
 		if (target === '%' || target === 'altcheck' || target === 'alt' || target === 'alts' || target === 'getalts') {
 			matched = true;

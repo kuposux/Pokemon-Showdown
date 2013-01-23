@@ -40,4 +40,39 @@ exports.BattleItems = {
 		},
 		desc: "Activates at 25% HP. Next move used goes first. One-time use."
 	},
+	"mentalherb": {
+		id: "mentalherb",
+		name: "Mental Herb",
+		spritenum: 285,
+		fling: {
+			basePower: 10,
+			effect: function(pokemon) {
+				pokemon.removeVolatile('attract');
+			}
+		},
+		onUpdate: function(pokemon) {
+			if (pokemon.volatiles.attract && pokemon.useItem()) {
+				pokemon.removeVolatile('attract');
+			}
+		},
+		desc: "Cures infatuation. One-time use."
+	},
+	"metronome": {
+		inherit: true,
+		effect: {
+			onBasePower: function(basePower, pokemon, target, move) {
+				if (pokemon.item !== 'metronome') {
+					pokemon.removeVolatile('metronome');
+					return;
+				}
+				if (!this.effectData.move || this.effectData.move !== move.id) {
+					this.effectData.move = move.id;
+					this.effectData.numConsecutive = 0;
+				} else if (this.effectData.numConsecutive < 10) {
+					this.effectData.numConsecutive++;
+				}
+				return basePower * (1+(this.effectData.numConsecutive/10));
+			}
+		}
+	}
 };
