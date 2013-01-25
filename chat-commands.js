@@ -2991,7 +2991,7 @@ function logModCommand(room, result, noBroadcast) {
 }
 
 function getRandMessage(user){
-	var numMessages = 30; // numMessages will always be the highest case # + 1
+	var numMessages = 31; // numMessages will always be the highest case # + 1
 	var message = '~~ ';
 	switch(Math.floor(Math.random()*numMessages)){
 		case 0: message = message + user.name + ' has vanished into nothingness!';
@@ -3051,6 +3051,8 @@ function getRandMessage(user){
 		case 27: message = message + user.name + ' was actually a 12 year and was banned for COPPA.';
 			break;
 		case 28: message = message + user.name + ' got lost in the illusion of reality.';
+			break;
+		case 29: message = message + user.name + ' was Pan Hammered!';
 			break;
 		default: message = message + user.name + ' was unfortunate and didn\'t get a cool message.';
 	};
