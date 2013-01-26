@@ -450,6 +450,13 @@ exports.BattleMovedex = {
 		num: 372,
 		accuracy: 100,
 		basePower: 50,
+		basePowerCallback: function(pokemon, source) {
+			if (source.lastDamage > 0 && pokemon.lastAttackedBy.thisTurn && pokemon.lastAttackedBy.move != "Pain Split") {			
+				this.debug('Boosted damge for being hit this turn');
+				return 100;
+			}
+			return 50;
+		},		
 		category: "Physical",
 		desc: "Deals damage to one adjacent target. Power doubles if the target has already taken damage this turn, other than from Pain Split. Makes contact.",
 		shortDesc: "Power doubles if target was damaged this turn.",
@@ -3555,6 +3562,13 @@ exports.BattleMovedex = {
 		num: 519,
 		accuracy: 100,
 		basePower: 50,
+		basePowerCallback: function(target, source, move) {
+			if (move.sourceEffect in {grasspledge:1, waterpledge:1}) {
+				this.debug('triple damage');
+				return 150;
+			}
+			return 50;
+		},
 		category: "Special",
 		desc: "Deals damage to one adjacent target. If one of the user's allies chose to use Grass Pledge or Water Pledge this turn and has not moved yet, they take their turn immediately after the user and the user's move does nothing. Power triples if this move is used by an ally that way, and a sea of fire appears on the target's side if the first move was Grass Pledge, or a rainbow appears on the user's side if the first move was Water Pledge.",
 		shortDesc: "Use with Grass or Water Pledge for added effect.",
@@ -3562,6 +3576,41 @@ exports.BattleMovedex = {
 		name: "Fire Pledge",
 		pp: 10,
 		priority: 0,
+		onTryHit: function(target, source, move) {
+			for (var i=0; i<this.queue.length; i++) {
+				var decision = this.queue[i];
+				if (!decision.pokemon || !decision.move) continue;
+				if (decision.pokemon.side === source.side && decision.move.id in {grasspledge:1, waterpledge:1}) {
+					this.prioritizeQueue(decision);
+					return null;
+				}
+			}
+		},
+		onHit: function(target, source, move) {
+			if (move.sourceEffect === 'grasspledge') {
+				target.side.addSideCondition('grasspledge');
+			}
+			if (move.sourceEffect === 'waterpledge') {
+				source.side.addSideCondition('firepledge');
+			}
+		},
+		effect: {
+			duration: 4,
+			onStart: function(targetSide) {
+				this.add('-sidestart', targetSide, 'Fire Pledge');
+			},
+			onEnd: function(targetSide) {
+				this.add('-sideend', targetSide, 'Fire Pledge');
+			},
+			onModifyMove: function(move) {
+				if (move.secondaries) {
+					this.debug('doubling secondary chance');
+					for (var i=0; i<move.secondaries.length; i++) {
+						move.secondaries[i].chance *= 2;
+					}
+				}
+			}
+		},
 		secondary: false,
 		target: "normal",
 		type: "Fire"
@@ -3666,6 +3715,17 @@ exports.BattleMovedex = {
 		name: "Flame Burst",
 		pp: 15,
 		priority: 0,
+		onHit: function(target, source) {
+			var allyActive = target.side.active;
+			if (allyActive.length === 1) {
+				return;
+			}
+			for (var i=0; i<allyActive.length; i++) {
+				if (allyActive[i] && this.isAdjacent(target, allyActive[i])) {
+					this.damage(allyActive[i].maxhp/16, allyActive[i], source, 'flameburst');
+				}
+			}
+		},
 		secondary: false,
 		target: "normal",
 		type: "Fire"
@@ -4481,6 +4541,13 @@ exports.BattleMovedex = {
 		num: 520,
 		accuracy: 100,
 		basePower: 50,
+		basePowerCallback: function(target, source, move) {
+			if (move.sourceEffect in {waterpledge:1, firepledge:1}) {
+				this.debug('triple damage');
+				return 150;
+			}
+			return 50;
+		},
 		category: "Special",
 		desc: "Deals damage to one adjacent target. If one of the user's allies chose to use Fire Pledge or Water Pledge this turn and has not moved yet, they take their turn immediately after the user and the user's move does nothing. Power triples if this move is used by an ally that way, and a sea of fire appears on the target's side if the first move was Fire Pledge, or a swamp appears on the target's side if the first move was Water Pledge.",
 		shortDesc: "Use with Fire or Water Pledge for added effect.",
@@ -4488,6 +4555,41 @@ exports.BattleMovedex = {
 		name: "Grass Pledge",
 		pp: 10,
 		priority: 0,
+		onTryHit: function(target, source, move) {
+			for (var i=0; i<this.queue.length; i++) {
+				var decision = this.queue[i];
+				if (!decision.pokemon || !decision.move) continue;
+				if (decision.pokemon.side === source.side && decision.move.id in {waterpledge:1, firepledge:1}) {
+					this.prioritizeQueue(decision);
+					return null;
+				}
+			}
+		},
+		onHit: function(target, source, move) {
+			if (move.sourceEffect === 'waterpledge') {
+				target.side.addSideCondition('waterpledge');
+			}
+			if (move.sourceEffect === 'firepledge') {
+				target.side.addSideCondition('grasspledge');
+			}
+		},
+		effect: {
+			duration: 4,
+			onStart: function(targetSide) {
+				this.add('-sidestart', targetSide, 'Grass Pledge');
+			},
+			onEnd: function(targetSide) {
+				this.add('-sideend', targetSide, 'Grass Pledge');
+			},
+			onResidual: function(side) {
+				for (var i=0; i<side.active.length; i++) {
+					var pokemon = side.active[i];
+					if (pokemon && !pokemon.hasType('Fire')) {
+						this.damage(pokemon.maxhp/8, pokemon);
+					}
+				}
+			}
+		},
 		secondary: false,
 		target: "normal",
 		type: "Grass"
@@ -7207,6 +7309,7 @@ exports.BattleMovedex = {
 				id: move.id,
 				pp: move.pp,
 				maxpp: move.pp,
+				target: move.target,
 				disabled: false,
 				used: false
 			};
@@ -7880,6 +7983,9 @@ exports.BattleMovedex = {
 		name: "Pay Day",
 		pp: 20,
 		priority: 0,
+		onHit: function() {
+			this.add('-fieldactivate', 'move: Pay Day');
+		},
 		secondary: false,
 		target: "normal",
 		type: "Normal"
@@ -8291,9 +8397,9 @@ exports.BattleMovedex = {
 			onModifyAtk: function() {
 				return this.effectData.atk;
 			},
-			onModifySpAPriority: 100,
-			onModifySpA: function() {
-				return this.effectData.spa;
+			onModifyDefPriority: 100,
+			onModifyDef: function() {
+				return this.effectData.def;
 			}
 		},
 		secondary: false,
@@ -9525,6 +9631,12 @@ exports.BattleMovedex = {
 		num: 496,
 		accuracy: 100,
 		basePower: 60,
+		basePowerCallback: function(target, source, move) {
+			if (move.sourceEffect === 'round') {
+				return 120;
+			}
+			return 60;
+		},
 		category: "Special",
 		desc: "Deals damage to one adjacent target. If there are other active Pokemon that chose this move for use this turn, those Pokemon take their turn immediately after the user, in Speed order, and this move's power is 120 for each other user. Pokemon with the Ability Soundproof are immune.",
 		shortDesc: "Power doubles if others used Round this turn.",
@@ -9533,6 +9645,16 @@ exports.BattleMovedex = {
 		pp: 15,
 		priority: 0,
 		isSoundBased: true,
+		onHit: function(target, source) {
+			for (var i=0; i<this.queue.length; i++) {
+				var decision = this.queue[i];
+				if (!decision.pokemon || !decision.move) continue;
+				if (decision.move.id === 'round') {
+					this.prioritizeQueue(decision);
+					return;
+				}
+			}
+		},
 		secondary: false,
 		target: "normal",
 		type: "Normal"
@@ -10204,6 +10326,7 @@ exports.BattleMovedex = {
 				id: move.id,
 				pp: move.pp,
 				maxpp: move.pp,
+				target: move.target,
 				disabled: false,
 				used: false
 			};
@@ -12739,6 +12862,13 @@ exports.BattleMovedex = {
 		num: 518,
 		accuracy: 100,
 		basePower: 50,
+		basePowerCallback: function(target, source, move) {
+			if (move.sourceEffect in {firepledge:1, grasspledge:1}) {
+				this.debug('triple damage');
+				return 150;
+			}
+			return 50;
+		},
 		category: "Special",
 		desc: "Deals damage to one adjacent target. If one of the user's allies chose to use Fire Pledge or Grass Pledge this turn and has not moved yet, they take their turn immediately after the user and the user's move does nothing. Power triples if this move is used by an ally that way, and a rainbow appears on the user's side if the first move was Fire Pledge, or a swamp appears on the target's side if the first move was Grass Pledge.",
 		shortDesc: "Use with Grass or Fire Pledge for added effect.",
@@ -12746,6 +12876,36 @@ exports.BattleMovedex = {
 		name: "Water Pledge",
 		pp: 10,
 		priority: 0,
+		onTryHit: function(target, source, move) {
+			for (var i=0; i<this.queue.length; i++) {
+				var decision = this.queue[i];
+				if (!decision.pokemon || !decision.move) continue;
+				if (decision.pokemon.side === source.side && decision.move.id in {firepledge:1, grasspledge:1}) {
+					this.prioritizeQueue(decision);
+					return null;
+				}
+			}
+		},
+		onHit: function(target, source, move) {
+			if (move.sourceEffect === 'firepledge') {
+				source.side.addSideCondition('firepledge');
+			}
+			if (move.sourceEffect === 'grasspledge') {
+				target.side.addSideCondition('waterpledge');
+			}
+		},
+		effect: {
+			duration: 4,
+			onStart: function(targetSide) {
+				this.add('-sidestart', targetSide, 'Water Pledge');
+			},
+			onEnd: function(targetSide) {
+				this.add('-sideend', targetSide, 'Water Pledge');
+			},
+			onModifySpe: function(spe) {
+				return spe/4;
+			}
+		},
 		secondary: false,
 		target: "normal",
 		type: "Water"

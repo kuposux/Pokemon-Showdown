@@ -734,6 +734,17 @@ exports.BattleAbilities = {
 		name: "Healer",
 		onResidualOrder: 5,
 		onResidualSubOrder: 1,
+		onResidual: function(pokemon) {
+			var allyActive = pokemon.side.active;
+			if (allyActive.length === 1) {
+				return;
+			}
+			for (var i=0; i<allyActive.length; i++) {
+				if (allyActive[i] && this.isAdjacent(pokemon, allyActive[i]) && allyActive[i].status && this.random(10) < 3) {
+					allyActive[i].cureStatus();
+				}
+			}
+		},
 		rating: 0,
 		num: 131
 	},
@@ -1214,6 +1225,17 @@ exports.BattleAbilities = {
 	"minus": {
 		desc: "This Pokemon's Special Attack receives a 50% boost in double battles if its partner has the Plus ability.",
 		shortDesc: "If another ally has this Ability or the Plus Ability, this Pokemon's Sp. Atk is 1.5x.",
+		onModifySpA: function(spa, pokemon) {
+			var allyActive = pokemon.side.active;
+			if (allyActive.length === 1) {
+				return;
+			}
+			for (var i=0; i<allyActive.length; i++) {
+				if (allyActive[i] && allyActive[i].position !== pokemon.position && !allyActive[i].fainted && (allyActive[i].ability === 'minus' || allyActive[i].ability === 'plus')) {
+					return spa * 1.5
+				}
+			}
+		},
 		id: "minus",
 		name: "Minus",
 		rating: 0,
@@ -1510,6 +1532,17 @@ exports.BattleAbilities = {
 	"plus": {
 		desc: "This Pokemon's Special Attack receives a 50% boost in double battles if its partner has the Minus ability.",
 		shortDesc: "If another ally has this Ability or the Minus Ability, this Pokemon's Sp. Atk is 1.5x.",
+		onModifySpA: function(spa, pokemon) {
+			var allyActive = pokemon.side.active;
+			if (allyActive.length === 1) {
+				return;
+			}
+			for (var i=0; i<allyActive.length; i++) {
+				if (allyActive[i] && allyActive[i].position !== pokemon.position && !allyActive[i].fainted && (allyActive[i].ability === 'minus' || allyActive[i].ability === 'plus')) {
+					return spa * 1.5
+				}
+			}
+		},
 		id: "plus",
 		name: "Plus",
 		rating: 0,

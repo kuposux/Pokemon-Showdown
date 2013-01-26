@@ -1,6 +1,6 @@
 exports.BattleScripts = {
 	gen: 5,
-	runMove: function(move, pokemon, target) {
+	runMove: function(move, pokemon, target, sourceEffect) {
 		move = this.getMove(move);
 		if (!target) target = this.resolveTarget(pokemon, move);
 
@@ -23,7 +23,7 @@ exports.BattleScripts = {
 		if (!lockedMove) {
 			pokemon.deductPP(move, 1, target);
 		}
-		this.useMove(move, pokemon, target);
+		this.useMove(move, pokemon, target, sourceEffect);
 		this.runEvent('AfterMove', target, pokemon, move);
 		this.runEvent('AfterMoveSelf', pokemon, target, move);
 	},
@@ -202,6 +202,8 @@ exports.BattleScripts = {
 			for (var i=0; i<hits && target.hp && pokemon.hp; i++) {
 				var moveDamage = this.moveHit(target, pokemon, move);
 				if (moveDamage === false) return true;
+				// Damage from each hit is individually counted for the
+				// purposes of Counter, Metal Burst, and Mirror Coat.
 				damage = (moveDamage || 0);
 			}
 			this.add('-hitcount', target, i);
@@ -419,6 +421,11 @@ exports.BattleScripts = {
 		}
 		return damage;
 	},
+	isAdjacent: function(pokemon1, pokemon2) {
+		if (!pokemon1.fainted && !pokemon2.fainted && pokemon2.position !== pokemon1.position && Math.abs(pokemon2.position-pokemon1.position) <= 1) {
+			return true;
+		}
+	},
 	getTeam: function(side, team) {
 		var format = side.battle.getFormat();
 		if (format.team === 'random') {
@@ -454,7 +461,7 @@ exports.BattleScripts = {
 			//choose forme
 			var formes = [];
 			for (var j in this.data.Pokedex) {
-				if (this.data.Pokedex[j].num === teamdexno[i] && this.getTemplate(this.data.Pokedex[j].species).learnset) {
+				if (this.data.Pokedex[j].num === teamdexno[i] && this.getTemplate(this.data.Pokedex[j].species).learnset && this.data.Pokedex[j].species !== 'Pichu-Spiky-eared') {
 					formes.push(this.data.Pokedex[j].species);
 				}
 			}
@@ -862,13 +869,6 @@ exports.BattleScripts = {
 					if (hasMove['trick'] || hasMove['switcheroo']) rejected = true;
 					break;
 				}
-				// handle HP IVs
-				if (move.id === 'hiddenpower') {
-					var HPivs = this.getType(move.name.substr(13)).HPivs;
-					for (var iv in HPivs) {
-						ivs[iv] = HPivs[iv];
-					}
-				}
 				if (k===3) {
 					if (counter['Status']>=4) {
 						// taunt bait, not okay
@@ -896,6 +896,14 @@ exports.BattleScripts = {
 				if (rejected && j<moveKeys.length) {
 					moves.splice(k,1);
 					break;
+				}
+
+				// handle HP IVs
+				if (move.id === 'hiddenpower') {
+					var HPivs = this.getType(move.type).HPivs;
+					for (var iv in HPivs) {
+						ivs[iv] = HPivs[iv];
+					}
 				}
 			}
 
@@ -1214,6 +1222,8 @@ exports.BattleScripts = {
 			if (!template || !template.name || !template.types) continue;
 			if ((template.tier === 'G4CAP' || template.tier === 'G5CAP') && Math.random()*5>1) continue;
 			if (keys[i].substr(0,6) === 'arceus' && Math.random()*17>1) continue;
+			// Not available on BW
+			if (template.species === 'Pichu-Spiky-eared') continue;
 
 			if (ruleset && ruleset[0]==='PotD') {
 				var potd = this.getTemplate(config.potd);
