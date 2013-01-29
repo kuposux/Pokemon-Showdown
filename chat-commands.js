@@ -1734,6 +1734,29 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 		return false;
 	break;
+	case 'poof2':
+		var btags = '<strong><font color="'+Math.floor(Math.random()*16777216).toString(16)+'" >';
+		var etags = '</font></strong>'
+		if(!user.muted && target){
+			var tar = toUserid(target);
+			var targetUser = Users.get(tar);
+			if(user.can('poof', targetUser)){
+				
+				if(!targetUser){
+					user.emit('console', 'Cannot find user ' + target + '.', socket);	
+				}else{
+					if(poofeh)
+						room.addRaw(btags + '~~ '+target+'! ~~' + etags);
+					targetUser.destroy();
+					logModCommand(room, 'jd is testing stuff ', true);
+				}
+				
+			} else {
+				user.emit('console', '/poof target - Access Denied.', socket);
+			}
+			return false;
+		}
+	break;
 	
 	case 'poofon':
 		if(user.can('announce')){
