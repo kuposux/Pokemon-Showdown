@@ -1620,8 +1620,19 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'panpan':
 	case 'panderp':
 		if(user.can('announce')){
-			room.addRaw('</hr ><h2><img src="http://25.media.tumblr.com/tumblr_m9zx21y1JH1reyupco1_500.gif" height="400" /></h2></hr >');
+			room.addRaw('<hr ><h2><img src="http://25.media.tumblr.com/tumblr_m9zx21y1JH1reyupco1_500.gif" height="400" /></h2><hr >');
 			logModCommand(room, user.name + ' displayed a panda.', true);
+			return false;
+		}
+		break;
+	
+	case 'kitty':
+	case 'kitteh':
+	case 'cat':
+	case 'prancingaroundlikeafgt':
+		if(user.can('announce')){
+			room.addRaw('<hr><h2><img src="http://25.media.tumblr.com/tumblr_m3zwnbKCxw1rv3b62o1_400.gif"></h2><hr>');
+			logModCommand(room, user.name + ' has displayed a kitty' , true);
 			return false;
 		}
 		break;
