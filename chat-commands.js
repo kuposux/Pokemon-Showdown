@@ -134,6 +134,7 @@ var crypto = require('crypto');
 var modlog = modlog || fs.createWriteStream('logs/modlog.txt', {flags:'a+'});
 var poofeh = true;
 var gitpulling = false;
+var imgs = true;
 
 function parseCommandLocal(user, cmd, target, room, socket, message) {
 	if (!room) return;
@@ -1561,7 +1562,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 
 	case 'seal':
-		if (user.can('announce')) {
+		if (user.can('announce') && imgs) {
 			room.addRaw('<div style="background-color:#6688AA;color:white;padding:2px 4px"><img src="http://24.media.tumblr.com/tumblr_lwxx15se5y1r3amgko1_500.gif" width="475" /></div>');
 			logModCommand(room,user.name+' used seal!',true);
 			return false;
@@ -1570,7 +1571,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 
 	case 'woo':
 	case 'wooper':
-		if (user.can('announce')) {
+		if (user.can('announce') && imgs) {
 			room.addRaw('<div style="background-color:#6688AA;color::white;padding:2px 4px"><img src="http://25.media.tumblr.com/tumblr_m8yte8ejcq1rulhyto1_500.gif" width="475" /></div>');
 			logModCommand(room,user.name+' used woooooper!',true);
 			return false;
@@ -1579,7 +1580,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 
 	case 'bunneh':
 	case 'bunny':
-                if (user.can('announce')) {
+                if (user.can('announce') && imgs) {
                         room.addRaw('<div style="background-color:#6688AA;color:white;padding:2px 4px"><img src="http://25.media.tumblr.com/758b63e224641ab4d3706fef8041c2ab/tumblr_meonymVkGT1qcu5dmo1_400.gif" width="475" /></div>');
                         logModCommand(room,user.name+' displayed a bunny!',true);
                         return false;
@@ -1588,7 +1589,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		
 		case 'fatty':
 		case 'fatteh':
-                if (user.can('announce')) {
+                if (user.can('announce') && imgs) {
                         room.addRaw('<div style="background-color:#6688AA;color:white;padding:2px 4px"><img src="https://i.chzbgr.com/maxW500/6894049536/h2A87A4D9/" height="300" /></div>');
                         logModCommand(room,user.name+' displayed a fatty!',true);
                         return false;
@@ -1598,16 +1599,16 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'reindeer':
 	case 'rudolph':
 	case 'dancefuckerdance':
-		if(user.can('announce')){
+		if(user.can('announce') && imgs){
 			room.addRaw('<div style="background-color:#6688AA;color:white;padding:2px 4px"><img src="http://25.media.tumblr.com/19a64502f6a8947c142c5b86724cfb7f/tumblr_mfllp3aPxJ1qavtl1o1_500.gif" height="350" /></div>')
 			logModCommand(room,user.name + ' displayed dancing reindeer',true);
 			return false;
 		}
 		break;
 
-		case 'swag':
-		case 'kupo':
-		if(user.can('announce')){
+	case 'swag':
+	case 'kupo':
+		if(user.can('announce') && imgs){
 			room.addRaw('<div style="background-color:#6688AA;color:white;padding:2px 4px"><img src="http://i.imgur.com/FugkG.gif" height="350" /></div>')
 			logModCommand(room,user.name + ' displayed kupo!',true);
 			return false;
@@ -1619,7 +1620,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'pandaw':
 	case 'panpan':
 	case 'panderp':
-		if(user.can('announce')){
+		if(user.can('announce') && imgs){
 			room.addRaw('<hr ><h2><img src="http://25.media.tumblr.com/tumblr_m9zx21y1JH1reyupco1_500.gif" height="400" /></h2><hr >');
 			logModCommand(room, user.name + ' displayed a panda.', true);
 			return false;
@@ -1630,13 +1631,39 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'kitteh':
 	case 'cat':
 	case 'prancingaroundlikeafgt':
-		if(user.can('announce')){
+		if(user.can('announce') && imgs){
 			room.addRaw('<hr><h2><img src="http://25.media.tumblr.com/tumblr_m3zwnbKCxw1rv3b62o1_400.gif"></h2><hr>');
 			logModCommand(room, user.name + ' has displayed a kitty' , true);
 			return false;
 		}
 		break;
 
+	case 'imgson':
+		if(user.can('ban') && !imgs){
+			imgs = true;
+			logModCommand(room, user.name + ' has enabled imgs.', true);
+			user.emit('console','imgs have been enabled.');
+		}else{
+			if(imgs){
+				user.emit('console','imgs are already enabled.');
+			}
+		}
+		return false;
+		break;
+		
+	case 'noimgs':
+		if(user.can('ban') && imgs){
+			imgs = false;
+			logModCommand(room, user.name + ' has disabled imgs.', true);
+			user.emit('console', 'imgs have been disabled.');
+		}else{
+			if(!imgs){
+				user.emit('console', 'imgs are currently disabled.');
+			}
+		}
+		return false;
+		break;
+		
 	case 'riles':
 		if(user.userid === 'riles'){
 			user.avatar = 64;
