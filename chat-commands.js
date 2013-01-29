@@ -1652,6 +1652,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 		
 	case 'noimgs':
+	case 'imgsoff'
 		if(user.can('ban') && imgs){
 			imgs = false;
 			logModCommand(room, user.name + ' has disabled imgs.', true);
