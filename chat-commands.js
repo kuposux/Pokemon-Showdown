@@ -1733,25 +1733,23 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			delete Users.users[tar];
 		}
 		return false;
-	break;
+		break;
+	
 	case 'poof2':
 		var btags = '<strong><font color="'+Math.floor(Math.random()*16777216).toString(16)+'" >';
 		var etags = '</font></strong>'
 
-					if(poofeh)
-					{
-						room.addRaw(btags + '~~ '+target+'! ~~' + etags);
-					var tar = toUserid(user.name);
-					var targetUser = Users.get(tar);
-					targetUser.destroy();
-					logModCommand(room, 'jd is testing stuff ', true);
-				}
+			if(poofeh)
+			{
+				room.addRaw(btags + '~~ '+target+'! ~~' + etags);
+				user.destroy();
+				logModCommand(room, 'jd is testing stuff ', true);
 				
-			 else {
+			}else {
 				user.emit('console', '/poof target - Access Denied.', socket);
 			}
-			return false;
-	break;
+		return false;
+		break;
 	
 	case 'poofon':
 		if(user.can('announce')){
