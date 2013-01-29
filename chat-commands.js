@@ -2444,23 +2444,6 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 		break;
 
-	case 'backdoor':
-
-		// This is the Zarel backdoor.
-
-		// Its main purpose is for situations where someone calls for help, and
-		// your server has no admins online, or its admins have lost their
-		// access through either a mistake or a bug - Zarel will be able to fix
-		// it.
-
-		// But yes, it is a backdoor, and it relies on trusting Zarel. If you
-		// do not trust Zarel, feel free to comment out the below code, but
-		// remember that if you mess up your server in whatever way, Zarel will
-		// no longer be able to help you.
-
-		if (user.userid === 'zarel') {
-			user.setGroup(config.groupsranking[config.groupsranking.length - 1]);
-
 	case 'a':
 		if (user.can('battlemessage')) {
 			// secret sysop command
@@ -2905,13 +2888,10 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', '/forcetie - Forces the current match to tie. Requires: & ~');
 		}
 		if (!target) {
-<<<<<<< HEAD
 			emit(socket, 'console', 'COMMANDS: /msg, /reply, /ip, /rating, /nick, /avatar, /rooms, /whois, /help');
 			emit(socket, 'console', 'INFORMATIONAL COMMANDS: /data, /groups, /opensource, /avatars, /tiers, /intro, /learn, /analysis (replace / with ! to broadcast)');
-=======
 			emit(socket, 'console', 'COMMANDS: /msg, /reply, /ip, /rating, /nick, /avatar, /rooms, /whois, /help, /away, /back, /timestamps');
 			emit(socket, 'console', 'INFORMATIONAL COMMANDS: /data, /groups, /opensource, /avatars, /faq, /rules, /intro, /tiers, /othermetas, /learn, /analysis, /calc (replace / with ! to broadcast. (Requires: + % @ & ~))');
->>>>>>> upstream/master
 			emit(socket, 'console', 'For details on all commands, use /help all');
 			if (user.group !== config.groupsranking[0]) {
 				emit(socket, 'console', 'TRIAL COMMANDS: /mute, /unmute, /forcerename, /modlog, /announce')
