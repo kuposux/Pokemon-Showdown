@@ -450,13 +450,13 @@ exports.BattleMovedex = {
 		num: 372,
 		accuracy: 100,
 		basePower: 50,
-		basePowerCallback: function(pokemon, source) {
-			if (source.lastDamage > 0 && pokemon.lastAttackedBy.thisTurn && pokemon.lastAttackedBy.move != "Pain Split") {			
-				this.debug('Boosted damge for being hit this turn');
+		basePowerCallback: function(pokemon, target) {
+			if (pokemon.volatiles.assurance && pokemon.volatiles.assurance.hurt) {			
+				this.debug('Boosted for being damaged this turn');
 				return 100;
 			}
 			return 50;
-		},		
+		},
 		category: "Physical",
 		desc: "Deals damage to one adjacent target. Power doubles if the target has already taken damage this turn, other than from Pain Split. Makes contact.",
 		shortDesc: "Power doubles if target was damaged this turn.",
@@ -464,6 +464,19 @@ exports.BattleMovedex = {
 		name: "Assurance",
 		pp: 10,
 		priority: 0,
+		beforeTurnCallback: function(pokemon, target) {
+			pokemon.addVolatile('assurance');
+			pokemon.volatiles.assurance.position = target.position;
+		},
+		effect: {
+			duration: 1,
+			onFoeAfterDamage: function(damage, target) {
+				if (target.position == this.effectData.position) {
+					this.debug('damaged this turn');
+					this.effectData.hurt = true;
+				}
+			}
+		},
 		isContact: true,
 		secondary: false,
 		target: "normal",
@@ -517,13 +530,25 @@ exports.BattleMovedex = {
 		pp: 15,
 		priority: 0,
 		isBounceable: true,
-		onHit: function(target) {
-			if (target.addVolatile('attract')) this.add("-start", target, "Attract");
-			else return false;
-		},
+		volatileStatus: 'attract',
 		effect: {
-			onStart: function(pokemon, source) {
-				return ((pokemon.gender === 'M' && source.gender === 'F') || (pokemon.gender === 'F' && source.gender === 'M'));
+			onStart: function(pokemon, source, effect) {
+				if (!(pokemon.gender === 'M' && source.gender === 'F') && !(pokemon.gender === 'F' && source.gender === 'M')) {
+					this.debug('incompatible gender');
+					return false;
+				}
+				if (!this.runEvent('Attract', pokemon, source)) {
+					this.debug('Attract event failed');
+					return false;
+				}
+
+				if (effect.id === 'cutecharm') {
+					this.add('-start', pokemon, 'Attract', '[from] ability: Cute Charm', '[of] '+source);
+				} else if (effect.id === 'destinyknot') {
+					this.add('-start', pokemon, 'Attract', '[from] item: Destiny Knot', '[of] '+source);
+				} else {
+					this.add('-start', pokemon, 'Attract');
+				}
 			},
 			onBeforeMove: function(pokemon, target, move) {
 				if (this.effectData.source && !this.effectData.source.isActive && pokemon.volatiles['attract']) {
@@ -629,8 +654,8 @@ exports.BattleMovedex = {
 		num: 419,
 		accuracy: 100,
 		basePower: 60,
-		basePowerCallback: function(pokemon, source) {
-			if (source.lastDamage > 0 && pokemon.lastAttackedBy && pokemon.lastAttackedBy.thisTurn) {
+		basePowerCallback: function(pokemon, target) {
+			if (target.lastDamage > 0 && pokemon.lastAttackedBy && pokemon.lastAttackedBy.thisTurn) {
 				this.debug('Boosted for getting hit by '+pokemon.lastAttackedBy.move);
 				return 120;
 			}
@@ -708,6 +733,7 @@ exports.BattleMovedex = {
 		basePower: false,
 		basePowerCallback: function(pokemon, target) {
 			pokemon.addVolatile('beatup');
+			if (!pokemon.side.pokemon[pokemon.volatiles.beatup.index]) return null;
 			return 5 + Math.floor(pokemon.side.pokemon[pokemon.volatiles.beatup.index].baseStats.atk / 10);
 		},
 		category: "Physical",
@@ -717,14 +743,7 @@ exports.BattleMovedex = {
 		name: "Beat Up",
 		pp: 10,
 		priority: 0,
-		onModifyMove: function(move, pokemon) {
-			var validpokemon = 1;
-			for (var p in pokemon.side.pokemon) {
-				if (pokemon.side.pokemon[p] === pokemon) continue;
-				if (pokemon.side.pokemon[p] && !pokemon.side.pokemon[p].fainted && !pokemon.side.pokemon[p].status) validpokemon++;
-			}
-			move.multihit = validpokemon;
-		},
+		multihit: 6,
 		effect: {
 			duration: 1,
 			onStart: function(pokemon) {
@@ -4313,6 +4332,16 @@ exports.BattleMovedex = {
 		num: 559,
 		accuracy: 100,
 		basePower: 100,
+		basePowerCallback: function(pokemon) {
+			var actives = pokemon.side.active;
+			for (var i=0; i<actives.length; i++) {
+				if (actives[i] && actives[i].lastMove === 'fusionflare' && actives[i].movedThisTurn) {
+					this.debug('double power');
+					return 200;
+				}
+			}
+			return 100;
+		},
 		category: "Physical",
 		desc: "Deals damage to one adjacent target. If this move is successful, the next use of Fusion Flare by any Pokemon this turn will have its power doubled.",
 		shortDesc: "Power doubles if used after Fusion Flare.",
@@ -4329,6 +4358,16 @@ exports.BattleMovedex = {
 		num: 558,
 		accuracy: 100,
 		basePower: 100,
+		basePowerCallback: function(pokemon) {
+			var actives = pokemon.side.active;
+			for (var i=0; i<actives.length; i++) {
+				if (actives[i] && actives[i].lastMove === 'fusionbolt' && actives[i].movedThisTurn) {
+					this.debug('double power');
+					return 200;
+				}
+			}
+			return 100;
+		},
 		category: "Special",
 		desc: "Deals damage to one adjacent target. If this move is successful, the next use of Fusion Bolt by any Pokemon this turn will have its power doubled. If the user is frozen, it will defrost before using this move.",
 		shortDesc: "Power doubles if used after Fusion Bolt.",
@@ -4636,6 +4675,7 @@ exports.BattleMovedex = {
 			onStart: function() {
 				this.add('-fieldstart', 'move: Gravity');
 			},
+			onModifyPokemonPriority: 100,
 			onModifyPokemon: function(pokemon) {
 				pokemon.negateImmunity['Ground'] = true;
 				pokemon.boosts.evasion -= 2;
@@ -10737,7 +10777,7 @@ exports.BattleMovedex = {
 				if (!applies) return false;
 				this.add('-start', pokemon, 'Smack Down');
 			},
-			onModifyPokemonPriority: 1,
+			onModifyPokemonPriority: 100,
 			onModifyPokemon: function(pokemon) {
 				pokemon.negateImmunity['Ground'] = true;
 			}
@@ -12669,6 +12709,57 @@ exports.BattleMovedex = {
 		pp: 10,
 		priority: 0,
 		isSoundBased: true,
+		self: {
+			volatileStatus: 'uproar'
+		},
+		onTryHit: function(target) {
+			for (var i=0; i<target.side.active.length; i++) {
+				var allyActive = target.side.active[i];
+				if (allyActive && allyActive.status === 'slp') allyActive.cureStatus();
+				var foeActive = target.side.foe.active[i];
+				if (foeActive && foeActive.status === 'slp') foeActive.cureStatus();
+			}
+		},
+		effect: {
+			duration: 3,
+			onResidual: function(target) {
+				if (target.lastMove === 'struggle') {
+					// don't lock
+					delete target.volatiles['uproar'];
+				}
+			},
+			onStart: function(target) {
+				this.add('-start', target, 'Uproar');
+			},
+			onResidual: function(target) {
+				this.add('-start', target, 'Uproar', '[upkeep]');
+			},
+			onEnd: function(target) {
+				this.add('-end', target, 'Uproar');
+			},
+			onLockMove: function(pokemon) {
+				return 'uproar';
+			},
+			onBeforeTurn: function(pokemon) {
+				this.debug('Forcing into uproar');
+				this.changeDecision(pokemon, {move: 'uproar'});
+			},
+			onAnySetStatus: function(status, pokemon) {
+				if (status.id === 'slp') {
+					if (pokemon === this.effectData.target) {
+						this.add('-fail', pokemon, 'slp', '[from] Uproar', '[msg]');
+					} else {
+						this.add('-fail', pokemon, 'slp', '[from] Uproar');
+					}
+					return null;
+				}
+			},
+			onAnyTryHit: function(target, source, move) {
+				if (move && move.id === 'yawn') {
+					return false;
+				}
+			}
+		},
 		secondary: false,
 		target: "randomNormal",
 		type: "Normal"

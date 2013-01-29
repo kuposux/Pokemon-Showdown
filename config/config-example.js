@@ -1,8 +1,20 @@
 // The server port - the port to run Pokemon Showdown under
 exports.port = 8000;
 
-// The setuid user - if you're using a port below 1024, you probably want to run
-//   PS as root and set this to an unprivileged user
+// The setuid user. If this is specified, the Pokemon Showdown server will
+// setuid() to this user after initialisation.
+//
+// WARNING: This is not generally the right way to run the server. If you want
+//          to run the server on a port below 1024, the correct way to do it
+//          is to run the server on port X > 1024 and then forward port the
+//          preferred port to port X.
+//
+//          If the server *.js files are writeable by the setuid user, this
+//          feature is equivalent to giving root to the setuid user, because
+//          they can just inject code to give themselves root into the part
+//          of the code before setuid() is called.
+//
+//          This feature should be used with caution.
 exports.setuid = '';
 
 // protocol - WebSockets ("ws") or Socket.IO ("io").
@@ -72,6 +84,15 @@ exports.reportbattles = true;
 //   huge influxes of spammy users.
 exports.modchat = false;
 
+// backdoor - allow Zarel to provide tech support for your server
+//   This backdoor gives Zarel admin access to your server, which allows him
+//   to provide tech support. This can be useful in a variety of situations:
+//   if an attacker attacks your server and you are not online, if you need
+//   help setting up your server, etc.
+//   It is a backdoor, though, so if you do not trust Zarel you should
+//   disable this feature.
+exports.backdoor = true;
+
 // permissions and groups:
 //   Each entry in `groupsranking' specifies the ranking of the groups.
 //   Each entry in `groups' is a seperate group. Some of the members are "special"
@@ -90,7 +111,6 @@ exports.modchat = false;
 //                       and 'u' is another special group where it means all groups
 //                       lower in rank than the current group.
 //   All the possible permissions are as follows:
-//     - console: Developer console (>>).
 //     - lockdown: /lockdown and /endlockdown commands.
 //     - hotpatch: /hotpatch, /crashfixed and /savelearnsets commands.
 //     - ignorelimits: Ignore limits such as chat message length.

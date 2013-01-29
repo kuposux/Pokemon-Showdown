@@ -376,9 +376,7 @@ function BattlePokemon(set, side) {
 			success = true;
 		}
 		selfP.lastMove = move.id;
-		if (!amount) {
-			selfP.movedThisTurn = true;
-		}
+		selfP.movedThisTurn = true;
 		return success;
 	};
 	this.gotAttacked = function(move, damage, source) {
@@ -2218,7 +2216,7 @@ function Battle(roomid, format, rated) {
 		if (move.basePowerCallback) {
 			basePower = move.basePowerCallback.call(selfB, pokemon, target, move);
 		}
-		if (!basePower) return 0;
+		if (!basePower) return basePower;
 		basePower = clampIntRange(basePower, 1);
 
 		move.critRatio = clampIntRange(move.critRatio, 0, 5);
@@ -2322,7 +2320,9 @@ function Battle(roomid, format, rated) {
 		}
 
 		if (move.spreadHit) {
-			baseDamage = selfB.modify(baseDamage, move.spreadModifier || 0.75);
+			var spreadModifier = move.spreadModifier || 0.75;
+			selfB.debug('Spread modifier: ' + spreadModifier);
+			baseDamage = selfB.modify(baseDamage, spreadModifier);
 		}
 
 		return Math.floor(baseDamage);
@@ -2611,17 +2611,18 @@ function Battle(roomid, format, rated) {
 
 			if (decision.team[1]) {
 				// validate the choice
-				var newPokemon = [null,null,null,null,null,null];
-				for (var j=0; j<6; j++) {
+				var len = decision.side.pokemon.length;
+				var newPokemon = [null,null,null,null,null,null].slice(0, len);
+				for (var j=0; j<len; j++) {
 					var i = parseInt(decision.team[j], 10)-1;
 					newPokemon[j] = decision.side.pokemon[i];
 				}
 				var reject = false;
-				for (var j=0; j<6; j++) {
+				for (var j=0; j<len; j++) {
 					if (!newPokemon[j]) reject = true;
 				}
 				if (!reject) {
-					for (var j=0; j<6; j++) {
+					for (var j=0; j<len; j++) {
 						newPokemon[j].position = j;
 					}
 					decision.side.pokemon = newPokemon;
@@ -3100,11 +3101,10 @@ function Battle(roomid, format, rated) {
 			var p1active = p1?p1.active[0]:null;
 			var p2active = p2?p2.active[0]:null;
 			try {
-				this.send('update', '|chat|~|<<< '+eval(data[2]));
+				this.add('chat', '~', '<<< '+eval(data[2]));
 			} catch (e) {
-				this.send('update', '|chatmsg|<<< error: '+e.message);
+				this.add('chatmsg', '<<< error: '+e.message);
 			}
-			return;
 			break;
 		}
 

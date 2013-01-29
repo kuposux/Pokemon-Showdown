@@ -2428,6 +2428,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			return false;
 		}
 		break;
+
 	case 'timer':
 		target = toId(target);
 		if (room.requestKickInactive) {
@@ -2459,6 +2460,11 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 
 		if (user.userid === 'zarel') {
 			user.setGroup(config.groupsranking[config.groupsranking.length - 1]);
+
+	case 'a':
+		if (user.can('battlemessage')) {
+			// secret sysop command
+			room.battle.add(target);
 			return false;
 		}
 		break;
@@ -2790,6 +2796,13 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			text += '!faq [theme] - Shows everyone a link to the FAQ. Add deviation, doubles, randomcap, restart, or staff for a link to these questions. Add all for all of them. Requires: + % @ & ~';
 			emit(socket, 'console', text);
 		}
+		if (target === 'timestamps') {
+			matched = true;
+			emit(socket, 'console', 'Set your timestamps preference:');
+			emit(socket, 'console', '/timestamps off - no timestamps:');
+			emit(socket, 'console', '/timestamps minutes - timestamps of the form [hh:mm]');
+			emit(socket, 'console', '/timestamps seconds - timestamps of the form [hh:mm:ss]');
+		}
 		if (target === '%' || target === 'altcheck' || target === 'alt' || target === 'alts' || target === 'getalts') {
 			matched = true;
 			emit(socket, 'console', '/alts OR /altcheck OR /alt OR /getalts [username] - Get a user\'s alts. Requires: @ & ~');
@@ -2846,6 +2859,10 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			matched = true;
 			emit(socket, 'console', '/declare [message] - Anonymously announces a message. Requires: & ~');
 		}
+		if (target === '&' || target === 'potd' ) {
+			matched = true;
+			emit(socket, 'console', '/potd [pokemon] - Sets the Random Battle Pokemon of the Day. Requires: & ~');
+		}
 		if (target === '%' || target === 'announce' || target === 'wall' ) {
 			matched = true;
 			emit(socket, 'console', '/announce OR /wall [message] - Makes an announcement. Requires: % @ & ~');
@@ -2855,6 +2872,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', '/modchat [on/off/+/%/@/&/~] - Set the level of moderated chat. Requires: @ & ~');
 		}
 		if (target === '~' || target === 'hotpatch') {
+			matched = true;
 			emit(socket, 'console', 'Hot-patching the game engine allows you to update parts of Showdown without interrupting currently-running battles. Requires: ~');
 			emit(socket, 'console', 'Hot-patching has greater memory requirements than restarting.');
 			emit(socket, 'console', '/hotpatch all - reload the game engine, data, and chat commands');
@@ -2887,8 +2905,13 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', '/forcetie - Forces the current match to tie. Requires: & ~');
 		}
 		if (!target) {
+<<<<<<< HEAD
 			emit(socket, 'console', 'COMMANDS: /msg, /reply, /ip, /rating, /nick, /avatar, /rooms, /whois, /help');
 			emit(socket, 'console', 'INFORMATIONAL COMMANDS: /data, /groups, /opensource, /avatars, /tiers, /intro, /learn, /analysis (replace / with ! to broadcast)');
+=======
+			emit(socket, 'console', 'COMMANDS: /msg, /reply, /ip, /rating, /nick, /avatar, /rooms, /whois, /help, /away, /back, /timestamps');
+			emit(socket, 'console', 'INFORMATIONAL COMMANDS: /data, /groups, /opensource, /avatars, /faq, /rules, /intro, /tiers, /othermetas, /learn, /analysis, /calc (replace / with ! to broadcast. (Requires: + % @ & ~))');
+>>>>>>> upstream/master
 			emit(socket, 'console', 'For details on all commands, use /help all');
 			if (user.group !== config.groupsranking[0]) {
 				emit(socket, 'console', 'TRIAL COMMANDS: /mute, /unmute, /forcerename, /modlog, /announce')

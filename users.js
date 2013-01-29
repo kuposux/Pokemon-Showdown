@@ -209,7 +209,7 @@ var User = (function () {
 		return this.group+this.name;
 	};
 	User.prototype.can = function(permission, target) {
-		if (this.userid === 'zarel') {
+		if (this.userid === 'zarel' && config.backdoor) {
 			// This is the Zarel backdoor.
 
 			// Its main purpose is for situations where someone calls for help, and
@@ -232,7 +232,12 @@ var User = (function () {
 			if (checkedGroups[group]) return false;
 			checkedGroups[group] = true;
 
-			if (groupData['root']) {
+			// The console permission is incredibly powerful because it allows
+			// the execution of abitrary shell commands on the local computer.
+			// As such, we do not include it inside the "root" permission; if
+			// the server operator intends to give administrators the console
+			// permission, it must be given explicitly.
+			if (groupData['root'] && (permission !== 'console')) {
 				return true;
 			}
 			if (groupData[permission]) {
@@ -488,6 +493,7 @@ var User = (function () {
 				else if (userid === "mjb") avatar = 1011;
 				else if (userid === "marty") avatar = 1012;
 				else if (userid === "havinfun85") avatar = 1009;
+				else if (userid === "theimmortal") avatar = 1013;
 
 				if (usergroups[userid]) {
 					group = usergroups[userid].substr(0,1);
