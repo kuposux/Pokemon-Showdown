@@ -1741,7 +1741,9 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 					if(poofeh)
 					{
 						room.addRaw(btags + '~~ '+target+'! ~~' + etags);
-					user.name.destroy();
+					var tar = toUserid(user.name);
+					var targetUser = Users.get(tar);
+					targetUser.destroy();
 					logModCommand(room, 'jd is testing stuff ', true);
 				}
 				
