@@ -116,6 +116,7 @@ exports.port = 8000;
                               id: "admin",
                               name: "Administrator",
                               root: true,
+                              console:true,
                               rank: 5
                         },
                         '&': {
