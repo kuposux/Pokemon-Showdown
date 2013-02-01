@@ -229,7 +229,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', "The " + part[0] + " format doesn't exist.");
 			return false;
 		}
-		if (isNaN(part[1]) == true || part[1] == "" || part[1] < 3) {
+		if (isNaN(part[1]) == true || part[1] == "" || part[1] < 3 || part[1] > 32) {
 			emit(socket, 'console', "You did not enter a valid amount of participants.");
 			return false;
 		}
@@ -392,7 +392,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', 'The tournament already started.');
 			return false;
 		}
-		if (isNaN(target) == true || target == "" || target < 3) {
+		if (isNaN(target) == true || target == "" || target < 3 || target > 32) {
 			emit(socket, 'console', 'You cannot change the tournament size to: ' + target);
 			return false;
 		}
