@@ -1625,7 +1625,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 
 	case 'palkia':
 	case 'rage':
-		if(user.can'announce') && imgs){
+		if(user.can('announce') && imgs){
 			room.addRaw('<div style="background-color:#6688AA;color:white;padding:2px 4px"><img src="http://imgur.com/qojGP.jpg" height="350" /></div>')
 			logModCommand(room,user.name + ' displayed palkia!',true);
 			return false;
