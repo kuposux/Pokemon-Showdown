@@ -1586,9 +1586,17 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
                         return false;
                 }
 		break;
+
+	case 'sony':
+		if (user.can('announce') && imgs) {
+			room.addRaw('<div style="background-color:#6688AA;color:white;padding:2px 4px"><img src="http://i2.kym-cdn.com/photos/images/original/000/321/454/d26.gif" width="475" /></div>')
+			logModCommand(room,user,name+'displayed a sony!',true);
+			return false;
+		}
+		break;
 		
-		case 'fatty':
-		case 'fatteh':
+	case 'fatty':
+	case 'fatteh':
                 if (user.can('announce') && imgs) {
                         room.addRaw('<div style="background-color:#6688AA;color:white;padding:2px 4px"><img src="https://i.chzbgr.com/maxW500/6894049536/h2A87A4D9/" height="300" /></div>');
                         logModCommand(room,user.name+' displayed a fatty!',true);
@@ -1606,15 +1614,24 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 		break;
 
-	case 'swag':
+	case 'squirtle':
 	case 'kupo':
 		if(user.can('announce') && imgs){
-			room.addRaw('<div style="background-color:#6688AA;color:white;padding:2px 4px"><img src="http://i.imgur.com/FugkG.gif" height="350" /></div>')
+			room.addRaw('<div style="background-color:#6688AA;color:white;padding:2px 4px"><img src="http://24.media.tumblr.com/tumblr_mckr9lcmGh1r807zvo1_500.gif" height="350" /></div>')
 			logModCommand(room,user.name + ' displayed kupo!',true);
 			return false;
 		}
 		break;
 
+	case 'palkia':
+	case 'rage':
+		if(user.can'announce') && imgs){
+			room.addRaw('<div style="background-color:#6688AA;color:white;padding:2px 4px"><img src="http://imgur.com/qojGP.jpg" height="350" /></div>')
+			logModCommand(room,user.name + ' displayed palkia!',true);
+			return false;
+		}
+		break;
+		
 	case 'panda':
 	case 'panpaw':
 	case 'pandaw':
