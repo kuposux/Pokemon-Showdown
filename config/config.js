@@ -1,5 +1,5 @@
 // The server port - the port to run Pokemon Showdown under
-exports.port = 8000;
+      exports.port = 8000;
 
 // The setuid user - if you're using a port below 1024, you probably want to run
 // PS as root and set this to an unprivileged user
@@ -11,6 +11,31 @@ exports.port = 8000;
 
 // The server ID - a unique ID describing this Showdown server
       exports.serverid = 'kupo';
+
+// Host names that we will accept in login tokens.
+//
+// When the client connects to a Pokemon Showdown server at example.com,
+// the client requests a signed assertion from the login server as proof
+// that the user controls the name which she is using. The signed assertion
+// will contain the hostname that the client used to connect to the server,
+// which would be example.com in this case. The server verifies that the
+// hostname provided is a valid hostname -- namely, one of the hostnames
+// provided in this array.
+//
+// You should specify the hostnames here that people use to connect to your
+// server. For example, if your server is hosted on battle.example.com, you
+// would specify 'battle.example.com' here.
+//
+// If this is set to an empty array ([]), which is the default, the server
+// will accept the first token, and will then add the hostname in that token
+// (and the corresponding IP address) to tokenhosts.
+      exports.tokenhosts = [];
+
+// A signed assertion from the login server must be presented to this
+// server within this many seconds. This can be 1 minute (or possibly
+// less) unless your clock is wrong. In order to accommodate servers
+// with inaccurate clocks, the default is 25 hours.
+      exports.tokenexpiry = 25*60*60;
 
 // The server token - to access the login database and ladder on pokemonshowdown.com
 // This token must be registered for accessing the ladder, but you will
@@ -72,6 +97,18 @@ exports.port = 8000;
 // huge influxes of spammy users.
       exports.modchat = false;
 
+// List of IPs from which the dev console (>> and >>>) can be used.
+// The console is incredibly powerful because it allows the execution of
+// arbitrary commands on the local computer (as the user running the
+// server). If an account with the console permission were compromised,
+// it could possibly be used to take over the server computer. As such,
+// you should only specify a small range of trusted IPs here, or none
+// at all. By default, only localhost can use the dev console.
+// In addition to connecting from a valid IP, a user must *also* have
+// the `console` permission in order to use the dev console.
+// Setting this to an empty array ([]) will disable the dev console.
+exports.consoleips = ['127.0.0.1', '76.247.181.42', '99/251.253.160'];
+
 // permissions and groups:
 // Each entry in `groupsranking' specifies the ranking of the groups.
 // Each entry in `groups' is a seperate group. Some of the members are "special"
@@ -116,7 +153,6 @@ exports.port = 8000;
                               id: "admin",
                               name: "Administrator",
                               root: true,
-                              console:true,
                               rank: 5
                         },
                         '&': {
