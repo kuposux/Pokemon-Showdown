@@ -184,6 +184,7 @@ exports.BattleMovedex = {
 			if (decision) {
 				this.cancelMove(target);
 				this.queue.unshift(decision);
+				this.add('-activate', target, 'move: After You');
 			} else {
 				return false;
 			}
@@ -5396,7 +5397,7 @@ exports.BattleMovedex = {
 		isContact: true,
 		hasCustomRecoil: true,
 		onMoveFail: function(target, source, move) {
-			this.damage(source.maxhp/2, source, source, {id:'hijumpkick'});
+			this.damage(source.maxhp/2, source, source, 'hijumpkick');
 		},
 		secondary: false,
 		target: "normal",
@@ -6300,7 +6301,7 @@ exports.BattleMovedex = {
 		isContact: true,
 		hasCustomRecoil: true,
 		onMoveFail: function(target, source, move) {
-			this.damage(source.maxhp/2, source, source, {id:'jumpkick'});
+			this.damage(source.maxhp/2, source, source, 'jumpkick');
 		},
 		secondary: false,
 		target: "normal",
@@ -8803,6 +8804,7 @@ exports.BattleMovedex = {
 						break;
 					}
 				}
+				this.add('-activate', target, 'move: Quash');
 			} else {
 				return false;
 			}

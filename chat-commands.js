@@ -1036,6 +1036,11 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			return false;
 		} */
 
+		if (!user.named) {
+			emit(socket, 'console', 'You must choose a name before you can send private messages.');
+			return false;
+		}
+
 		var message = {
 			name: user.getIdentity(),
 			pm: targetUser.getIdentity(),
@@ -1183,9 +1188,12 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 
 		var isDemotion = (config.groups[nextGroup].rank < config.groups[currentGroup].rank);
-		Users.setOfflineGroup(name, nextGroup);
+		if (!Users.setOfflineGroup(name, nextGroup)) {
+			emit(socket, 'console', '/promote - WARNING: This user is offline and could be unregistered. Use /forcepromote if you\'re sure you want to risk it.');
+			return false;
+		}
 		var groupName = config.groups[nextGroup].name || nextGroup || '';
-		logModCommand(room,''+name+' was '+(isDemotion?'demoted':'promoted')+' to ' + (groupName.trim() || 'a regular user') + ' by '+user.name+'.');
+		logModCommand(room,''+name+' was '+(isDemotion?'demoted':'promoted')+' to ' + (groupName.trim() || 'a regular user') + ' by '+user.name+'.', isDemotion);
 		if (targetUser && targetUser.connected) room.send('|N|'+targetUser.getIdentity()+'|'+targetUser.userid);
 		return false;
 		break;
@@ -1226,6 +1234,24 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return false;
 		break;
 
+	case 'forcepromote':
+		// warning: never document this command in /help
+		if (!user.can('forcepromote')) {
+			emit(socket, 'console', '/forcepromote - Access denied.');
+			return false;
+		}
+		var targets = splitTarget(target, true);
+		var name = targets[2];
+		var nextGroup = targets[1] ? targets[1] : Users.getNextGroupSymbol(' ', false);
+
+		if (!Users.setOfflineGroup(name, nextGroup, true)) {
+			emit(socket, 'console', '/forcepromote - Don\'t forcepromote unless you have to.');
+			return false;
+		}
+		var groupName = config.groups[nextGroup].name || nextGroup || '';
+		logModCommand(room,''+name+' was promoted to ' + (groupName.trim()) + ' by '+user.name+'.');
+		return false;
+		break;
 
 	case 'deauth':
 		return parseCommand(user, 'demote', target+', deauth', room, socket);
@@ -1380,7 +1406,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 
 	case 'disableladder':
-		if (!user.can('modchat')) {
+		if (!user.can('disableladder')) {
 			emit(socket, 'console', '/disableladder - Access denied.');
 			return false;
 		}
@@ -1389,11 +1415,12 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			return false;
 		}
 		LoginServer.disabled = true;
+		logModCommand(room, 'The ladder was disabled by ' + user.name + '.', true);
 		room.addRaw('<div style="background:#BB6655;color:white;padding:2px 4px"><b>Due to high server load, the ladder has been temporarily disabled</b><br />Rated games will no longer update the ladder. It will be back momentarily.</div>');
 		return false;
 		break;
 	case 'enableladder':
-		if (!user.can('modchat')) {
+		if (!user.can('disableladder')) {
 			emit(socket, 'console', '/enable - Access denied.');
 			return false;
 		}
@@ -1402,6 +1429,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			return false;
 		}
 		LoginServer.disabled = false;
+		logModCommand(room, 'The ladder was enabled by ' + user.name + '.', true);
 		room.addRaw('<div style="background-color:#559955;color:white;padding:2px 4px"><b>The ladder is now back.</b><br />Rated games will update the ladder now.</div>');
 		return false;
 		break;
@@ -2029,6 +2057,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			'<br />- <a href="https://github.com/kupochu/Pokemon-Showdown/commits/master" target="blank">What\'s new with TBT?</a>'+
 			'<br />- <a href="https://github.com/kupochu/Pokemon-Showdown" target="_blank">TBT\'s Source</a>'+
 			'</div>');
+			'<div style="border:1px solid #6688AA;padding:2px 4px">Pokemon Showdown is open source:<br />- Language: JavaScript<br />- <a href="https://github.com/Zarel/Pokemon-Showdown/commits/master" target="_blank">What\'s new?</a><br />- <a href="https://github.com/Zarel/Pokemon-Showdown" target="_blank">Server source code</a><br />- <a href="https://github.com/Zarel/Pokemon-Showdown-Client" target="_blank">Client source code</a></div>');
 		return false;
 		break;
 
@@ -2461,6 +2490,19 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 		break;
 
+	case 'lobbychat':
+		target = toId(target);
+		if (target === 'off') {
+			user.blockLobbyChat = true;
+			emit(socket, 'console', 'You are now blocking lobby chat.');
+		} else {
+			user.blockLobbyChat = false;
+			emit(socket, 'console', 'You are now receiving lobby chat.');
+		}
+		return false;
+		break;
+		break;
+
 	case 'a':
 		if (user.can('battlemessage')) {
 			// secret sysop command
@@ -2792,16 +2834,22 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 		if (target === 'all' || target === 'faq') {
 			matched = true;
-			text = '/faq [theme] - Provides a link to the FAQ. Add deviation, doubles, randomcap, restart, or staff for a link to these questions. Add all for all of them.<br />';
-			text += '!faq [theme] - Shows everyone a link to the FAQ. Add deviation, doubles, randomcap, restart, or staff for a link to these questions. Add all for all of them. Requires: + % @ & ~';
-			emit(socket, 'console', text);
+			emit(socket, 'console', '/faq [theme] - Provides a link to the FAQ. Add deviation, doubles, randomcap, restart, or staff for a link to these questions. Add all for all of them.');
+			emit(socket, 'console', '!faq [theme] - Shows everyone a link to the FAQ. Add deviation, doubles, randomcap, restart, or staff for a link to these questions. Add all for all of them. Requires: + % @ & ~');
+		}
+		if (target === 'all' || target === 'highlight') {
+			matched = true;
+			emit(socket, 'console', 'Set your highlights preference:');
+			emit(socket, 'console', '/highlight delete - deletes all highlighting words.');
+			emit(socket, 'console', '/highlight add, word - adds a highlighing word. You can add several words separated by commas.');
+			emit(socket, 'console', '/highlight delete, word - deletes a single or seveal highlighting words. Separated by commas.');
 		}
 		if (target === 'timestamps') {
 			matched = true;
 			emit(socket, 'console', 'Set your timestamps preference:');
-			emit(socket, 'console', '/timestamps off - no timestamps:');
-			emit(socket, 'console', '/timestamps minutes - timestamps of the form [hh:mm]');
-			emit(socket, 'console', '/timestamps seconds - timestamps of the form [hh:mm:ss]');
+			emit(socket, 'console', '/timestamps [all|lobby|pms], [minutes|seconds|off]');
+			emit(socket, 'console', 'all - change all timestamps preferences, lobby - change only lobby chat preferences, pms - change only PM preferences');
+			emit(socket, 'console', 'off - set timestamps off, minutes - show timestamps of the form [hh:mm], seconds - show timestamps of the form [hh:mm:ss]');
 		}
 		if (target === '%' || target === 'altcheck' || target === 'alt' || target === 'alts' || target === 'getalts') {
 			matched = true;
@@ -2971,6 +3019,10 @@ function canTalk(user, room, socket) {
 		if (socket) emit(socket, 'console', 'You are muted.');
 		return false;
 	}
+	if (user.blockLobbyChat) {
+		if (socket) emit(socket, 'console', "You can't send messages while blocking lobby chat.");
+		return false;
+	}
 	if (config.modchat && room.id === 'lobby') {
 		if (config.modchat === 'crash') {
 			if (!user.can('ignorelimits')) {
@@ -3019,19 +3071,19 @@ function getDataMessage(target) {
 	var atLeastOne = false;
 	var response = [];
 	if (pokemon.exists) {
-		response.push('|c|&server|/data-pokemon '+pokemon.name);
+		response.push('|c|~|/data-pokemon '+pokemon.name);
 		atLeastOne = true;
 	}
 	if (ability.exists) {
-		response.push('|c|&server|/data-ability '+ability.name);
+		response.push('|c|~|/data-ability '+ability.name);
 		atLeastOne = true;
 	}
 	if (item.exists) {
-		response.push('|c|&server|/data-item '+item.name);
+		response.push('|c|~|/data-item '+item.name);
 		atLeastOne = true;
 	}
 	if (move.exists) {
-		response.push('|c|&server|/data-move '+move.name);
+		response.push('|c|~|/data-move '+move.name);
 		atLeastOne = true;
 	}
 	if (!atLeastOne) {

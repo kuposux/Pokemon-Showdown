@@ -21,16 +21,16 @@ exports.BattleFormats = {
 		searchShow: true,
 		ruleset: ['Random Battle']
 	},
-	// seasonalseasoningsgreetings: {
-	// 	effectType: 'Format',
-	// 	name: "[Seasonal] Seasoning's Greetings",
-	// 	team: 'randomSeasonal',
-	// 	canUseRandomTeam: true,
-	// 	rated: true,
-	// 	challengeShow: true,
-	// 	searchShow: true,
-	// 	ruleset: ['PotD', 'Pokemon', 'Sleep Clause']
-	// },
+	/* seasonalseasoningsgreetings: {
+		effectType: 'Format',
+		name: "[Seasonal] Seasoning's Greetings",
+		team: 'randomSeasonal',
+		canUseRandomTeam: true,
+		rated: true,
+		challengeShow: true,
+		searchShow: true,
+		ruleset: ['PotD', 'Pokemon', 'Sleep Clause']
+	},
 	seasonalwinterwonderland: {
 		effectType: 'Format',
 		name: "[Seasonal] Winter Wonderland",
@@ -150,6 +150,17 @@ exports.BattleFormats = {
 			}
 		},
 		ruleset: ['PotD', 'Pokemon', 'Sleep Clause']
+	},*/
+	seasonalvalentineventure: {
+		effectType: 'Format',
+		name: "[Seasonal] Valentine Venture",
+		team: 'randomSeasonalVV',
+		gameType: 'doubles',
+		canUseRandomTeam: true,
+		rated: true,
+		challengeShow: true,
+		searchShow: true,
+		ruleset: ['PotD', 'Pokemon', 'Sleep Clause']
 	},
 	challengecup: {
 		effectType: 'Format',
@@ -200,20 +211,19 @@ exports.BattleFormats = {
 	//	ruleset: ['Pokemon', 'Standard', 'Evasion Abilities Clause', 'Team Preview'],
 	//	banlist: ['Uber', 'Drizzle ++ Swift Swim', 'Soul Dew']
 	//},
-	// oususpecttest: {
-	// 	effectType: 'Format',
-	// 	name: "OU (suspect test)",
-	// 	challengeDefault: true,
-	// 	rated: true,
-	// 	challengeShow: true,
-	// 	searchShow: true,
-	// 	teambuilderFormat: 'ou',
-	// 	ruleset: ['Pokemon', 'Standard', 'Team Preview'],
-	// 	 banlist: [
-	// 		'Arceus-Bug', 'Arceus-Dark', 'Arceus-Dragon', 'Arceus-Electric', 'Arceus-Fighting', 'Arceus-Fire', 'Arceus-Flying', 'Arceus-Ghost', 'Arceus-Grass', 'Arceus-Ground', 'Arceus-Ice', 'Arceus', 'Arceus-Poison', 'Arceus-Psychic', 'Arceus-Rock', 'Arceus-Steel', 'Arceus-Water', 'Blaziken', 'Darkrai', 'Deoxys', 'Deoxys-Attack', 'Deoxys-Speed', 'Dialga', 'Excadrill', 'Giratina', 'Giratina-Origin', 'Groudon', 'Ho-Oh', 'Kyogre', 'Lugia', 'Manaphy', 'Mewtwo', 'Palkia', 'Rayquaza', 'Reshiram', 'Shaymin-Sky', 'Thundurus', 'Zekrom', 'Kyurem-White', 'Drizzle ++ Swift Swim', 'Soul Dew'
-	// 	] 
-	// 	banlist: ['Uber', 'Drizzle ++ Swift Swim', 'Soul Dew', 'Genesect']
-	// },
+	oususpecttest: {
+		effectType: 'Format',
+		name: "OU (suspect test)",
+		rated: true,
+		challengeShow: true,
+		searchShow: true,
+		teambuilderFormat: 'ou',
+		ruleset: ['Pokemon', 'Standard', 'Evasion Abilities Clause', 'Team Preview'],
+		//  banlist: [
+			// 'Arceus-Bug', 'Arceus-Dark', 'Arceus-Dragon', 'Arceus-Electric', 'Arceus-Fighting', 'Arceus-Fire', 'Arceus-Flying', 'Arceus-Ghost', 'Arceus-Grass', 'Arceus-Ground', 'Arceus-Ice', 'Arceus', 'Arceus-Poison', 'Arceus-Psychic', 'Arceus-Rock', 'Arceus-Steel', 'Arceus-Water', 'Blaziken', 'Darkrai', 'Deoxys', 'Deoxys-Attack', 'Deoxys-Speed', 'Dialga', 'Excadrill', 'Giratina', 'Giratina-Origin', 'Groudon', 'Ho-Oh', 'Kyogre', 'Lugia', 'Manaphy', 'Mewtwo', 'Palkia', 'Rayquaza', 'Reshiram', 'Shaymin-Sky', 'Thundurus', 'Zekrom', 'Kyurem-White', 'Drizzle ++ Swift Swim', 'Soul Dew'
+		// ] 
+		banlist: ['Uber', 'Drizzle ++ Swift Swim', 'Soul Dew', 'Deoxys-Defense']
+	},
 	cap: {
 		effectType: 'Format',
 		name: "CAP",
