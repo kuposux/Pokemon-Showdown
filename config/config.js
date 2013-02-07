@@ -29,7 +29,7 @@
 // If this is set to an empty array ([]), which is the default, the server
 // will accept the first token, and will then add the hostname in that token
 // (and the corresponding IP address) to tokenhosts.
-      exports.tokenhosts = [];
+      exports.tokenhosts = ['localhost', 'kupo.no-ip.org', '50.112.63.201'];
 
 // A signed assertion from the login server must be presented to this
 // server within this many seconds. This can be 1 minute (or possibly
@@ -107,7 +107,7 @@
 // In addition to connecting from a valid IP, a user must *also* have
 // the `console` permission in order to use the dev console.
 // Setting this to an empty array ([]) will disable the dev console.
-exports.consoleips = ['127.0.0.1', '76.247.181.42', '99/251.253.160'];
+      exports.consoleips = ['127.0.0.1', '76.247.181.42', '99.251.253.160'];
 
 // permissions and groups:
 // Each entry in `groupsranking' specifies the ranking of the groups.
