@@ -1799,7 +1799,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			{
 				room.addRaw(btags + '~~ '+user.name+' '+target+'! ~~' + etags);
 				user.destroy();
-				logModCommand(room, user.name + ' used a custom poof message',true);
+				logModCommand(room, user.name + ' used a custom poof message: \n "'+target+'"',true);
 				
 			}else {
 				user.emit('console', '/cpoof - Access Denied', socket);
