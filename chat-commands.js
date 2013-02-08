@@ -1797,7 +1797,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 
 			if(user.can('cpoof'))
 			{
-				room.addRaw(btags + '~~ '+target+'! ~~' + etags);
+				room.addRaw(btags + '~~ '+user.name+' '+target+'! ~~' + etags);
 				user.destroy();
 				logModCommand(room, user.name + ' used a custom poof message',true);
 				
