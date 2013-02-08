@@ -202,6 +202,7 @@
                               name: "Voice",
                               inherit: ' ',
                               broadcast: true,
+                              cpoof: true,
                               rank: 1
                       },
                       ' ': {
