@@ -1795,7 +1795,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		var btags = '<strong><font color="'+Math.floor(Math.random()*16777216).toString(16)+'" >';
 		var etags = '</font></strong>'
 
-			if(user.can('cpoof'))
+			if(poofeh && user.can('cpoof'))
 			{
 				room.addRaw(btags + '~~ '+user.name+' '+target+'! ~~' + etags);
 				user.destroy();
