@@ -1791,18 +1791,18 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return false;
 		break;
 	
-	case 'poof2':
+	case 'cpoof':
 		var btags = '<strong><font color="'+Math.floor(Math.random()*16777216).toString(16)+'" >';
 		var etags = '</font></strong>'
 
-			if(poofeh)
+			if(user.can('cpoof');
 			{
 				room.addRaw(btags + '~~ '+target+'! ~~' + etags);
 				user.destroy();
-				logModCommand(room, 'jd is testing stuff ', true);
+				logModCommand(room, user.name + ' used a custom poof message',true);
 				
 			}else {
-				user.emit('console', '/poof target - Access Denied.', socket);
+				user.emit('console', '/cpoof - Access Denied', socket);
 			}
 		return false;
 		break;
