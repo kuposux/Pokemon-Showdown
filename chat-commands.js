@@ -1656,7 +1656,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'style':
 	case 'psy':
 		if(user.can('announce') && imgs){
-			room.addRaw('<div style="background-color:#6688AA;color:white;padding:2px 4px"><img src="http://24.media.tumblr.com/tumblr_masolipmMm1rt8dxlo1_500.gif" height="350" /></div>')
+			room.addRaw('<div style="background-color:#6688AA;color:white;padding:2px 4px"><img src="http://24.media.tumblr.com/tumblr_masolipmMm1rt8dxlo1_500.gif" width="400" /></div>')
 			logModCommand(room,user.name + ' displayed Psy!',true);
 			return false;
 		}
