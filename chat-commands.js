@@ -1924,6 +1924,40 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return false;
 		break;
 	
+	case 'rj':
+	case 'reportjoins':
+		if(user.can('declare') && !config.reportjoins){
+			config.reportjoins = true;
+			config.reportbattles = true;
+			user.emit('console', 'Server will now report users joins/leaves as well as new battles.');
+			logModCommand(room, user.name + ' has enabled reportjoins/battles.', true);
+		}else{
+			if(!user.can('declare')){
+				user.emit('console', '/reportjoins - Access Denied.');
+			}else{
+				user.emit('console','Server is already reporting joins/leaves and battles.');	
+			}
+		}
+		return false;
+		break;
+	
+	case 'drj':
+	case 'disablereportjoins':
+		if(user.can('declare') && config.reportjoins){
+			config.reportjoins = false;
+			config.reportbattles = false;
+			user.emit('console', 'Server will not report users joins/leaves or new battles.');
+			logModCommand(room, user.name + ' has disabled reportjoins/battles.', true);
+		}else{
+			if(!user.can('declare')){
+				user.emit('console', '/disablereportjoins - Access Denied.');
+			}else{
+				user.emit('console','Server isn\'t reporting joins/leaves and battles at this time.');	
+			}
+		}
+		return false;
+		break;
+	
 	// INFORMATIONAL COMMANDS
 	case '!irc':
 	case 'irc':
