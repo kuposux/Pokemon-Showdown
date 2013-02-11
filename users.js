@@ -80,7 +80,6 @@ function connectUser(socket, room) {
 		});
 	});
 	
-	return person;
 	return connection;
 }
 
