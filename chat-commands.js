@@ -1984,16 +1984,25 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case '!info':
 		showOrBroadcastStart(user, cmd, room, socket, message);
 		showOrBroadcast(user, cmd, room, socket, '<div style="border:1px solid #6688AA;padding:2px 4px">The Battle Tower\'s External Websites:<br />'+
-				'- <a href="http://thebattletower.no-ip.org/forums" target="_blank">Forums</a><br />'+
-				'- <a href="http://thebattletower.no-ip.org/team-manager" target="_blank">Team Manager</a><br />'+
-				'- <a href="http://play.pokemonshowdown.com/" target="_blank"> PS main </a><br />'+
-				'- <a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=45" target="_blank" >Promotion Guide </a><br />'+
-				'- <a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=18" target="_blank">Epic Quotes Thread</a><br />'+
-				'- <a href="http://thebattletower.no-ip.org/forums/forumdisplay.php?fid=9" target="_blank">TBT POKEMON LEAGUE</a>'+
-				'</div>');
+			'- <a href="http://thebattletower.no-ip.org/forums" target="_blank">Forums</a><br />'+
+			'- <a href="http://thebattletower.no-ip.org/team-manager" target="_blank">Team Manager</a><br />'+
+			'- <a href="http://play.pokemonshowdown.com/" target="_blank"> PS main </a><br />'+
+			'- <a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=45" target="_blank" >Promotion Guide </a><br />'+
+			'- <a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=18" target="_blank">Epic Quotes Thread</a><br />'+
+			'- <a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=85&pid=391#pid391" target="_blank">TBT POKEMON LEAGUE</a>'+
+			'</div>');
 		return false;
 		break;
 
+	case 'league':
+		showOrBroadcastStart(user, cmd, room, socket, message);
+		showOrBroadcast(user, cmd, room, socket, '<div style="border:1px solid #6688AA;padding:2px 4px">The Battle Tower\'s Pokémon League:<br />' +
+			'- a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=85&pid=391#pid391" target="_blank">Gyms </a>'+
+			'- a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=86" target="_blank" >Elite 4 </a>'+
+			'</div>');
+		return false;
+		break;
+	
 	case 'data':
 	case '!data':
 	case 'stats':
@@ -2878,7 +2887,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		if (target === 'all' || target === 'highlight') {
 			matched = true;
 			emit(socket, 'console', 'Set your highlights preference:');
-			emit(socket, 'console', '/highlight delete - deletes all highlighting words.');
+			emit(socket, 'console', '/highlight delete - deletes all highlighted words.');
 			emit(socket, 'console', '/highlight add, word - adds a highlighing word. You can add several words separated by commas.');
 			emit(socket, 'console', '/highlight delete, word - deletes a single or seveal highlighting words. Separated by commas.');
 		}
