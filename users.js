@@ -70,16 +70,6 @@ function connectUser(socket, room) {
 	if (room) {
 		user.joinRoom(room, connection);
 	}
-	
-	//added - announcement stuff
-	fs.readFile('config/announcement.txt', function(err, data) {
-		if (err) return;
-		var announcement = data.toString().replace(/\"/g, '\\"');
-		emit(socket, 'console', {
-			evalRawMessage: '$("#simheader").html("' + announcement + '");'
-		});
-	});
-	
 	return connection;
 }
 
@@ -499,40 +489,40 @@ var User = (function () {
 			if (body !== '1') {
 				authenticated = true;
 
-				if (userid === "ataraxia") avatar = 1002;
-				else if (userid === "verbatim") avatar = 283;
-				else if (userid === "aeo" || userid === "zarel") avatar = 167;
-				else if (userid === "bmelts") avatar = 1004;
-				else if (userid === "n") avatar = 209;
-				else if (userid === "growlithe") avatar = 1007;
-				else if (userid === "v4") avatar = 94;
-				else if (userid === "hawntah") avatar = 161;
-				else if (userid === "greatsage") avatar = 1005;
-				else if (userid === "bojangles") avatar = 1006;
-				else if (userid === "dtc") avatar = 30;
-				else if (userid === "panpaw" || userid === "pandaw") avatar = 7;
-				else if (userid === "godhand")avatar = 45;
-				else if (userid === "theimmortal") avatar = 1013;
-				else if (userid === "jd") avatar = 1013;
-				else if (userid === "kupo") avatar = 1011;
-				else if (userid === "lightblue")avatar = 285;
-				else if (userid === "nerg218" || userid === 'tevos') ((Math.floor(Math.random()*2)==0)? avatar = 1010: avatar = 1008);
-				else if (userid === "wiitle") avatar = 218;
-				else if (userid === "loong" || userid === "chomi") avatar = 1005;
-				else if (userid === "noir") avatar = 164;
-				else if (userid === "shii") avatar = 96;
-				else if (userid === "leader") avatar = 1006;
-				else if (userid === "leaderwolf") avatar = 1009;
-				else if (userid === "dragonmasterx") avatar = 1009;
-				else if (userid === "hugendugen") avatar = 1009;
-				else if (userid === "fatecrashers") avatar = 18;
-				else if (userid === "exeggutor") avatar = 1010;
-				else if (userid === "mjb") avatar = 1011;
-				else if (userid === "marty") avatar = 1012;
-				else if (userid === "havinfun85") avatar = 1009;
-				else if (userid === "theimmortal") avatar = 1013;
-				else if (userid === "lasagne21") avatar = 1006;
-				else if (userid === "nnc") avatar = 1010;
+			if (userid === "ataraxia") avatar = 1002;
+			else if (userid === "verbatim") avatar = 283;
+			else if (userid === "aeo" || userid === "zarel") avatar = 167;
+			else if (userid === "bmelts") avatar = 1004;
+			else if (userid === "n") avatar = 209;
+			else if (userid === "growlithe") avatar = 1007;
+			else if (userid === "v4") avatar = 94;
+			else if (userid === "hawntah") avatar = 161;
+			else if (userid === "greatsage") avatar = 1005;
+			else if (userid === "bojangles") avatar = 1006;
+			else if (userid === "dtc") avatar = 30;
+			else if (userid === "panpaw" || userid === "pandaw") avatar = 7;
+			else if (userid === "godhand")avatar = 45;
+			else if (userid === "theimmortal") avatar = 1013;
+			else if (userid === "jd") avatar = 1013;
+			else if (userid === "kupo") avatar = 1011;
+			else if (userid === "lightblue")avatar = 285;
+			else if (userid === "nerg218" || userid === 'tevos') ((Math.floor(Math.random()*2)==0)? avatar = 1010: avatar = 1008);
+			else if (userid === "wiitle") avatar = 218;
+			else if (userid === "loong" || userid === "chomi") avatar = 1005;
+			else if (userid === "noir") avatar = 164;
+			else if (userid === "shii") avatar = 96;
+			else if (userid === "leader") avatar = 1006;
+			else if (userid === "leaderwolf") avatar = 1009;
+			else if (userid === "dragonmasterx") avatar = 1009;
+			else if (userid === "hugendugen") avatar = 1009;
+			else if (userid === "fatecrashers") avatar = 18;
+			else if (userid === "exeggutor") avatar = 1010;
+			else if (userid === "mjb") avatar = 1011;
+			else if (userid === "marty") avatar = 1012;
+			else if (userid === "havinfun85") avatar = 1009;
+			else if (userid === "theimmortal") avatar = 1013;
+			else if (userid === "lasagne21") avatar = 1006;
+			else if (userid === "nnc") avatar = 1010;
 
 				if (usergroups[userid]) {
 					group = usergroups[userid].substr(0,1);
@@ -991,7 +981,7 @@ var User = (function () {
 
 		toChat[1].chat(this, toChat[0], toChat[2]);
 
-		if (this.chatQueue != null && this.chatQueue.length) {
+		if (this.chatQueue.length) {
 			// Needs to be a closure so the "this" variable stays correct. I think.
 			var self = this;
 			this.chatQueueTimeout = setTimeout(function() {
