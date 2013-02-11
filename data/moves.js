@@ -817,7 +817,7 @@ exports.BattleMovedex = {
 				source.item = yourItem;
 				return false;
 			}
-			this.add('-item',target,yourItem.name,'[from] move: Bestow');
+			this.add('-item', target, yourItem.name, '[from] move: Bestow', '[of] '+source);
 		},
 		secondary: false,
 		target: "normal",
@@ -3584,6 +3584,7 @@ exports.BattleMovedex = {
 		basePower: 50,
 		basePowerCallback: function(target, source, move) {
 			if (move.sourceEffect in {grasspledge:1, waterpledge:1}) {
+				this.add('-combine');
 				this.debug('triple damage');
 				return 150;
 			}
@@ -3602,6 +3603,7 @@ exports.BattleMovedex = {
 				if (!decision.pokemon || !decision.move) continue;
 				if (decision.pokemon.side === source.side && decision.move.id in {grasspledge:1, waterpledge:1}) {
 					this.prioritizeQueue(decision);
+					this.add('-waiting', source, decision.pokemon);
 					return null;
 				}
 			}
@@ -4583,6 +4585,7 @@ exports.BattleMovedex = {
 		basePower: 50,
 		basePowerCallback: function(target, source, move) {
 			if (move.sourceEffect in {waterpledge:1, firepledge:1}) {
+				this.add('-combine');
 				this.debug('triple damage');
 				return 150;
 			}
@@ -4601,6 +4604,7 @@ exports.BattleMovedex = {
 				if (!decision.pokemon || !decision.move) continue;
 				if (decision.pokemon.side === source.side && decision.move.id in {waterpledge:1, firepledge:1}) {
 					this.prioritizeQueue(decision);
+					this.add('-waiting', source, decision.pokemon);
 					return null;
 				}
 			}
@@ -4846,7 +4850,7 @@ exports.BattleMovedex = {
 			source.setBoost(targetBoosts);
 			target.setBoost(sourceBoosts);
 
-			this.add('-swapboost', target, source, 'def, spd', '[from] move: Guard Swap');
+			this.add('-swapboost', source, target, 'def, spd', '[from] move: Guard Swap');
 		},
 		secondary: false,
 		target: "normal",
@@ -5240,7 +5244,7 @@ exports.BattleMovedex = {
 			target.setBoost(sourceBoosts);
 			source.setBoost(targetBoosts);
 
-			this.add('-swapboost', target, source, '[from] move: Heart Swap');
+			this.add('-swapboost', source, target, '[from] move: Heart Swap');
 		},
 		secondary: false,
 		target: "normal",
@@ -8403,7 +8407,7 @@ exports.BattleMovedex = {
 			source.setBoost(targetBoosts);
 			target.setBoost(sourceBoosts);
 
-			this.add('-swapboost', target, source, 'atk, spa', '[from] move: Power Swap');
+			this.add('-swapboost', source, target, 'atk, spa', '[from] move: Power Swap');
 		},
 		secondary: false,
 		target: "normal",
@@ -12957,6 +12961,7 @@ exports.BattleMovedex = {
 		basePower: 50,
 		basePowerCallback: function(target, source, move) {
 			if (move.sourceEffect in {firepledge:1, grasspledge:1}) {
+				this.add('-combine');
 				this.debug('triple damage');
 				return 150;
 			}
@@ -12975,6 +12980,7 @@ exports.BattleMovedex = {
 				if (!decision.pokemon || !decision.move) continue;
 				if (decision.pokemon.side === source.side && decision.move.id in {firepledge:1, grasspledge:1}) {
 					this.prioritizeQueue(decision);
+					this.add('-waiting', source, decision.pokemon);
 					return null;
 				}
 			}

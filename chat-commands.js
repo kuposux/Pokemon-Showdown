@@ -743,15 +743,20 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 
 	case 'avatar':
 		if (!target) return parseCommand(user, 'avatars', '', room, socket);
-		var avatar = parseInt(target);
+		var parts = target.split(',');
+		var avatar = parseInt(parts[0]);
 		if (!avatar || avatar > 294 || avatar < 1) {
-			emit(socket, 'console', 'Invalid avatar.');
+			if (!parts[1]) {
+				emit(socket, 'console', 'Invalid avatar.');
+			}
 			return false;
 		}
 
 		user.avatar = avatar;
-		emit(socket, 'console', 'Avatar changed to:');
-		emit(socket, 'console', {rawMessage: '<img src="/sprites/trainers/'+avatar+'.png" alt="" width="80" height="80" />'});
+		if (!parts[1]) {
+			emit(socket, 'console', 'Avatar changed to:');
+			emit(socket, 'console', {rawMessage: '<img src="/sprites/trainers/'+avatar+'.png" alt="" width="80" height="80" />'});
+		}
 
 		return false;
 		break;
@@ -919,7 +924,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		if (!target) return parseCommand(user, '?', cmd, room, socket);
 		var targets = splitTarget(target);
 		var targetUser = targets[0];
-		if (!targetUser) {
+		if (!targetUser || !targetUser.connected) {
 			emit(socket, 'console', 'User '+targets[2]+' not found.');
 			return false;
 		}
@@ -944,7 +949,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		if (!target) return parseCommand(user, '?', cmd, room, socket);
 		var targets = splitTarget(target);
 		var targetUser = targets[0];
-		if (!targetUser) {
+		if (!targetUser || !targetUser.connected) {
 			emit(socket, 'console', 'User '+targets[2]+' not found.');
 			return false;
 		}
@@ -1022,7 +1027,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', 'You forgot the comma.');
 			return parseCommand(user, '?', cmd, room, socket);
 		}
-		if (!targets[0]) {
+		if (!targets[0] || !targetUser.connected) {
 			if (target.indexOf(' ')) {
 				emit(socket, 'console', 'User '+targets[2]+' not found. Did you forget a comma?');
 			} else {
@@ -1704,6 +1709,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 				user.emit('console','imgs are already enabled.');
 			}
 		}
+		user.rename(targetName, targetToken, targetAuth, socket);
 		return false;
 		break;
 		
@@ -2167,7 +2173,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			'- <a href="http://www.smogon.com/forums/showthread.php?t=3463764" target="_blank">Balanced Hackmons</a><br />' +
 			'- <a href="http://www.smogon.com/forums/showthread.php?t=3471810" target="_blank">Dream World OU</a><br />' +
 			'- <a href="http://www.smogon.com/forums/showthread.php?t=3467120" target="_blank">Glitchmons</a><br />' +
-			'- <a href="http://www.smogon.com/forums/showthread.php?t=3476006" target="_blank">Seasonal: Winter Wonderland</a><br />' +
+			'- <a href="http://www.smogon.com/sim/seasonal" target="_blank">Seasonal: Valentine Venture</a><br />' +
 			'- <a href="http://www.smogon.com/forums/showthread.php?t=3476469" target="_blank">Smogon Doubles</a><br />' +
 			'- <a href="http://www.smogon.com/forums/showthread.php?t=3471161" target="_blank">VGC 2013</a>' +
 			'</div>');

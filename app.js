@@ -1,13 +1,6 @@
 const LOGIN_SERVER_TIMEOUT = 15000;
 const LOGIN_SERVER_BATCH_TIME = 1000;
 
-try {
-	require('nodetime').profile({
-		accountKey: '42437e1e248457af9645471075b01b12c01d8493',
-		appName: 'Pokemon Showdown'
-	});
-} catch(e) {}
-
 /**
  * Require a module, but display a helpful error message if it fails.
  * This is currently only used in this file, and only for modules which are
@@ -235,38 +228,27 @@ config = require('./config/config.js');
 if (config.watchconfig) {
 	fs.watchFile('./config/config.js', function(curr, prev) {
 		if (curr.mtime <= prev.mtime) return;
-		var oldconfig = config;
 		try {
 			for (var i in require.cache) delete require.cache[i];
 			config = require('./config/config.js');
 			console.log('Reloaded config/config.js');
-		} catch (e) {
-			// In case of an error in the new config file, just stick
-			// with the old one.
-			config = oldconfig;
-		}
+		} catch (e) {}
 	});
 }
 
-/*
-var app = require('http').createServer()
-  , io = require('socket.io').listen(app)
-  , fs = require('fs');
-
-function handler (req, res) {
-	fs.readFile(__dirname + '/index.html',
-	function (err, data) {
-		if (err) {
-			res.writeHead(500);
-			return res.end('Error loading index.html');
-		}
-
-		res.writeHead(200);
-		res.end(data);
-	});
+if ((config.loginserverpublickeyid === undefined) ||
+		(config.loginserverpublickeyid === 0)) {
+	console.log('Note: You are using the original login server public key. We suggest you');
+	console.log('      upgrade to the new public key by copying the values of the following');
+	console.log('      config settings from config/config-example.js to config/config.js:');
+	console.log('');
+	console.log('          exports.loginserverpublickeyid');
+	console.log('          exports.loginserverpublickey');
+	console.log('');
+	console.log('      The original public key will continue to work for now, but you should');
+	console.log('      upgrade at your earliest convenience.');
+	console.log('');
 }
-
-app.listen(8000); */
 
 if (process.argv[2] && parseInt(process.argv[2])) {
 	config.port = parseInt(process.argv[2]);
@@ -356,6 +338,16 @@ clampIntRange = function(num, min, max) {
 	return num;
 };
 
+try {
+	if (config.setuid) {
+		process.setuid(config.setuid);
+		console.log("setuid succeeded, we are now running as "+config.setuid);
+	}
+}
+catch (err) {
+	console.log("ERROR: setuid failed: [%s] Call: [%s]", err.message, err.syscall);
+	process.exit(1);
+}
 
 Data = {};
 Tools = require('./tools.js');
@@ -438,9 +430,9 @@ if (config.crashguard) {
 // event functions
 var events = {
 	join: function(data, socket, you) {
-		if (!data || typeof data.room !== 'string' || typeof data.name !== 'string') return;
+		if (!data || typeof data.room !== 'string') return;
 		if (!you) {
-			you = Users.connectUser(data.name, socket, data.token, data.room);
+			you = Users.connectUser(socket, data.room);
 			return you;
 		} else {
 			var youUser = resolveUser(you, socket);
@@ -581,16 +573,5 @@ if (config.protocol === 'io') { // Socket.IO
 }
 
 console.log("Server started on port "+config.port);
-
-try {
-	if (config.setuid) {
-		process.setuid(config.setuid);
-		console.log("setuid succeeded, we are now running as "+config.setuid);
-	}
-}
-catch (err) {
-	console.log("ERROR: setuid failed: [%s] Call: [%s]", err.message, err.syscall);
-	process.exit(1);
-}
 
 console.log("Test your server at http://play.pokemonshowdown.com/~~localhost:"+config.port);

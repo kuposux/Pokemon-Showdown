@@ -24,25 +24,6 @@ exports.protocol = 'ws';
 // The server ID - a unique ID describing this Showdown server
 exports.serverid = 'testserver';
 
-// Host names that we will accept in login tokens.
-//
-// When the client connects to a Pokemon Showdown server at example.com,
-// the client requests a signed assertion from the login server as proof
-// that the user controls the name which she is using. The signed assertion
-// will contain the hostname that the client used to connect to the server,
-// which would be example.com in this case. The server verifies that the
-// hostname provided is a valid hostname -- namely, one of the hostnames
-// provided in this array.
-//
-// You should specify the hostnames here that people use to connect to your
-// server. For example, if your server is hosted on battle.example.com, you
-// would specify 'battle.example.com' here.
-//
-// If this is set to an empty array ([]), which is the default, the server
-// will accept the first token, and will then add the hostname in that token
-// (and the corresponding IP address) to tokenhosts.
-exports.tokenhosts = [];
-
 // A signed assertion from the login server must be presented to this
 // server within this many seconds. This can be 1 minute (or possibly
 // less) unless your clock is wrong. In order to accommodate servers
@@ -66,14 +47,15 @@ exports.proxyip = false;
 //   Don't change this setting - there aren't any other login servers right now
 exports.loginserver = 'http://play.pokemonshowdown.com/';
 exports.loginserverkeyalgo = "RSA-SHA1";
+exports.loginserverpublickeyid = 1;
 exports.loginserverpublickey = "-----BEGIN PUBLIC KEY-----\n" +
-	"MIIBIDANBgkqhkiG9w0BAQEFAAOCAQ0AMIIBCAKCAQEApd1so8v8acgTXNQ/uQ12\n" +
-	"oAoq0Cf27iyg+hS8elJZqkTelqIwA0OWTq4NzMCdrUWkmi+pHoUKy4wLHbD2w9KI\n" +
-	"+kjah5HncXmqb7FK9RVjD8z6C84qFMBvg/VXX16c5CP2h0BC/pSwJfkw0NtOdFZL\n" +
-	"ZhCkLObCjAN367/JGkp7CGP/hnNEm57GX9OUThfSX3t/DhV0cHdRkECsYkrTzZOV\n" +
-	"nsz3uifOjVHiW5PR0KNwQm0ed6Bmg24PK7RJ091aRkT6lvmD1MB5Zl1SIV2l+wF6\n" +
-	"O/G3x63WhR1HrNEM/jr/LVz+QjWuvNv68iSHDV3U62JkG/Yc53An1n/urX4J72DS\n" +
-	"twIBIw==\n" +
+	"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA2O8mOdl6ELJvx+XufPNk\n" +
+	"piAwG6G7dOG61RCly4inBtQ8OgAcotfbq1km1FIZJ4II7IzcmGAwQLoBb9TfpNNi\n" +
+	"+rN4shVth15riL4ip6YjKNxH4EFPTgvq5GnPmXdIIDxYnzRd3hIVqsCu6iKNcQm+\n" +
+	"e/yyQEd4NRCtNeQEHodkZK/7usZzY9gzePQeS6OclzXaS6G99dNBP3Z6frapEckE\n" +
+	"B2TSjcOvFaHWqbMR1Tk+B7ZEFvOXjsjlcL8PByqRErHglIxeujqtjzR46sLq6ofJ\n" +
+	"vohoUaig9PjfEfyPgcObzOjUki9QLcRcvqUZGTKmDUTgwjCGY22OlvfYI+qW0hxx\n" +
+	"mQIDAQAB\n" +
 	"-----END PUBLIC KEY-----\n";
 
 // Pokemon of the Day - put a pokemon's name here to make it Pokemon of the Day
