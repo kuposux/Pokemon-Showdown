@@ -1336,7 +1336,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
         case 'gitpull':
 		if (!user.can('gitpull')) {
-			socket.emit('console', '/gitpull - Access denied.');
+			emit(socket, 'console', '/gitpull - Access denied.');
 			return false;
 		}
 		var args = splitArgs('git, pull');
