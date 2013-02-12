@@ -858,6 +858,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return false;
 		break;
 
+	var barn = false;
 	case 'b':
 	case 'barn':
 		barn = true;
