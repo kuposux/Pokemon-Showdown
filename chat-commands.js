@@ -1334,8 +1334,8 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		emit(socket, 'console', 'Your hot-patch command was unrecognized.');
 		return false;
 		break;
-case 'gitpull':
-		if (!user.can('hotpatch')) {
+        case 'gitpull':
+		if (!user.can('gitpull')) {
 			socket.emit('console', '/gitpull - Access denied.');
 			return false;
 		}
@@ -1344,15 +1344,6 @@ case 'gitpull':
 		room.addRaw('<div style="background:#7067AB;color:white;padding:2px 4px"><b>Server updating... there might be some lag.</b></div>');
 		gitpulling = true;
 		runCommand(args.shift(), args, socket);
-		for (var i in require.cache) delete require.cache[i];
-		//Tools = require('./tools.js');
-		parseCommand = require('./chat-commands.js').parseCommand;
-		//sim = require('./battles.js');
-		//BattlePokemon = sim.BattlePokemon;
-		//BattleSide = sim.BattleSide;
-		//Battle = sim.Battle;
-		emit(socket, 'console', 'The game engine has been hot-patched.');
-		room.addRaw('<div style="background:#7067AB;color:white;padding:2px 4px"><b>Server update finished.</b></div>');
 		return false;
 		break;
 
