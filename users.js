@@ -64,7 +64,7 @@ function connectUser(socket, room) {
 			connection.challenge = buffer.toString('hex');
 			console.log('JOIN: ' + connection.user.name + ' [' + connection.challenge.substr(0, 15) + '] [' + socket.id + ']');
 			var keyid = config.loginserverpublickeyid || 0;
-			connection.sendTo(null, '|challenge-string|' + keyid + '|' + connection.challenge);
+			connection.sendTo(null, '|challstr|' + keyid + '|' + connection.challenge);
 		}
 	});
 	if (room) {
@@ -950,7 +950,7 @@ var User = (function () {
 			if (this.chatQueue.length > 6) {
 				emit(socket, 'console', {
 					room: room.id,
-					rawMessage: "<strong style=\"color:red\">Your message was not sent because you've been typing too quickly.</strong>"
+					rawMessage: "<strong class=\"message-throttle-notice\">Your message was not sent because you've been typing too quickly.</strong>"
 				});
 			} else {
 				this.chatQueue.push([message, room, socket]);
