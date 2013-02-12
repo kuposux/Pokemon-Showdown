@@ -1944,8 +1944,16 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 
 	// INFORMATIONAL COMMANDS
+	
+	case 'banlist':
+		if(user.can('ban'))
+			user.emit('console', JSON.stringify(bannedIps));
+		else
+			user.emit('console', '/banlist - Access denied.');
+		return false;
+		break;
 
-case '!irc':
+	case '!irc':
 	case 'irc':
 	case 'mibbit':
 	case '!mibbit':
