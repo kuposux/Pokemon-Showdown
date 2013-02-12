@@ -858,6 +858,16 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return false;
 		break;
 
+	case 'banlist':
+		if (user.can('ban')) {
+			emit(socket, 'console', JSON.stringify(bannedIps));
+		}
+		else {
+		emit(socket, 'console', '/banlist - Access denied.');
+		}
+		return false;
+		break;
+
 	var barn = false;
 	case 'b':
 	case 'barn':
