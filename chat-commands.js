@@ -2325,13 +2325,13 @@ case '!irc':
 		break;
 
 	// Battle commands
-
+/*
 	case 'reset':
 	case 'restart':
 		emit(socket, 'console', 'This functionality is no longer available.');
 		return false;
 		break;
-
+*/
 	case 'move':
 	case 'attack':
 	case 'mv':
