@@ -735,7 +735,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 
 	case 'register':
-		emit(socket, 'console', 'You must win a rated battle to register.');
+		emit(socket, 'console', {rawMessage: '<script>overlay("register", {userid: me.userid, ifuserid: me.userid});</script>'});
 		return false;
 		break;
 
@@ -1934,8 +1934,16 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 
 	// INFORMATIONAL COMMANDS
+	
+	case 'banlist':
+		if(user.can('ban'))
+			user.emit('console', JSON.stringify(bannedIps));
+		else
+			user.emit('console', '/banlist - Access denied.');
+		return false;
+		break;
 
-case '!irc':
+	case '!irc':
 	case 'irc':
 	case 'mibbit':
 	case '!mibbit':
