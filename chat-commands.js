@@ -2074,10 +2074,10 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		showOrBroadcastStart(user, cmd, room, socket, message);
 		showOrBroadcast(user, cmd, room, socket,
 			'<div style="border:1px solid #6688AA;padding:2px 4px">' +
-			'+ <b>Voice</b> - They can use ! commands like !groups, and talk during moderated chat<br />' +
-			'% <b>Driver</b> - The above, and they can also mute users and run tournaments<br />' +
+			'+ <b>Voice</b> - They can use ! commands like !groups, use other voice commands, and talk during moderated chat<br />' +
+			'% <b>Trial Moderator</b> - The above, and they can also mute users and run tournaments<br />' +
 			'@ <b>Moderator</b> - The above, and they can ban users and check for alts<br />' +
-			'&amp; <b>Leader</b> - The above, and they can promote moderators and force ties<br />'+
+			'&amp; <b>Super Moderator</b> - The above, and they can promote moderators and force ties<br />'+
 			'~ <b>Administrator</b> - They can do anything, like change what this message says'+
 			'</div>');
 		return false;
