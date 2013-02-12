@@ -2843,12 +2843,22 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', '/highlight add, word - adds a highlighing word. You can add several words separated by commas.');
 			emit(socket, 'console', '/highlight delete, word - deletes a single or several highlighting words. Separated by commas.');
 		}
+		if (target === 'all' || target === 'poof' || target === 'd') {
+			matched = true;
+			emit(socket, 'console', 'Leave the server with a random message');
+			emit(socket, 'console', '/poof OR /d');
+		}
 		if (target === 'timestamps') {
 			matched = true;
 			emit(socket, 'console', 'Set your timestamps preference:');
 			emit(socket, 'console', '/timestamps [all|lobby|pms], [minutes|seconds|off]');
 			emit(socket, 'console', 'all - change all timestamps preferences, lobby - change only lobby chat preferences, pms - change only PM preferences');
 			emit(socket, 'console', 'off - set timestamps off, minutes - show timestamps of the form [hh:mm], seconds - show timestamps of the form [hh:mm:ss]');
+		}
+		if (target === '+' || target === 'cpoof') {
+			matched = true;
+			emit(socket, 'console', 'Poof with a custom message:');
+			emit(socket, 'console', '/cpoof [custom message]');
 		}
 		if (target === '%' || target === 'altcheck' || target === 'alt' || target === 'alts' || target === 'getalts') {
 			matched = true;
@@ -2943,6 +2953,10 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', '/hotpatch data - reload the game data (abilities, moves...)');
 			emit(socket, 'console', '/hotpatch chat - reload chat-commands.js');
 		}
+		if (target === '~' || target === 'gitpull') {
+			matched = true;
+			emit(socket, 'console', '/gitpull - updates the server from the git repository and hotpatches chat-commands.js');
+		}
 		if (target === 'all' || target === 'help' || target === 'h' || target === '?' || target === 'commands') {
 			matched = true;
 			emit(socket, 'console', '/help OR /h OR /? - Gives you help.');
@@ -2952,7 +2966,8 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', 'INFORMATIONAL COMMANDS: /data, /groups, /opensource, /avatars, /faq, /rules, /intro, /tiers, /othermetas, /learn, /analysis, /calc (replace / with ! to broadcast. (Requires: + % @ & ~))');
 			emit(socket, 'console', 'For details on all commands, use /help all');
 			if (user.group !== config.groupsranking[0]) {
-				emit(socket, 'console', 'DRIVER COMMANDS: /mute, /unmute, /announce, /forcerename, /alts')
+				emit (socket, 'console', 'VOICE COMMANDS: /cpoof');
+				emit(socket, 'console', 'DRIVER COMMANDS: /mute, /unmute, /announce, /forcerename, /alts');
 				emit(socket, 'console', 'MODERATOR COMMANDS: /ban, /unban, /unbanall, /ip, /modlog, /redirect, /kick');
 				emit(socket, 'console', 'LEADER COMMANDS: /promote, /demote, /forcerenameto, /namelock, /nameunlock, /forcewin, /forcetie, /declare');
 				emit(socket, 'console', 'For details on all moderator commands, use /help @');
