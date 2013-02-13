@@ -1908,7 +1908,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'mibbit':
 	case '!mibbit':
 		showOrBroadcastStart(user, cmd, room, socket, message);
-		showOrBroadcast(user, cmd, room, socket, '<div style="border:1px solid #6688AA;padding:2px 4px"><strong>TBT\'s IRC HANGOUT</strong><br />'+
+		showOrBroadcast(user, cmd, room, socket, '<div class="message-irc"><strong>TBT\'s IRC HANGOUT</strong><br />'+
 			'- <a href="http://mibbit.com/#tbt-hangout@irc.synirc.net" target="_blank">#TBT-HANGOUT@irc.synirc.net</a><br />'+
 			'</div>');
 		return false;
@@ -1917,7 +1917,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case '!forums':
 	case 'forums':
 		showOrBroadcastStart(user, cmd, room, socket, message);
-		showOrBroadcast(user, cmd, room, socket, '<div style="border:1px solid #6688AA;padding:2px 4px">The link for The Battle Tower\'s Forums:<br />'+
+		showOrBroadcast(user, cmd, room, socket, '<div class="message-forums">The link for The Battle Tower\'s Forums:<br />'+
 			'- <a href="http://thebattletower.no-ip.org/forums" target="_blank">Click Me</a><br /></div>');
 		return false;
 		break;
@@ -1927,7 +1927,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'info':
 	case '!info':
 		showOrBroadcastStart(user, cmd, room, socket, message);
-		showOrBroadcast(user, cmd, room, socket, '<div style="border:1px solid #6688AA;padding:2px 4px">The Battle Tower\'s External Websites:<br />'+
+		showOrBroadcast(user, cmd, room, socket, '<div class="message-extLinks">The Battle Tower\'s External Websites:<br />'+
 			'- <a href="http://thebattletower.no-ip.org/forums" target="_blank">Forums</a><br />'+
 			'- <a href="http://thebattletower.no-ip.org/team-manager" target="_blank">Team Manager</a><br />'+
 			'- <a href="http://play.pokemonshowdown.com/" target="_blank"> PS main </a><br />'+
@@ -1941,7 +1941,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'league':
 	case '!league':
 		showOrBroadcastStart(user, cmd, room, socket, message);
-		showOrBroadcast(user, cmd, room, socket, '<div style="border:1px solid #6688AA;padding:2px 4px">The Battle Tower\'s Pokémon League:<br />' +
+		showOrBroadcast(user, cmd, room, socket, '<div class="message-league">The Battle Tower\'s Pokémon League:<br />' +
 			'- <a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=85&pid=391#pid391" target="_blank">Gyms </a></br >'+
 			'- <a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=86" target="_blank" >Elite 4 </a>'+
 			'</div>');
