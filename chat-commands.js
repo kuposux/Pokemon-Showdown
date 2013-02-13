@@ -2905,6 +2905,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		if (target === '~' || target === 'gitpull') {
 			matched = true;
 			emit(socket, 'console', '/gitpull - updates the server from the git repository and hotpatches chat-commands.js');
+		}
 		if (target === '~' || target === 'lockdown') {
 			matched = true;
 			emit(socket, 'console', '/lockdown - locks down the server, which prevents new battles from starting so that the server can eventually be restarted. Requires: ~');
