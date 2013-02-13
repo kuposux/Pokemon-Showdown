@@ -1302,7 +1302,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 		var args = splitArgs('git, pull');
 		logModCommand(room,user.name+' pulled from git',true);
-		room.addRaw('<h2><strong><font color="0099FF" size="12">Server updating... there might be some lag.</font></strong></h2>');
+		room.addRaw('<div class="message-declare"><strong><font color="0099FF">Server updating... there might be some lag.</font></strong></div>');
 		gitpulling = true;
 		runCommand(args.shift(), args, socket);
 		return false;
