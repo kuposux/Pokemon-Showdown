@@ -1294,6 +1294,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		emit(socket, 'console', 'Your hot-patch command was unrecognized.');
 		return false;
 		break;
+		
         case 'gitpull':
 		if (!user.can('gitpull')) {
 			emit(socket, 'console', '/gitpull - Access denied.');
@@ -1301,7 +1302,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 		var args = splitArgs('git, pull');
 		logModCommand(room,user.name+' pulled from git',true);
-		room.addRaw('<div style="background:#7067AB;color:white;padding:2px 4px"><b>Server updating... there might be some lag.</b></div>');
+		room.addRaw('<h2><b>Server updating... there might be some lag.</b></h2>');
 		gitpulling = true;
 		runCommand(args.shift(), args, socket);
 		return false;
@@ -1908,7 +1909,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'mibbit':
 	case '!mibbit':
 		showOrBroadcastStart(user, cmd, room, socket, message);
-		showOrBroadcast(user, cmd, room, socket, '<div class="message-irc"><strong>TBT\'s IRC HANGOUT</strong><br />'+
+		showOrBroadcast(user, cmd, room, socket, '<div class="message-opensource"><strong>TBT\'s IRC HANGOUT</strong><br />'+
 			'- <a href="http://mibbit.com/#tbt-hangout@irc.synirc.net" target="_blank">#TBT-HANGOUT@irc.synirc.net</a><br />'+
 			'</div>');
 		return false;
@@ -1917,7 +1918,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case '!forums':
 	case 'forums':
 		showOrBroadcastStart(user, cmd, room, socket, message);
-		showOrBroadcast(user, cmd, room, socket, '<div class="message-forums">The link for The Battle Tower\'s Forums:<br />'+
+		showOrBroadcast(user, cmd, room, socket, '<div class="message-opensource">The link for The Battle Tower\'s Forums:<br />'+
 			'- <a href="http://thebattletower.no-ip.org/forums" target="_blank">Click Me</a><br /></div>');
 		return false;
 		break;
@@ -1927,7 +1928,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'info':
 	case '!info':
 		showOrBroadcastStart(user, cmd, room, socket, message);
-		showOrBroadcast(user, cmd, room, socket, '<div class="message-extLinks">The Battle Tower\'s External Websites:<br />'+
+		showOrBroadcast(user, cmd, room, socket, '<div class="message-opensource">The Battle Tower\'s External Websites:<br />'+
 			'- <a href="http://thebattletower.no-ip.org/forums" target="_blank">Forums</a><br />'+
 			'- <a href="http://thebattletower.no-ip.org/team-manager" target="_blank">Team Manager</a><br />'+
 			'- <a href="http://play.pokemonshowdown.com/" target="_blank"> PS main </a><br />'+
@@ -1941,7 +1942,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'league':
 	case '!league':
 		showOrBroadcastStart(user, cmd, room, socket, message);
-		showOrBroadcast(user, cmd, room, socket, '<div class="message-league">The Battle Tower\'s Pokémon League:<br />' +
+		showOrBroadcast(user, cmd, room, socket, '<div class="message-opensource">The Battle Tower\'s Pokémon League:<br />' +
 			'- <a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=85&pid=391#pid391" target="_blank">Gyms </a></br >'+
 			'- <a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=86" target="_blank" >Elite 4 </a>'+
 			'</div>');
@@ -2033,12 +2034,9 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case '!gropus':
 		showOrBroadcastStart(user, cmd, room, socket, message);
 		showOrBroadcast(user, cmd, room, socket,
-			'<div style="border:1px solid #6688AA;padding:2px 4px">' +
+			'<div class="message-groups">' +
 			'+ <b>Voice</b> - They can use ! commands like !groups, use other voice commands, and talk during moderated chat<br />' +
 			'% <b>Trial Moderator</b> - The above, and they can also mute users and run tournaments<br />' +
-			'<div class="message-groups">' +
-			'+ <b>Voice</b> - They can use ! commands like !groups, and talk during moderated chat<br />' +
-			'% <b>Driver</b> - The above, and they can also mute users and run tournaments<br />' +
 			'@ <b>Moderator</b> - The above, and they can ban users and check for alts<br />' +
 			'&amp; <b>Super Moderator</b> - The above, and they can promote moderators and force ties<br />'+
 			'~ <b>Administrator</b> - They can do anything, like change what this message says'+
