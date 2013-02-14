@@ -188,7 +188,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', 'The tournament is not currently in its signup phase.');
 			return false;
 		}
-		var msg = '<h2><font color="green">A ' + tour.tiers[tour[roomid].tier].name + ' Tournament is currently in its signup phase. <button onclick="emit(socket, \'chat\', {room: \'' + roomid + '\', message: \'/jt\'});"><b>Join Tournament</b></button></font></h2>';
+		var tourName = tour.tiers[tour[roomid].tier].name; var vowels = ["A", "E", "I", "O", "U"]; var msg = '<h2><font color="green">A' + (vowels.contains(tourName.charAt(0).toUpperCase())) ? 'n ' : ' ' + tourName + ' Tournament...
 		if (user.can('broadcast') && cmd.charAt(0) == "!") {
 			showOrBroadcastStart(user, cmd, room, socket, message);
 			showOrBroadcast(user, cmd, room, socket, msg);
