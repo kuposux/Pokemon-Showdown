@@ -881,7 +881,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		logModCommand(room,""+targetUser.name+" was "+ (barn?"barned ":" banned ") + "by "+user.name+"." + (targets[1] ? " (" + targets[1] + ")" : ""));
 		targetUser.emit('message', user.name+' has' + (barn?"barned ":" banned ") +'you.  If you feel that your banning was unjustified you can <a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=75" target="_blank">appeal the ban</a>. '+targets[1]);
 		var alts = targetUser.getAlts();
-		if (alts.length) logModCommand(room,""+targetUser.name+"'s alts were also banned: "+alts.join(", "));
+		if (alts.length) logModCommand(room,""+targetUser.name+"'s alts were also "+(barn?"barned":"banned")+" : "+alts.join(", "));
 
 		targetUser.ban();
 		barn = false;
