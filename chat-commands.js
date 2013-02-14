@@ -544,20 +544,18 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			var p2c = "";
 
 			if (status == 2) {
-				p1c = "color: red;";
-				p2c = "color: green;";
+				p1c = "red";
+				p2c = "green";
 				if (winner == p1) {
-					p1c = "color: green;";
-					p2c = "color: red;";
+					p1c = "green";
+					p2c = "red";
 				}
+				p1 = '<font color="'+p1c+'">'+sanitize(p1)+'</font>';
+				p2 = '<font color="'+p2c+'">'+sanitize(p2)+'</font>';
 			}
 
-			if (status == 1) {
-				var fontweight = "font-weight: bold;";
-			}
-
-			if (p2 != 0) msg += "<div style=\"" + fontweight + "\"><span style=\"" + p1c + "\">" + sanitize(p1) + "</span> vs. <span style=\"" + p2c + "\">" + sanitize(p2) + "</span></div>";
-			else msg += "<div style=\"" + fontweight + "\"><span style=\"" + p1c + "\">" + sanitize(p1) + "</span> gets a bye.</div>";
+			if (p2 != 0) msg += (status == 1? '<b>': '') + p1 + ' vs. ' + p2 + (status ==1? '</b>':'') + '<br />';
+			else msg += p1 +  " gets a bye.<br />";
 		}
 		msg += "<br />";
 		if (user.can('broadcast') && cmd.charAt(0) == "!") {
