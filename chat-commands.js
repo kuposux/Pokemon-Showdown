@@ -536,6 +536,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			var current = tour[roomid].round[i].split('|');
 			var p1 = current[0];
 			var p2 = current[1];
+			var p3 = p2;
 			var status = current[2];
 			var winner = current[3];
 
@@ -554,7 +555,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 				p2 = '<font color="'+p2c+'">'+sanitize(p2)+'</font>';
 			}
 
-			if (p2 != 0) msg += (status == 1? '<b>': '') + p1 + ' vs. ' + p2 + (status ==1? '</b>':'') + '<br />';
+			if (p3 != 0) msg += (status == 1? '<b>': '') + p1 + ' vs. ' + p2 + (status ==1? '</b>':'') + '<br />';
 			else msg += p1 +  " gets a bye.<br />";
 		}
 		msg += "<br />";
