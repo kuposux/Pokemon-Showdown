@@ -188,7 +188,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', 'The tournament is not currently in its signup phase.');
 			return false;
 		}
-		var tourName = tour.tiers[tour[roomid].tier].name; var vowels = ["A", "E", "I", "O", "U"]; var msg = '<h2><font color="green">A' + (vowels.contains(tourName.charAt(0).toUpperCase())) ? 'n ' : ' ' + tourName + ' Tournament is currently in its signup phase. <button onclick="emit(socket, \'chat\', {room: \'' + roomid + '\', message: \'/jt\'});"><b>Join Tournament</b></button></font></h2>';
+		var tourName = tour.tiers[tour[roomid].tier].name; var vowels = ["A", "E", "I", "O", "U"]; var msg = '<h2><font color="green">A' + ((vowels.indexOf(tourName.charAt(0).toUpperCase())) > -1) ? 'n ' : ' ' + tourName + ' Tournament is currently in its signup phase. <button onclick="emit(socket, \'chat\', {room: \'' + roomid + '\', message: \'/jt\'});"><b>Join Tournament</b></button></font></h2>';
 		if (user.can('broadcast') && cmd.charAt(0) == "!") {
 			showOrBroadcastStart(user, cmd, room, socket, message);
 			showOrBroadcast(user, cmd, room, socket, msg);
@@ -1507,7 +1507,8 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			}
 		}
 		return false;
-
+	
+	/* TODO: fix /alert
 	case 'alert':
 		if (!user.can('alert')){ 
 			emit(socket, 'console', '/alert - Access denied.'); 
@@ -1524,7 +1525,8 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		emit(socket, 'console', 'You have alerted ' + target);
 		return false;
 		break;
-
+	*/
+	
 	case 'seal':
 		if (user.can('announce') && imgs) {
 			room.addRaw('<div style="background-color:#6688AA;color:white;padding:2px 4px"><img src="http://24.media.tumblr.com/tumblr_lwxx15se5y1r3amgko1_500.gif" width="475" /></div>');
