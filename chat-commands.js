@@ -1346,6 +1346,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		room.addRaw('<div class="chat-command-message message-disable-ladder"><b>Due to high server load, the ladder has been temporarily disabled</b><br />Rated games will no longer update the ladder. It will be back momentarily.</div>');
 		return false;
 		break;
+		
 	case 'enableladder':
 		if (!user.can('disableladder')) {
 			emit(socket, 'console', '/enable - Access denied.');
@@ -1943,7 +1944,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case '!league':
 		showOrBroadcastStart(user, cmd, room, socket, message);
 		showOrBroadcast(user, cmd, room, socket, '<div class="message-opensource">The Battle Tower\'s Pokémon League:<br />' +
-			'- <a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=85&pid=391#pid391" target="_blank">Gyms </a></br >'+
+			'- <a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=85&pid=391#pid391" target="_blank">Gyms </a><br />'+
 			'- <a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=86" target="_blank" >Elite 4 </a>'+
 			'</div>');
 		return false;
