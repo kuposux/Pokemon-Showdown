@@ -92,7 +92,7 @@ Major changes:
   - Sky Attack: 100% -1 Def, 70 bp
   - Freeze Shock: 100% paralysis, 70 bp
   - Ice Burn: 100% burn, 70 bp
-  - Bounce: 100% paralysis, 45 bp
+  - Bounce: 30% paralysis, 45 bp
   - Fly: 100% -1 Def, 45 bp
   - Dig: 100% -1 Def, 45 bp
   - Dive: 100% -1 Def, 45 bp
@@ -207,6 +207,9 @@ Minor move changes:
 
 - Perfect accuracy moves with a base power of 60 have their base power
   increased to 90
+
+- Scald's damage is no longer affected by weather: instead, it gets 0% burn
+  chance in rain and 60% burn chance in sun
 
 - Shadow Ball now has 90 base power and 30% -SpD
 
@@ -332,6 +335,8 @@ Minor ability changes:
 - Magma Armor reduces incoming move damage by 1/8 of the user's max HP,
   provides immunity to Hail and freeze, and provides a one-time immunity
   to Water and Ice, after which it turns into Shell Armor
+
+- Telepathy grants Imprison on switch-in
 
 - Compoundeyes now grants 1.6x accuracy, Victory Star grants 1.5x
 

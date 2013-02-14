@@ -148,7 +148,7 @@ function BattlePokemon(set, side) {
 	this.baseMoveset = [];
 	this.trapped = false;
 
-	this.level = clampIntRange(set.forcedLevel || set.level || 100, 1, 100);
+	this.level = clampIntRange(set.forcedLevel || set.level || 100, 1, 1000);
 	this.hp = 0;
 	this.maxhp = 100;
 	var genders = {M:'M',F:'F'};
@@ -973,7 +973,7 @@ function BattlePokemon(set, side) {
 	};
 
 	selfP.clearVolatile(true);
-}
+} // function BattlePokemon
 
 function BattleSide(name, battle, n, team) {
 	var selfB = battle;
@@ -1118,12 +1118,9 @@ function BattleSide(name, battle, n, team) {
 	};
 } // function BattleSide
 
-function Battle(roomid, format, rated) {
+function Battle(roomid, formatarg, rated) {
 	var selfB = this;
-
-	// merge in scripts and tools
-	Tools.mod(format).install(this);
-	format = Tools.getFormat(format);
+	var format = Tools.getFormat(formatarg);
 
 	this.log = [];
 	this.turn = 0;
@@ -2057,6 +2054,11 @@ function Battle(roomid, format, rated) {
 			if (!(damage || damage === 0)) {
 				this.debug('damage event failed');
 				return damage;
+			}
+			if (target.illusion && effect && effect.effectType === 'Move') {
+				this.debug('illusion cleared');
+				target.illusion = null;
+				this.add('replace', target, target.getDetails());
 			}
 		}
 		if (damage !== 0) damage = clampIntRange(damage, 1);
@@ -3174,7 +3176,12 @@ function Battle(roomid, format, rated) {
 
 		selfB = null;
 	};
-}
+
+	// Merge in scripts and tools.
+	// This call is located at the end of the Battle function so that mods
+	// can override properties of Battle by defining functions in scripts.js.
+	Tools.mod(formatarg).install(this);
+} // function Battle
 
 exports.BattlePokemon = BattlePokemon;
 exports.BattleSide = BattleSide;

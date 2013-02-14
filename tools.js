@@ -33,8 +33,13 @@ module.exports = (function () {
 		} else {
 			dataTypes.forEach(function(dataType) {
 				try {
-					Data[mod][dataType] = require('./mods/'+mod+'/'+dataFiles[dataType])['Battle'+dataType];
-				} catch (e) {}
+					var path = './mods/' + mod + '/' + dataFiles[dataType];
+					if (fs.existsSync(path)) {
+						Data[mod][dataType] = require(path)['Battle' + dataType];
+					}
+				} catch (e) {
+					console.log(e.stack);
+				}
 				if (!Data[mod][dataType]) Data[mod][dataType] = {};
 				for (var i in Data.base[dataType]) {
 					if (Data[mod][dataType][i] === null) {
@@ -377,6 +382,7 @@ module.exports = (function () {
 		var set = (lsetData.set || (lsetData.set={}));
 		var format = (lsetData.format || (lsetData.format={}));
 		var alreadyChecked = {};
+		var level = set.level || 100;
 
 		var limit1 = true;
 		var sketch = true;
@@ -411,9 +417,23 @@ module.exports = (function () {
 
 					for (var i=0, len=lset.length; i<len; i++) {
 						var learned = lset[i];
+						if (learned.substr(0,2) in {'4L':1,'5L':1}) {
+							// gen 4 or 5 level-up moves
+							if (level >= parseInt(learned.substr(2),10)) {
+								// we're past the required level to learn it
+								return false;
+							}
+							if (!template.gender || template.gender === 'F') {
+								// available as egg move
+								learned = learned.substr(0,1)+'Eany';
+							} else {
+								// this move is unavailable, skip it
+								continue;
+							}
+						}
 						if (learned.substr(1,1) in {L:1,M:1,T:1}) {
 							if (learned.substr(0,1) === '5') {
-								// current-gen level-up, TM, or tutor moves:
+								// current-gen TM or tutor moves:
 								//   always available
 								return false;
 							}
@@ -429,6 +449,8 @@ module.exports = (function () {
 								var eggGroups = template.eggGroups;
 								if (eggGroups[0] === 'No Eggs') eggGroups = this.getTemplate(template.evos[0]).eggGroups;
 								var atLeastOne = false;
+								var fromSelf = (learned.substr(1) === 'Eany');
+								learned = learned.substr(0,2);
 								for (var templateid in this.data.Pokedex) {
 									var dexEntry = this.getTemplate(templateid);
 									if (
@@ -437,7 +459,7 @@ module.exports = (function () {
 										// can't breed mons from future gens
 										dexEntry.gen <= parseInt(learned.substr(0,1),10) &&
 										// if chainbreeding, only match the original source
-										!alreadyChecked[dexEntry.speciesid] &&
+										(!alreadyChecked[dexEntry.speciesid] || fromSelf) &&
 										// the breeding target can learn this move
 										dexEntry.learnset && (dexEntry.learnset[move]||dexEntry.learnset['sketch'])) {
 										if (dexEntry.eggGroups.intersect(eggGroups).length) {
@@ -692,7 +714,7 @@ module.exports = (function () {
 		if (!Array.isArray(set.moves)) set.moves = [];
 
 		var maxLevel = format.maxLevel || 100;
-		if (!set.level || set.level > maxLevel) {
+		if (!set.level || set.level > maxLevel || set.level == set.forcedLevel) {
 			set.level = maxLevel;
 		}
 
@@ -833,7 +855,7 @@ module.exports = (function () {
 						if (eventData.gender) {
 							set.gender = eventData.gender;
 						}
-						if (eventData.level && set.level < eventData.level && !set.forcedLevel) {
+						if (eventData.level && set.level < eventData.level) {
 							problems.push(name+" must come from a specific event that makes it at least level "+eventData.level+".");
 						}
 					}
@@ -846,7 +868,7 @@ module.exports = (function () {
 				} else if (lsetData.sources) {
 					var compatibleSource = false;
 					for (var i=0,len=lsetData.sources.length; i<len; i++) {
-						if (lsetData.sources[i].substr(0,2) === '5E' || (lsetData.sources[i].substr(0,2) === '5D' && (set.level >= 10 || set.forcedLevel))) {
+						if (lsetData.sources[i].substr(0,2) === '5E' || (lsetData.sources[i].substr(0,2) === '5D' && set.level >= 10)) {
 							compatibleSource = true;
 							break;
 						}
@@ -856,9 +878,12 @@ module.exports = (function () {
 					}
 				}
 			}
-			if (set.level < template.evoLevel && !set.forcedLevel) {
+			if (set.level < template.evoLevel) {
 				// FIXME: Event pokemon given at a level under what it normally can be attained at gives a false positive
 				problems.push(name+" must be at least level "+template.evoLevel+".");
+			}
+			if (!lsetData.sources && lsetData.sourcesBefore <= 3 && this.getAbility(set.ability).gen === 4 && !template.prevo) {
+				problems.push(name+" has a gen 4 ability and isn't evolved - it can't use anything from gen 3.");
 			}
 		}
 		setHas[toId(template.tier)] = true;
@@ -911,6 +936,9 @@ module.exports = (function () {
 	 */
 	Tools.prototype.install = function(battle) {
 		for (var i in this) {
+			if (battle[i] !== undefined) {
+				battle.debug('scripts.js overrode battle.' + i);
+			}
 			battle[i] = this[i];
 		}
 	};

@@ -4396,6 +4396,7 @@ exports.BattleMovedex = {
 		pp: 10,
 		priority: 0,
 		isNotProtectable: true,
+		affectedByImmunities: false,
 		onTryHit: function(target, source) {
 			source.side.addSideCondition('futuremove');
 			if (source.side.sideConditions['futuremove'].positions[source.position]) {
@@ -4409,6 +4410,7 @@ exports.BattleMovedex = {
 				moveData: {
 					basePower: 100,
 					category: "Special",
+					affectedByImmunities: true,
 					type: 'Psychic'
 				}
 			};
@@ -10516,7 +10518,7 @@ exports.BattleMovedex = {
 				return null;
 			}
 			if (defender.volatiles['bounce'] || defender.volatiles['dig'] || defender.volatiles['dive'] || defender.volatiles['fly'] || defender.volatiles['shadowforce']) {
-				this.add('-miss', attacker);
+				this.add('-miss', attacker, defender);
 				return null;
 			}
 			this.add('-prepare', attacker, move.name, defender);

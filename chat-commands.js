@@ -770,7 +770,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 				if (!first) output += ' | ';
 				first = false;
 
-				output += '<a href="/'+i+'" onclick="return selectTab(\''+i+'\');">'+i+'</a>';
+				output += '<a href="/'+i+'" room="'+i+'">'+i+'</a>';
 			}
 			if (!output) {
 				emit(socket, 'console', ""+targetUser.name+" is offline.");
@@ -850,7 +850,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 				if (!first) output += ' | ';
 				first = false;
 
-				output += '<a href="/'+i+'" onclick="return selectTab(\''+i+'\');">'+i+'</a>';
+				output += '<a href="/'+i+'" room="'+i+'">'+i+'</a>';
 			}
 			emit(socket, 'console', {rawMessage: output});
 		}
@@ -1228,12 +1228,12 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			break;
 		}
 		if (config.modchat === true) {
-			room.addRaw('<div class="message-modchat-enable"><b>Moderated chat was enabled!</b><br />Only registered users can talk.</div>');
+			room.addRaw('<div class="broadcast-red"><b>Moderated chat was enabled!</b><br />Only registered users can talk.</div>');
 		} else if (!config.modchat) {
-			room.addRaw('<div class="message-modchat-disable"><b>Moderated chat was disabled!</b><br />Anyone may talk now.</div>');
+			room.addRaw('<div class="broadcast-blue"><b>Moderated chat was disabled!</b><br />Anyone may talk now.</div>');
 		} else {
 			var modchat = sanitize(config.modchat);
-			room.addRaw('<div class="message-modchat-group"><b>Moderated chat was set to '+modchat+'!</b><br />Only users of rank '+modchat+' and higher can talk.</div>');
+			room.addRaw('<div class="broadcast-red"><b>Moderated chat was set to '+modchat+'!</b><br />Only users of rank '+modchat+' and higher can talk.</div>');
 		}
 		logModCommand(room,user.name+' set modchat to '+config.modchat,true);
 		return false;
@@ -1245,7 +1245,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', '/declare - Access denied.');
 			return false;
 		}
-		room.addRaw('<div class="message-declare"><b>'+target+'</b></div>');
+		room.addRaw('<div class="broadcast-blue"><b>'+target+'</b></div>');
 		logModCommand(room,user.name+' declared '+target,true);
 		return false;
 		break;
@@ -1342,7 +1342,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 		LoginServer.disabled = true;
 		logModCommand(room, 'The ladder was disabled by ' + user.name + '.', true);
-		room.addRaw('<div class="chat-command-message message-disable-ladder"><b>Due to high server load, the ladder has been temporarily disabled</b><br />Rated games will no longer update the ladder. It will be back momentarily.</div>');
+		room.addRaw('<div class="broadcast-red"><b>Due to high server load, the ladder has been temporarily disabled</b><br />Rated games will no longer update the ladder. It will be back momentarily.</div>');
 		return false;
 		break;
 		
@@ -1357,7 +1357,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 		LoginServer.disabled = false;
 		logModCommand(room, 'The ladder was enabled by ' + user.name + '.', true);
-		room.addRaw('<div class="message-enableladder"><b>The ladder is now back.</b><br />Rated games will update the ladder now.</div>');
+		room.addRaw('<div class="broadcast-green"><b>The ladder is now back.</b><br />Rated games will update the ladder now.</div>');
 		return false;
 		break;
 
@@ -1973,13 +1973,17 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case '!learn':
 	case 'learnall':
 	case '!learnall':
-		var lsetData = {};
+	case 'learn5':
+	case '!learn5':
+		var lsetData = {set:{}};
 		var targets = target.split(',');
 		if (!targets[1]) return parseCommand(user, 'help', 'learn', room, socket);
 		var template = Tools.getTemplate(targets[0]);
 		var move = {};
 		var problem;
 		var all = (cmd.substr(cmd.length-3) === 'all');
+
+		if (cmd === 'learn5' || cmd === '!learn5') lsetData.set.level = 5;
 
 		showOrBroadcastStart(user, cmd, room, socket, message);
 
@@ -1999,7 +2003,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			problem = Tools.checkLearnset(move, template, lsetData);
 			if (problem) break;
 		}
-		var buffer = ''+template.name+(problem?" <strong class=\"message-learn-cannotlearn\">can't</strong> learn ":" <strong class=\"message-learn-canlearn\">can</strong> learn ")+(targets.length>2?"these moves":move.name);
+		var buffer = ''+template.name+(problem?" <span class=\"message-learn-cannotlearn\">can't</span> learn ":" <span class=\"message-learn-canlearn\">can</span> learn ")+(targets.length>2?"these moves":move.name);
 		if (!problem) {
 			var sourceNames = {E:"egg",S:"event",D:"dream world"};
 			if (lsetData.sources || lsetData.sourcesBefore) buffer += " only when obtained from:<ul class=\"message-learn-list\">";
@@ -2033,12 +2037,14 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 
 	case 'groups':
 	case '!groups':
-	case '!gropus':
 		showOrBroadcastStart(user, cmd, room, socket, message);
 		showOrBroadcast(user, cmd, room, socket,
 			'<div class="message-groups">' +
 			'+ <b>Voice</b> - They can use ! commands like !groups, use other voice commands, and talk during moderated chat<br />' +
 			'% <b>Trial Moderator</b> - The above, and they can also mute users and run tournaments<br />' +
+			'<div class="infobox">' +
+			'+ <b>Voice</b> - They can use ! commands like !groups, and talk during moderated chat<br />' +
+			'% <b>Driver</b> - The above, and they can also mute users and run tournaments<br />' +
 			'@ <b>Moderator</b> - The above, and they can ban users and check for alts<br />' +
 			'&amp; <b>Super Moderator</b> - The above, and they can promote moderators and force ties<br />'+
 			'~ <b>Administrator</b> - They can do anything, like change what this message says'+
@@ -2052,13 +2058,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case '!git':
 		showOrBroadcastStart(user, cmd, room, socket, message);
 		showOrBroadcast(user, cmd, room, socket,
-			'<div class="message-opensource">Pokemon Showdown is open source:<br />- Language: JavaScript<br />'+
-			'- <a href="https://github.com/Zarel/Pokemon-Showdown/commits/master" target="_blank">What\'s new?</a><br />'+
-			'- <a href="https://github.com/Zarel/Pokemon-Showdown" target="_blank">Server source code</a><br />'+
-			'- <a href="https://github.com/Zarel/Pokemon-Showdown-Client" target="_blank">Client source code</a><br />'+
-			'- <a href="https://github.com/kupochu/Pokemon-Showdown" target="_blank">TBT Server source code</a><br />'+
-			'- <a href="https://github.com/kupochu/Pokemon-Showdown/commits/master" target="_blank">What\'s new with TBT?</a><br />'+
-			'</div>');
+			'<div class="infobox">Pokemon Showdown is open source:<br />- Language: JavaScript<br />- <a href="https://github.com/Zarel/Pokemon-Showdown/commits/master" target="_blank">What\'s new?</a><br />- <a href="https://github.com/Zarel/Pokemon-Showdown" target="_blank">Server source code</a><br />- <a href="https://github.com/Zarel/Pokemon-Showdown-Client" target="_blank">Client source code</a><br />- <a href="https://github.com/kupochu/Pokemon-Showdown" target="_blank">TBT Server Source code</a><br />- <a href="https://github.com/kupochu/Pokemon-Showdown/commits/master" target="_blank">What\'s new with TBT?</a></div>');
 		return false;
 		break;
 
@@ -2066,7 +2066,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case '!avatars':
 		showOrBroadcastStart(user, cmd, room, socket, message);
 		showOrBroadcast(user, cmd, room, socket,
-			'<div class="message-avatars">Want a custom avatar?<br />- <a href="/sprites/trainers/" target="_blank">How to change your avatar</a></div>');
+			'<div class="infobox">Want a custom avatar?<br />- <a href="/sprites/trainers/" target="_blank">How to change your avatar</a></div>');
 		return false;
 		break;
 
@@ -2076,7 +2076,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case '!introduction':
 		showOrBroadcastStart(user, cmd, room, socket, message);
 		showOrBroadcast(user, cmd, room, socket,
-			'<div class="message-intro">New to competitive pokemon?<br />' +
+			'<div class="infobox">New to competitive pokemon?<br />' +
 			'- <a href="http://www.smogon.com/dp/articles/intro_comp_pokemon" target="_blank">An introduction to competitive pokemon</a><br />' +
 			'- <a href="http://www.smogon.com/bw/articles/bw_tiers" target="_blank">What do "OU", "UU", etc mean?</a><br />' +
 			'- <a href="http://www.smogon.com/bw/banlist/" target="_blank">What are the rules for each format? What is "Sleep Clause"?</a>' +
@@ -2090,7 +2090,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case '!calculator':
 		showOrBroadcastStart(user, cmd, room, socket, message);
 		showOrBroadcast(user, cmd , room , socket,
-			'<div class="message-calc">Pokemon Showdown! damage calculator. (Courtesy of Honko)<br />' +
+			'<div class="infobox">Pokemon Showdown! damage calculator. (Courtesy of Honko)<br />' +
 			'- <a href="http://pokemonshowdown.com/damagecalc/" target="_blank">Damage Calculator</a><br />' +
 			'</div>');
 		return false;
@@ -2100,7 +2100,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case '!cap':
 		showOrBroadcastStart(user, cmd, room, socket, message);
 		showOrBroadcast(user, cmd, room, socket,
-			'<div class="message-cap">An introduction to the Create-A-Pokemon project:<br />' +
+			'<div class="infobox">An introduction to the Create-A-Pokemon project:<br />' +
 			'- <a href="http://www.smogon.com/cap/" target="_blank">CAP project website and description</a><br />' +
 			'- <a href="http://www.smogon.com/forums/showthread.php?t=48782" target="_blank">What Pokemon have been made?</a><br />' +
 			'- <a href="http://www.smogon.com/forums/showthread.php?t=3464513" target="_blank">Talk about the metagame here</a><br />' +
@@ -2115,7 +2115,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case '!othermetas':
 		showOrBroadcastStart(user, cmd, room, socket, message);
 		showOrBroadcast(user, cmd, room, socket,
-			'<div class="message-othermetas">Information on the Other Metagames:<br />' +
+			'<div class="infobox">Information on the Other Metagames:<br />' +
 			'- <a href="http://www.smogon.com/forums/showthread.php?t=3463764" target="_blank">Balanced Hackmons</a><br />' +
 			'- <a href="http://www.smogon.com/forums/showthread.php?t=3471810" target="_blank">Dream World OU</a><br />' +
 			'- <a href="http://www.smogon.com/forums/showthread.php?t=3467120" target="_blank">Glitchmons</a><br />' +
@@ -2132,7 +2132,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case '!rule':
 		showOrBroadcastStart(user, cmd, room, socket, message);
 		showOrBroadcast(user, cmd, room, socket,
-			'<div class="message-rules">Please follow the rules:<br />' +
+			'<div class="infobox">Please follow the rules:<br />' +
 			'- <a href="http://pokemonshowdown.com/rules" target="_blank">Rules</a><br />' +
 			'</div>');
 		return false;
@@ -2141,7 +2141,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'faq':
 	case '!faq':
 		target = target.toLowerCase();
-		var buffer = '<div class="message-faq">';
+		var buffer = '<div class="infobox">';
 		var matched = false;
 		if (!target || target === 'all') {
 			matched = true;
@@ -2183,7 +2183,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case '!tiers':
 		showOrBroadcastStart(user, cmd, room, socket, message);
 		showOrBroadcast(user, cmd, room, socket,
-			'<div class="message-tiers">Smogon tiers:<br />' +
+			'<div class="infobox">Smogon tiers:<br />' +
 			'- <a href="http://www.smogon.com/bw/banlist/" target="_blank">The banlists for each tier</a><br />' +
 			'- <a href="http://www.smogon.com/bw/tiers/uber" target="_blank">Uber Pokemon</a><br />' +
 			'- <a href="http://www.smogon.com/bw/tiers/ou" target="_blank">Overused Pokemon</a><br />' +
@@ -2528,7 +2528,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 
 		lockdown = true;
 		for (var id in rooms) {
-			rooms[id].addRaw('<div class="message-lockdown"><b>The server is restarting soon.</b><br />Please finish your battles quickly. No new battles can be started until the server resets in a few minutes.</div>');
+			rooms[id].addRaw('<div class="broadcast-red"><b>The server is restarting soon.</b><br />Please finish your battles quickly. No new battles can be started until the server resets in a few minutes.</div>');
 			if (rooms[id].requestKickInactive) rooms[id].requestKickInactive(user, true);
 		}
 		return false;
@@ -2542,7 +2542,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 
 		lockdown = false;
 		for (var id in rooms) {
-			rooms[id].addRaw('<div class="message-endlockdown"><b>The server shutdown was canceled.</b></div>');
+			rooms[id].addRaw('<div class="broadcast-green"><b>The server shutdown was canceled.</b></div>');
 		}
 		return false;
 		break;
@@ -2610,7 +2610,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 
 		lockdown = false;
 		config.modchat = false;
-		rooms.lobby.addRaw('<div class="message-crashfixed"><b>We fixed the crash without restarting the server!</b><br />You may resume talking in the lobby and starting new battles.</div>');
+		rooms.lobby.addRaw('<div class="broadcast-green"><b>We fixed the crash without restarting the server!</b><br />You may resume talking in the lobby and starting new battles.</div>');
 		return false;
 		break;
 	case 'crashnoted':
@@ -2626,7 +2626,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 
 		lockdown = false;
 		config.modchat = false;
-		rooms.lobby.addRaw('<div class="message-crashnoted"><b>We have logged the crash and are working on fixing it!</b><br />You may resume talking in the lobby and starting new battles.</div>');
+		rooms.lobby.addRaw('<div class="broadcast-green"><b>We have logged the crash and are working on fixing it!</b><br />You may resume talking in the lobby and starting new battles.</div>');
 		return false;
 		break;
 	case 'modlog':
