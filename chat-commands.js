@@ -2056,8 +2056,14 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case '!git':
 		showOrBroadcastStart(user, cmd, room, socket, message);
 		showOrBroadcast(user, cmd, room, socket,
-			'<div class="infobox">Pokemon Showdown is open source:<br />- Language: JavaScript<br />- <a href="https://github.com/Zarel/Pokemon-Showdown/commits/master" target="_blank">What\'s new?</a><br />- <a href="https://github.com/Zarel/Pokemon-Showdown" target="_blank">Server source code</a><br />- <a href="https://github.com/Zarel/Pokemon-Showdown-Client" target="_blank">Client source code</a><br />- <a href="https://github.com/kupochu/Pokemon-Showdown" target="_blank">TBT Server Source code</a><br />- <a href="https://github.com/kupochu/Pokemon-Showdown/commits/master" target="_blank">What\'s new with TBT?</a></div>');
-		return false;
+				'<div class="message-opensource">Pokemon Showdown is open source:<br />- Language: JavaScript<br />'+
+				'- <a href="https://github.com/Zarel/Pokemon-Showdown/commits/master" target="_blank">What\'s new?</a><br />'+
+				'- <a href="https://github.com/Zarel/Pokemon-Showdown" target="_blank">Server source code</a><br />'+
+				'- <a href="https://github.com/Zarel/Pokemon-Showdown-Client" target="_blank">Client source code</a><br />'+
+				'- <a href="https://github.com/kupochu/Pokemon-Showdown" target="_blank">TBT Server source code</a><br />'+
+				'- <a href="https://github.com/kupochu/Pokemon-Showdown/commits/master" target="_blank">What\'s new with TBT?</a><br />'+
+				'</div>');
+			return false;
 		break;
 
 	case 'avatars':
