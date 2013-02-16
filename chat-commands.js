@@ -1922,7 +1922,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'forum':
 	case '!forum':
 	case 'fourms':
-	case '!fourms'
+	case '!fourms':
 		showOrBroadcastStart(user, cmd, room, socket, message);
 		showOrBroadcast(user, cmd, room, socket, '<div class="infobox">The link for The Battle Tower\'s Forums:<br />'+
 			'- <a href="http://thebattletower.no-ip.org/forums" target="_blank">Click Me</a><br /></div>');
