@@ -1167,7 +1167,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		if(spromo)
 			user.emit('console', ''+name+' was '+ (isDemotion?'demoted':'promoted')+' to '+ (groupName.trim() || 'a regular user') + '.');
 		else
-			room.addRaw(''+name+' was '+ (isDemotion?'demoted':'promoted')+' to '+ (groupName.trim() || 'a regular user') + '.');
+			room.addRaw(''+name+' was '+ (isDemotion?'demoted':'promoted')+' to '+ (groupName.trim() || 'a regular user') + 'by '+ user.name + '.');
 			
 		spromo = false;
 		return false;
