@@ -1782,18 +1782,20 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 	
 	case 'cpoof':
-		var btags = '<strong><font color="'+Math.floor(Math.random()*16777216).toString(16)+'" >';
-		var etags = '</font></strong>'
-
-			if(poofeh && user.can('cpoof'))
-			{
-				room.addRaw(btags + '~~ '+user.name+' '+target+'! ~~' + etags);
-				user.destroy();
-				logModCommand(room, user.name + ' used a custom poof message: \n "'+target+'"',true);
-				
-			}else {
-				user.emit('console', '/cpoof - Access Denied', socket);
-			}
+		if(!user.can('cpoof')){
+			user.emit('console', '/cpoof - Access Denied');
+			return false;
+		}
+		
+		if(poofeh)
+		{
+			var btags = '<strong><font color="'+Math.floor(Math.random()*16777216).toString(16)+'" >';
+			var etags = '</font></strong>'
+			room.addRaw(btags + '~~ '+user.name+' '+target+'! ~~' + etags);
+			logModCommand(room, user.name + ' used a custom poof message: \n "'+target+'"',true);	
+		}
+		
+		user.destroy();
 		return false;
 		break;
 	
@@ -1827,7 +1829,8 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 		return false;
 		break;
-	
+		
+/* TODO: get this shit to work too ;-;	
 	case 'alertall':
 		if (!user.can('alertall')){
 			emit(socket, 'console', '/alertall - Access denied.');
@@ -1846,7 +1849,8 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		emit(socket, 'console', 'You have alerted everyone.');
 		return false;
 		break;
-	
+*/
+
 	case 'slots':
 	case 'spin':
 		if (!user.balance || user.balance <= 0) {
