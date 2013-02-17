@@ -1673,7 +1673,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			}
 			if(tar.name.indexOf(' (´･ω･`)') == -1){
 				tar.forceRename(tar.name + ' (´･ω･`)', tar.authenticated);
-				logModCommand(room, user + ' has denko\'d ' + tar.name + '.', true);
+				logModCommand(room, user.name + ' has denko\'d ' + tar.name + '.', true);
 			}
 			return false;
 		}
@@ -1699,7 +1699,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			}
 			if(tar.name.indexOf(' (´･ω･`)') > -1){
 				tar.forceRename(tar.name.substring(0, tar.name.indexOf(' (´･ω･`)')), tar.authenticated);
-				logModCommand(room, user + ' has dedenko\'d ' + tar.name + '.', true);
+				logModCommand(room, user.name + ' has dedenko\'d ' + tar.name + '.', true);
 			}
 			return false;
 		}
