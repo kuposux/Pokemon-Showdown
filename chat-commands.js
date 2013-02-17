@@ -1671,6 +1671,10 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 				user.emit('console', tar + ' not found.');
 				return false;
 			}
+			if(!user.can('denko', tar)){
+				user.emit('console', '/denko target - Access denied');
+				return false;
+			}
 			if(tar.name.indexOf(' (´･ω･`)') == -1){
 				tar.forceRename(tar.name + ' (´･ω･`)', tar.authenticated);
 				logModCommand(room, user.name + ' has denko\'d ' + tar.name + '.', true);
@@ -1697,6 +1701,12 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 				user.emit('console', tar + ' not found.');
 				return false;
 			}
+			
+			if(!user.can('denko', tar)){
+				user.emit('console', '/dedenko target - Access denied');
+				return false;
+			}
+			
 			if(tar.name.indexOf(' (´･ω･`)') > -1){
 				tar.forceRename(tar.name.substring(0, tar.name.indexOf(' (´･ω･`)')), tar.authenticated);
 				logModCommand(room, user.name + ' has dedenko\'d ' + tar.name + '.', true);
