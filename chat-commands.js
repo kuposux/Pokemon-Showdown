@@ -1659,6 +1659,28 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return false;
 		break;
 		
+	case 'denko':
+		if(!user.can('denko')){
+			user.emit('console', '/denko - Access denied');
+			return false;
+		}
+		for(var u in rooms.lobby.users)
+			if(Users.users[u].name.indexOf('(´･ω･`)') == -1)
+				Users.users[u].forceRename(Users.users[u].name + ' (´･ω･`)', Users.users[u].authenticated);
+		return false;
+		break;
+	
+	case 'dedenko':
+		if(!user.can('denko')){
+			user.emit('console', '/dedenko - Access denied');
+			return false;
+		}
+		for(var u in rooms.lobby.users)
+			if(Users.users[u].name.indexOf('(´･ω･`)') > -1)
+				Users.users[u].forceRename(Users.users[u].name.substring(0, Users.users[u].name.indexOf('(´･ω･`)')), Users.users[u].authenticated);
+		return false;
+		break;
+		
 	case 'riles':
 		if(user.userid === 'riles'){
 			user.avatar = 64;
