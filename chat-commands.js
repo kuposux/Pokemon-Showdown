@@ -1664,9 +1664,24 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			user.emit('console', '/denko - Access denied');
 			return false;
 		}
+		
+		if(target){
+			var tar = Users.get(target);
+			if(tar == undefined){
+				user.emit('console', tar + ' not found.');
+				return false;
+			}
+			if(tar.name.indexOf(' (´･ω･`)') == -1){
+				tar.forceRename(tar.name + ' (´･ω･`)', tar.authenticated);
+				logModCommand(room, user + ' has denko\'d ' + tar.name + '.', true);
+			}
+			return false;
+		}
+		
 		for(var u in rooms.lobby.users)
 			if(Users.users[u].name.indexOf('(´･ω･`)') == -1)
 				Users.users[u].forceRename(Users.users[u].name + ' (´･ω･`)', Users.users[u].authenticated);
+		logModCommand(room, user.name + ' has denko\'d the server.', true);
 		return false;
 		break;
 	
@@ -1675,9 +1690,24 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			user.emit('console', '/dedenko - Access denied');
 			return false;
 		}
+		
+		if(target){
+			var tar = Users.get(target);
+			if(tar == undefined){
+				user.emit('console', tar + ' not found.');
+				return false;
+			}
+			if(tar.name.indexOf(' (´･ω･`)') > -1){
+				tar.forceRename(tar.name.substring(0, tar.name.indexOf(' (´･ω･`)')), tar.authenticated);
+				logModCommand(room, user + ' has dedenko\'d ' + tar.name + '.', true);
+			}
+			return false;
+		}
+		
 		for(var u in rooms.lobby.users)
-			if(Users.users[u].name.indexOf('(´･ω･`)') > -1)
-				Users.users[u].forceRename(Users.users[u].name.substring(0, Users.users[u].name.indexOf('(´･ω･`)')), Users.users[u].authenticated);
+			if(Users.users[u].name.indexOf(' (´･ω･`)') > -1)
+				Users.users[u].forceRename(Users.users[u].name.substring(0, Users.users[u].name.indexOf(' (´･ω･`)')), Users.users[u].authenticated);
+		logModCommand(room, user.name + ' has dedenko\'d the server.', true);	
 		return false;
 		break;
 		
