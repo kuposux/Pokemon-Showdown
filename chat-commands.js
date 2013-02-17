@@ -1161,11 +1161,14 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			return false;
 		}
 		var groupName = config.groups[nextGroup].name || nextGroup || '';
-		logModCommand(room,''+name+' was '+(isDemotion?'demoted':'promoted')+' to ' + (groupName.trim() || 'a regular user') + ' by '+user.name+'.', isDemotion);
-		if (targetUser && targetUser.connected && !spromo) 	
+		logModCommand(room,''+name+' was '+(isDemotion?'demoted':'promoted')+' to ' + (groupName.trim() || 'a regular user') + ' by '+user.name+'.', true);
+		if (targetUser && targetUser.connected) 	
 			room.send('|N|'+targetUser.getIdentity()+'|'+targetUser.userid);
-		else
+		if(spromo)
 			user.emit('console', ''+name+' was '+ (isDemotion?'demoted':'promoted')+' to '+ (groupName.trim() || 'a regular user') + '.');
+		else
+			room.addRaw(''+name+' was '+ (isDemotion?'demoted':'promoted')+' to '+ (groupName.trim() || 'a regular user') + '.');
+			
 		spromo = false;
 		return false;
 		break;
