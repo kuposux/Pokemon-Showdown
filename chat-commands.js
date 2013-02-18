@@ -2136,11 +2136,11 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		showOrBroadcastStart(user, cmd, room, socket, message);
 		showOrBroadcast(user, cmd, room, socket,
 			'<div class="infobox">' +
-			'+ <b>Voice</b> - They can use ! commands like !groups, use other voice commands, and talk during moderated chat<br />' +
-			'% <b>Trial Moderator</b> - The above, and they can also mute users and run tournaments<br />' +
-			'@ <b>Moderator</b> - The above, and they can ban users and check for alts<br />' +
-			'&amp; <b>Super Moderator</b> - The above, and they can promote moderators and force ties<br />'+
-			'~ <b>Administrator</b> - They can do anything, like change what this message says'+
+			'+ <b>Voice</b> - They can use ! commands like !groups, run tournaments, use other voice commands, and talk during moderated chat.<br />' +
+			'% <b>Half Operator</b> - The above, they can also mute users.<br />' +
+			'@ <b>Operator</b> - The above, they can also ban and kick users.<br />' +
+			'&amp; <b>Administrator</b> - The above, they help decide who gets promoted and watch over the rest of the staff.<br />'+
+			'~ <b>Owner</b> - They are the owners of this server, they can do anything including change what this message says.'+
 			'</div>');
 		return false;
 		break;
