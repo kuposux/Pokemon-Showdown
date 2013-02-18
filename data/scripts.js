@@ -170,8 +170,11 @@ exports.BattleScripts = {
 				if (pokemon.level > target.level) accuracy += (pokemon.level - target.level);
 			}
 		}
-		if (move.alwaysHit) accuracy = true; // bypasses ohko accuracy modifiers
-		accuracy = this.runEvent('Accuracy', target, pokemon, move, accuracy);
+		if (move.alwaysHit) {
+			accuracy = true; // bypasses ohko accuracy modifiers
+		} else {
+			accuracy = this.runEvent('Accuracy', target, pokemon, move, accuracy);
+		}
 		if (accuracy !== true && this.random(100) >= accuracy) {
 			if (!spreadHit) this.attrLastMove('[miss]');
 			this.add('-miss', pokemon, target);
@@ -211,11 +214,11 @@ exports.BattleScripts = {
 
 		if (move.category !== 'Status') target.gotAttacked(move, damage, pokemon);
 
-		if (!damage && damage !== 0) return false;
-
 		if (move.selfdestruct) {
 			this.faint(pokemon, pokemon, move);
 		}
+
+		if (!damage && damage !== 0) return false;
 
 		if (!move.negateSecondary) {
 			this.singleEvent('AfterMoveSecondary', move, null, target, pokemon, move);
@@ -316,19 +319,37 @@ exports.BattleScripts = {
 
 		if (target) {
 			var didSomething = false;
+
 			damage = this.getDamage(pokemon, target, moveData);
-			if (damage === false || damage === null) {
-				return false;
-			}
-			if (move.noFaint && damage >= target.hp) {
-				damage = target.hp - 1;
-			}
-			if (damage || (damage === 0 && move.category !== 'Status' && !isSecondary && !isSelf) && !target.fainted) {
+
+			// getDamage has several possible return values:
+			//
+			//   a number:
+			//     means that much damage is dealt (0 damage still counts as dealing
+			//     damage for the purposes of things like Static)
+			//   false:
+			//     gives error message: "But it failed!" and move ends
+			//   null:
+			//     the move ends, with no message (usually, a custom fail message
+			//     was already output by an event handler)
+			//   undefined:
+			//     means no damage is dealt and the move continues
+			//
+			// basically, these values have the same meanings as they do for event
+			// handlers.
+
+			if ((damage || damage === 0) && !target.fainted) {
+				if (move.noFaint && damage >= target.hp) {
+					damage = target.hp - 1;
+				}
 				damage = this.damage(damage, target, pokemon, move);
 				if (!(damage || damage === 0)) return false;
 				didSomething = true;
 			} else if (damage === false && typeof hitResult === 'undefined') {
 				this.add('-fail', target);
+			}
+			if (damage === false || damage === null) {
+				return false;
 			}
 			if (moveData.boosts && !target.fainted) {
 				this.boost(moveData.boosts, target, pokemon, move);
@@ -645,7 +666,7 @@ exports.BattleScripts = {
 			hasMove = {};
 			counter = {
 				Physical: 0, Special: 0, Status: 0, damage: 0,
-				technician: 0, skilllink: 0, contrary: 0, sheerforce: 0,
+				technician: 0, skilllink: 0, contrary: 0, sheerforce: 0, ironfist: 0,
 				recoil: 0, inaccurate: 0,
 				physicalsetup: 0, specialsetup: 0, mixedsetup: 0
 			};
@@ -663,6 +684,9 @@ exports.BattleScripts = {
 				}
 				if (move.multihit && move.multihit[1] === 5) {
 					counter['skilllink']++;
+				}
+				if (move.isPunchAttack) {
+					counter['ironfist']++;
 				}
 				if (move.recoil) {
 					counter['recoil']++;
@@ -756,13 +780,13 @@ exports.BattleScripts = {
 				case 'seismictoss': case 'nightshade': case 'superfang':
 					if (setupType) rejected = true;
 					break;
-				case 'knockoff': case 'perishsong': case 'magiccoat': case 'haze':
+				case 'knockoff': case 'perishsong': case 'magiccoat': case 'spikes':
 					if (setupType) rejected = true;
 					break;
 				case 'uturn': case 'voltswitch': case 'relicsong':
 					if (setupType) rejected = true;
 					break;
-				case 'pursuit': case 'trick': case 'switcheroo': case 'protect':
+				case 'pursuit': case 'trick': case 'switcheroo': case 'protect': case 'haze': case 'stealthrock':
 					if (setupType || (hasMove['rest'] && hasMove['sleeptalk'])) rejected = true;
 					break;
 
@@ -793,13 +817,19 @@ exports.BattleScripts = {
 					if (hasMove['acrobatics']) rejected = true;
 					break;
 				case 'energyball': case 'grassknot': case 'petaldance': case 'solarbeam':
-					if (hasMove['gigadrain']) rejected = true;
+					if (hasMove['gigadrain'] || hasMove['leafstorm']) rejected = true;
+					break;
+				case 'gigadrain':
+					if (hasMove['leafstorm']) rejected = true;
 					break;
 				case 'weatherball':
 					if (!hasMove['sunnyday']) rejected = true;
 					break;
 				case 'firepunch':
 					if (hasMove['flareblitz']) rejected = true;
+					break;
+				case 'bugbite':
+					if (hasMove['uturn']) rejected = true;
 					break;
 				case 'crosschop': case 'hijumpkick':
 					if (hasMove['closecombat']) rejected = true;
@@ -860,11 +890,22 @@ exports.BattleScripts = {
 				case 'fakeout':
 					if (hasMove['trick'] || hasMove['switcheroo']) rejected = true;
 					break;
-				case 'bellydrum': case 'encore': case 'stealthrock': case 'suckerpunch':
+				case 'bellydrum': case 'encore': case 'suckerpunch':
 					if (hasMove['rest'] && hasMove['sleeptalk']) rejected = true;
 					break;
-				case 'trickroom':
+				case 'trickroom': case 'reflect': case 'lightscreen':
 					if (hasMove['trick']) rejected = true;
+					break;
+				case 'rockpolish': case 'agility': case 'autotomize':
+					if (!setupType && !hasMove['batonpass'] && hasMove['thunderwave']) rejected = true;
+					if ((hasMove['stealthrock'] || hasMove['spikes'] || hasMove['toxicspikes']) && !hasMove['batonpass']) rejected = true;
+					break;
+				case 'thunderwave':
+					if (setupType && (hasMove['rockpolish'] || hasMove['agility'])) rejected = true;
+					if (hasMove['trickroom']) rejected = true;
+					break;
+				case 'lavaplume':
+					if (hasMove['willowisp']) rejected = true;
 					break;
 				}
 				if (k===3) {
@@ -943,6 +984,9 @@ exports.BattleScripts = {
 					rejectAbility = true;
 				}
 				if (ability === 'Skill Link' && !counter['skilllink']) {
+					rejectAbility = true;
+				}
+				if (ability === 'Iron Fist' && !counter['ironfist']) {
 					rejectAbility = true;
 				}
 				if ((ability === 'Rock Head' || ability === 'Reckless') && !counter['recoil']) {

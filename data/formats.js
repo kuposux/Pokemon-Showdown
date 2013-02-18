@@ -476,8 +476,8 @@ exports.BattleFormats = {
 	},
 	standardnext: {
 		effectType: 'Banlist',
-		ruleset: ['Sleep Clause', 'Species Clause', 'OHKO Clause', 'Moody Clause', 'Evasion Moves Clause'],
-		banlist: ['Unreleased', 'Illegal'],
+		ruleset: ['Sleep Clause', 'Species Clause', 'OHKO Clause'],
+		banlist: ['Unreleased', 'Illegal', 'Double Team'],
 		validateSet: function(set) {
 			// limit one of each move in Standard
 			var moves = [];
@@ -510,11 +510,7 @@ exports.BattleFormats = {
 			this.p2.pokemon = this.p2.pokemon.slice(0,4);
 			this.p2.pokemonLeft = this.p2.pokemon.length;
 		},
-		validateSet: function(set) {
-			if (!set.level || set.level >= 50) {
-				set.forcedLevel = 50;
-			}
-		},
+		maxForcedLevel: 50,
 		// no restrictions, for serious
 		ruleset: ['Pokemon', 'Team Preview VGC', 'Species Clause', 'Item Clause'],
 		banlist: ['Unreleased', 'Illegal', 'Sky Drop', 'Dark Void', 'Soul Dew',
@@ -824,7 +820,7 @@ exports.BattleFormats = {
 			for (var i=0; i<team.length; i++) {
 				var template = this.getTemplate(team[i].species);
 				if (speciesTable[template.num]) {
-					return ["You are limited to one of each pokemon by Species Clause.","(You have at least two "+template.name+")"];
+					return ["You are limited to one of each pokemon by Species Clause.","(You have more than one "+template.name+")"];
 				}
 				speciesTable[template.num] = true;
 			}
@@ -841,7 +837,7 @@ exports.BattleFormats = {
 				var item = toId(team[i].item);
 				if (!item) continue;
 				if (itemTable[item]) {
-					return ["You are limited to one of each item by Item Clause.","(You have at least two "+this.getItem(item).name+")"];
+					return ["You are limited to one of each item by Item Clause.","(You have more than one "+this.getItem(item).name+")"];
 				}
 				itemTable[item] = true;
 			}
@@ -928,6 +924,32 @@ exports.BattleFormats = {
 					}
 				}
 			}
+		}
+	},
+	sametypeclause: {
+		effectType: 'Rule',
+		onStart: function() {
+			this.add('rule', 'Same Type Clause: Pokemon in a team must share a type');
+		},
+		validateTeam: function(team, format) {
+			var typeTable = {};
+			for (var i=0; i<team.length; i++) {
+				var template = this.getTemplate(team[i].species);
+
+				// first type
+				var type = template.types[0];
+				typeTable[type] = (typeTable[type]||0) + 1;
+
+				// second type
+				type = template.types[1];
+				if (type) typeTable[type] = (typeTable[type]||0) + 1;
+			}
+			for (var type in typeTable) {
+				if (typeTable[type] >= team.length) {
+					return;
+				}
+			}
+			return ["Your team must share a type."];
 		}
 	}
 };

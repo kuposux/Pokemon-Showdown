@@ -134,6 +134,7 @@ var modlog = modlog || fs.createWriteStream('logs/modlog.txt', {flags:'a+'});
 var poofeh = true;
 var gitpulling = false;
 var imgs = true;
+var updateServerLock = false;
 
 function parseCommandLocal(user, cmd, target, room, socket, message) {
 	if (!room) return;
@@ -638,13 +639,10 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'birkal':
 		if (canTalk(user, room) && user.can('broadcast') && room.id === 'lobby') {
 			if (cmd === '!birkal') {
-				room.log.push('|c|'+user.getIdentity()+'|!birkal '+target);
+				room.add('|c|'+user.getIdentity()+'|!birkal '+target, true);
 			}
-			room.log.push('|c| Birkal|/me '+target);
-			if (!parseCommand.lastBirkal) parseCommand.lastBirkal = [];
-			parseCommand.lastBirkal.push(user.name);
-			parseCommand.lastBirkal.push(target);
-			if (parseCommand.lastBirkal.length > 100) parseCommand.lastBirkal.shift();
+			room.logEntry(user.name + ' used /birkal ' + target);
+			room.add('|c| Birkal|/me '+target, true);
 			return false;
 		}
 		break;
@@ -1170,6 +1168,17 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			room.addRaw(''+name+' was '+ (isDemotion?'demoted':'promoted')+' to '+ (groupName.trim() || 'a regular user') + ' by '+ user.name + '.');
 			
 		spromo = false;
+		var groupName = (config.groups[nextGroup].name || nextGroup || '').trim() || 'a regular user';
+		var entry = ''+name+' was '+(isDemotion?'demoted':'promoted')+' to ' + groupName + ' by '+user.name+'.';
+		logModCommand(room, entry, isDemotion);
+		if (isDemotion) {
+			rooms.lobby.logEntry(entry);
+			emit(socket, 'console', 'You demoted ' + name + ' to ' + groupName + '.');
+			if (targetUser) {
+				targetUser.emit('console', 'You were demoted to ' + groupName + ' by ' + user.name + '.');
+			}
+		}
+		if (targetUser && targetUser.connected) room.send('|N|'+targetUser.getIdentity()+'|'+targetUser.userid);
 		return false;
 		break;
 
@@ -1420,7 +1429,14 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 
 		if (targetUser.userid === toUserid(targets[2])) {
-			logModCommand(room,''+targetUser.name+' was forced to choose a new name by '+user.name+'.' + (targets[1] ? " (" + targets[1] + ")" : ""));
+			var entry = ''+targetUser.name+' was forced to choose a new name by '+user.name+'.' + (targets[1] ? " (" + targets[1] + ")" : "");
+			logModCommand(room, entry, true);
+			rooms.lobby.sendAuth(entry);
+			if (room.id !== 'lobby') {
+				room.add(entry);
+			} else {
+				room.logEntry(entry);
+			}
 			targetUser.resetName();
 			targetUser.emit('nameTaken', {reason: user.name+" has forced you to change your name. "+targets[1]});
 		} else {
@@ -1448,7 +1464,14 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 
 		if (targetUser.userid === toUserid(targets[2])) {
-			logModCommand(room, ''+targetUser.name+' was forcibly renamed to '+targets[1]+' by '+user.name+'.');
+			var entry = ''+targetUser.name+' was forcibly renamed to '+targets[1]+' by '+user.name+'.';
+			logModCommand(room, entry, true);
+			rooms.lobby.sendAuth(entry);
+			if (room.id !== 'lobby') {
+				room.add(entry);
+			} else {
+				room.logEntry(entry);
+			}
 			targetUser.forceRename(targets[1]);
 		} else {
 			emit(socket, 'console', "User "+targetUser.name+" is no longer using that name.");
@@ -2287,36 +2310,35 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 
 		showOrBroadcastStart(user, cmd, room, socket, message);
 
-		if(!template.exists) {
+		if (!template.exists) {
 			showOrBroadcast(user, cmd, room, socket, 'Pokemon "'+template.id+'" not found.');
 			return false;
 		}
 
-		if(generation === "bw" || generation === "bw2" || generation === "5" || generation === "five")
+		if (generation === "bw" || generation === "bw2" || generation === "5" || generation === "five") {
 			generation = "bw";
-		else if(generation === "dp" || generation === "dpp" || generation === "4" || generation === "four") {
+		} else if (generation === "dp" || generation === "dpp" || generation === "4" || generation === "four") {
 			generation = "dp";
 			genNumber = 4;
-		}
-		else if(generation === "adv" || generation === "rse" || generation === "rs" || generation === "3" || generation === "three") {
+		} else if (generation === "adv" || generation === "rse" || generation === "rs" || generation === "3" || generation === "three") {
 			generation = "rs";
 			genNumber = 3;
-		}
-		else if(generation === "gsc" || generation === "gs" || generation === "2" || generation === "two") {
+		} else if (generation === "gsc" || generation === "gs" || generation === "2" || generation === "two") {
 			generation = "gs";
 			genNumber = 2;
-		}
-		else if(generation === "rby" || generation === "rb" || generation === "1" || generation === "one") {
+		} else if(generation === "rby" || generation === "rb" || generation === "1" || generation === "one") {
 			generation = "rb";
 			genNumber = 1;
-		}
-		else {
+		} else {
 			generation = "bw";
 		}
 
 		if (genNumber < template.gen) {
 			showOrBroadcast(user, cmd, room, socket, template.name+' did not exist in '+generation.toUpperCase()+'!');
 			return false;
+		}
+		if (template.tier === 'G4CAP' || template.tier === 'G5CAP') {
+			generation = "cap";
 		}
 
 		var poke = template.name.toLowerCase();
@@ -2521,10 +2543,12 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'timer':
 		target = toId(target);
 		if (room.requestKickInactive) {
-			if (target === 'off') {
+			if (target === 'off' || target === 'stop') {
 				room.stopKickInactive(user, user.can('timer'));
-			} else {
+			} else if (target === 'on' || !target) {
 				room.requestKickInactive(user, user.can('timer'));
+			} else {
+				emit(socket, 'console', "'"+target+"' is not a recognized timer state.");
 			}
 		} else {
 			emit(socket, 'console', 'You can only set the timer from inside a room.');
@@ -2590,9 +2614,11 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		config.potd = target;
 		Simulator.eval('config.potd = \''+toId(target)+'\'');
 		if (target) {
-			logModCommand(room, 'The Pokemon of the Day was changed to '+target+' by '+user.name+'.');
+			rooms.lobby.addRaw('<div class="broadcast-blue"><b>The Pokemon of the Day is now '+target+'!</b><br />This Pokemon will be guaranteed to show up in random battles.</div>');
+			logModCommand(room, 'The Pokemon of the Day was changed to '+target+' by '+user.name+'.', true);
 		} else {
-			logModCommand(room, 'The Pokemon of the Day was removed by '+user.name+'.');
+			rooms.lobby.addRaw('<div class="broadcast-blue"><b>The Pokemon of the Day was removed!</b><br />No pokemon will be guaranteed in random battles.</div>');
+			logModCommand(room, 'The Pokemon of the Day was removed by '+user.name+'.', true);
 		}
 		return false;
 		break;
@@ -2608,6 +2634,9 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			rooms[id].addRaw('<div class="broadcast-red"><b>The server is restarting soon.</b><br />Please finish your battles quickly. No new battles can be started until the server resets in a few minutes.</div>');
 			if (rooms[id].requestKickInactive) rooms[id].requestKickInactive(user, true);
 		}
+
+		rooms.lobby.logEntry(user.name + ' used /lockdown');
+
 		return false;
 		break;
 
@@ -2621,6 +2650,9 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		for (var id in rooms) {
 			rooms[id].addRaw('<div class="broadcast-green"><b>The server shutdown was canceled.</b></div>');
 		}
+
+		rooms.lobby.logEntry(user.name + ' used /endlockdown');
+
 		return false;
 		break;
 
@@ -2634,6 +2666,13 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', 'For safety reasons, /kill can only be used during lockdown.');
 			return false;
 		}
+
+		if (updateServerLock) {
+			emit(socket, 'console', 'Wait for /updateserver to finish before using /kill.');
+			return false;
+		}
+
+		rooms.lobby.logEntry(user.name + ' used /kill');
 
 		process.exit();
 		return false;
@@ -2675,6 +2714,54 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return false;
 		break;
 
+	case 'updateserver':
+		if (!user.can('console')) {
+			emit(socket, 'console', '/updateserver - Access denied.');
+			return false;
+		}
+
+		if (updateServerLock) {
+			emit(socket, 'console', '/updateserver - Another update is already in progress.');
+			return false;
+		}
+
+		updateServerLock = true;
+
+		var logQueue = [];
+		logQueue.push(user.name + ' used /updateserver');
+
+		var exec = require('child_process').exec;
+		exec('git diff-index --quiet HEAD --', function(error) {
+			var cmd = 'git pull --rebase';
+			if (error) {
+				if (error.code === 1) {
+					// The working directory or index have local changes.
+					cmd = 'git stash;' + cmd + ';git stash pop';
+				} else {
+					// The most likely case here is that the user does not have
+					// `git` on the PATH (which would be error.code === 127).
+					user.emit('console', '' + error);
+					logQueue.push('' + error);
+					logQueue.forEach(rooms.lobby.logEntry);
+					updateServerLock = false;
+					return;
+				}
+			}
+			var entry = 'Running `' + cmd + '`';
+			user.emit('console', entry);
+			logQueue.push(entry);
+			exec(cmd, function(error, stdout, stderr) {
+				('' + stdout + stderr).split('\n').forEach(function(s) {
+					user.emit('console', s);
+					logQueue.push(s);
+				});
+				logQueue.forEach(rooms.lobby.logEntry);
+				updateServerLock = false;
+			});
+		});
+		return false;
+		break;
+
 	case 'crashfixed':
 		if (!lockdown) {
 			emit(socket, 'console', '/crashfixed - There is no active crash.');
@@ -2688,6 +2775,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		lockdown = false;
 		config.modchat = false;
 		rooms.lobby.addRaw('<div class="broadcast-green"><b>We fixed the crash without restarting the server!</b><br />You may resume talking in the lobby and starting new battles.</div>');
+		rooms.lobby.logEntry(user.name + ' used /crashfixed');
 		return false;
 		break;
 	case 'crashnoted':
@@ -2704,6 +2792,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		lockdown = false;
 		config.modchat = false;
 		rooms.lobby.addRaw('<div class="broadcast-green"><b>We have logged the crash and are working on fixing it!</b><br />You may resume talking in the lobby and starting new battles.</div>');
+		rooms.lobby.logEntry(user.name + ' used /crashnoted');
 		return false;
 		break;
 	case 'modlog':
