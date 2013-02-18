@@ -151,14 +151,14 @@
       exports.groupsranking = [' ', '+', '%', '@', '&', '~'];
       exports.groups = {
                         '~': {
-                              id: "admin",
-                              name: "Administrator",
+                              id: "owner",
+                              name: "Owner",
                               root: true,
                               rank: 5
                         },
                         '&': {
-                              id: "smod",
-                              name: "Super Moderator",
+                              id: "admin",
+                              name: "Administrator",
                               inherit: '@',
                               jurisdiction: '@us',
                               promote: 'u',
@@ -173,8 +173,8 @@
                               rank: 4
                         },
                         '@': {
-                              id: "mod",
-                              name: "Moderator",
+                              id: "op",
+                              name: "Operator",
                               inherit: '%',
                               jurisdiction: 'u',
                               ban: true,
@@ -187,8 +187,8 @@
                               rank: 3
                         },
                         '%': {
-                              id: "tmod",
-                              name: "Trial Moderator",
+                              id: "halfop",
+                              name: "Half Operator",
                               inherit: '+',
                               jurisdiction: 'u',
                               announce: true,
