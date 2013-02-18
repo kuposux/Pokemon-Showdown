@@ -1158,19 +1158,12 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', '/promote - WARNING: This user is offline and could be unregistered. Use /forcepromote if you\'re sure you want to risk it.');
 			return false;
 		}
-		var groupName = config.groups[nextGroup].name || nextGroup || '';
-		logModCommand(room,''+name+' was '+(isDemotion?'demoted':'promoted')+' to ' + (groupName.trim() || 'a regular user') + ' by '+user.name+'.', true);
-		if (targetUser && targetUser.connected) 	
-			room.send('|N|'+targetUser.getIdentity()+'|'+targetUser.userid);
-		if(spromo)
-			user.emit('console', ''+name+' was '+ (isDemotion?'demoted':'promoted')+' to '+ (groupName.trim() || 'a regular user') + '.');
-		else
-			room.addRaw(''+name+' was '+ (isDemotion?'demoted':'promoted')+' to '+ (groupName.trim() || 'a regular user') + ' by '+ user.name + '.');
-			
-		spromo = false;
+		
 		var groupName = (config.groups[nextGroup].name || nextGroup || '').trim() || 'a regular user';
 		var entry = ''+name+' was '+(isDemotion?'demoted':'promoted')+' to ' + groupName + ' by '+user.name+'.';
-		logModCommand(room, entry, isDemotion);
+		logModCommand(room, entry, true);
+		if (targetUser && targetUser.connected) room.send('|N|'+targetUser.getIdentity()+'|'+targetUser.userid);
+		
 		if (isDemotion) {
 			rooms.lobby.logEntry(entry);
 			emit(socket, 'console', 'You demoted ' + name + ' to ' + groupName + '.');
@@ -1178,7 +1171,13 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 				targetUser.emit('console', 'You were demoted to ' + groupName + ' by ' + user.name + '.');
 			}
 		}
-		if (targetUser && targetUser.connected) room.send('|N|'+targetUser.getIdentity()+'|'+targetUser.userid);
+		
+		if(spromo)
+			user.emit('console', ''+name+' was '+ (isDemotion?'demoted':'promoted')+' to '+ (groupName.trim() || 'a regular user') + '.');
+		else
+			room.addRaw(''+name+' was '+ (isDemotion?'demoted':'promoted')+' to '+ (groupName.trim() || 'a regular user') + ' by '+ user.name + '.');
+		
+		spromo = false;
 		return false;
 		break;
 
