@@ -166,7 +166,7 @@
                               declare: true,
                               modchatall: true,
                               poof:true,
-                              alert: true,
+                              denko:true,
                               potd: true,
                               namelock: true,
                               forcerenameto: true,
