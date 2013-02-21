@@ -899,7 +899,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return false;
 		break;
 
-	case 'kick':
+      /*case 'kick':
 	case 'k':
 		// TODO: /kick will be removed in due course.
 		if (!target) return parseCommand(user, '?', cmd, room, socket);
@@ -916,6 +916,27 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 
 		logModCommand(room,''+targetUser.name+' was kicked to the Rules page by '+user.name+'' + (targets[1] ? " (" + targets[1] + ")" : ""));
 		targetUser.emit('console', {evalRulesRedirect: 1});
+		return false;
+		break;*/
+	case 'kick':
+	case 'k':
+		if (!target) return parseCommand(user, '?', cmd, room, socket);
+		var targets = splitTarget(target);
+		var targetUser = targets[0];
+		var tar2 = toUserid(targets[0]);
+		var targetUser2 = Users.get(tar2);
+		if (!targetUser || !targetUser.connected) {
+			emit(socket, 'console', 'User '+targets[2]+' not found.');
+			return false;
+		}
+		if (!user.can('kick', targetUser)) {
+			emit(socket, 'console', '/kick - Access denied.');
+			return false;
+		}
+		logModCommand(room, ''+targetUser.name+' was kicked from the server by '+user.name+'. Reason: '+targets[1]);
+		targetUser.emit('console', 'You have been kicked from the server by '+user.name+'. Reason: '+targets[1]);
+		targetUser.emit('console', 'Please take a few minutes to read our rules at http://www.pokemonshowdown.com/rules');
+		targetUser2.destroy();
 		return false;
 		break;
 
