@@ -234,7 +234,7 @@ function BattleRoom(roomid, format, p1, p2, parentid, rated) {
 			});
 		}); // asychronicity
 		//console.log(JSON.stringify(logData));
-		fs.writeFile('logs/lastbattle.txt', ''+rooms.lobby.numRooms);
+		rooms.lobby.writeNumRooms();
 	};
 	this.emit = function(type, message, user) {
 		if (type === 'console' || type === 'update') {
@@ -760,6 +760,7 @@ function LobbyRoom(roomid) {
 	this.searchers = [];
 	this.logFile = null;
 	this.logFilename = '';
+	this.destroyingLog = false;
 
 	// Never do any other file IO synchronously
 	// but this is okay to prevent race conditions as we start up PS
@@ -767,6 +768,34 @@ function LobbyRoom(roomid) {
 	try {
 		this.numRooms = parseInt(fs.readFileSync('logs/lastbattle.txt')) || 0;
 	} catch (e) {} // file doesn't exist [yet]
+
+	// this function is complex in order to avoid several race conditions
+	this.writeNumRooms = (function() {
+		var writing = false;
+		var numRooms;	// last numRooms to be written to file
+		var finishWriting = function() {
+			writing = false;
+			if (numRooms !== selfR.numRooms) {
+				selfR.writeNumRooms();
+			}
+		};
+		return function() {
+			if (writing) return;
+			numRooms = selfR.numRooms;
+			writing = true;
+			fs.writeFile('logs/lastbattle.txt.0', '' + numRooms, function() {
+				// rename is atomic on POSIX, but will throw an error on Windows
+				fs.rename('logs/lastbattle.txt.0', 'logs/lastbattle.txt', function(err) {
+					if (err) {
+						// This should only happen on Windows.
+						fs.writeFile('logs/lastbattle.txt', '' + numRooms, finishWriting);
+						return;
+					}
+					finishWriting();
+				});
+			});
+		};
+	})();
 
 	// generate and cache the format list
 	this.formatListText = (function() {
@@ -803,6 +832,7 @@ function LobbyRoom(roomid) {
 		mkdir(path, '0755', function() {
 			path += '/' + date.format('{yyyy}-{MM}');
 			mkdir(path, '0755', function() {
+				if (selfR.destroyingLog) return;
 				path += '/' + date.format('{yyyy}-{MM}-{dd}') + '.txt';
 				if (path !== selfR.logFilename) {
 					selfR.logFilename = path;
@@ -815,6 +845,38 @@ function LobbyRoom(roomid) {
 			});
 		});
 	};
+	this.destroyLog = function(initialCallback, finalCallback) {
+		selfR.destroyingLog = true;
+		initialCallback();
+		if (selfR.logFile) {
+			selfR.logEntry = function() { };
+			selfR.logFile.on('close', finalCallback);
+			selfR.logFile.destroySoon();
+		} else {
+			finalCallback();
+		}
+	};
+	this.logUserStats = function() {
+		var total = 0;
+		var guests = 0;
+		var groups = {};
+		config.groupsranking.forEach(function(group) {
+			groups[group] = 0;
+		});
+		for (var i in selfR.users) {
+			var user = selfR.users[i];
+			++total;
+			if (!user.named) {
+				++guests;
+			}
+			++groups[user.group];
+		}
+		var entry = '|userstats|total:' + total + '|guests:' + guests;
+		for (var i in groups) {
+			entry += '|' + i + ':' + groups[i];
+		}
+		selfR.logEntry(entry);
+	};
 	if (config.loglobby) {
 		this.rollLogFile(true);
 		this.logEntry = function(entry) {
@@ -822,6 +884,9 @@ function LobbyRoom(roomid) {
 			selfR.logFile.write(timestamp + entry + '\n');
 		};
 		this.logEntry('Lobby created');
+		if (config.loguserstats) {
+			setInterval(this.logUserStats, config.loguserstats);
+		}
 	} else {
 		this.logEntry = function() { };
 	}

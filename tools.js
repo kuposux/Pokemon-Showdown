@@ -26,10 +26,28 @@ module.exports = (function () {
 		if (mod === 'base') {
 			dataTypes.forEach(function(dataType) {
 				try {
-					Data[mod][dataType] = require('./data/'+dataFiles[dataType])['Battle'+dataType];
-				} catch (e) {}
+					var path = './data/' + dataFiles[dataType];
+					if (fs.existsSync(path)) {
+						Data[mod][dataType] = require(path)['Battle' + dataType];
+					}
+				} catch (e) {
+					console.log(e.stack);
+				}
 				if (!Data[mod][dataType]) Data[mod][dataType] = {};
 			}, this);
+			try {
+				var path = './config/formats.js';
+				if (fs.existsSync(path)) {
+					var configFormats = require(path).Formats;
+					for (var i=0; i<configFormats.length; i++) {
+						var id = toId(configFormats[i].name);
+						configFormats[i].effectType = 'Format';
+						Data[mod].Formats[id] = configFormats[i];
+					}
+				}
+			} catch (e) {
+				console.log(e.stack);
+			}
 		} else {
 			dataTypes.forEach(function(dataType) {
 				try {
@@ -59,9 +77,9 @@ module.exports = (function () {
 		}
 		this.data = Data[mod];
 
-		// Scripts are Tools specific to a mod; they add to or overwrite base tools
-		// Many Scripts are not meant to be run from Tools directly; rather, they're meant
-		// to be copied into Battle.js using Tools.install and run from there
+		// Scripts can override Tools
+		// Be careful! Some Scripts are meant to be run only from inside a
+		// Battle!
 		for (var i in this.data.Scripts) {
 			this[i] = this.data.Scripts[i];
 		}
@@ -422,6 +440,8 @@ module.exports = (function () {
 						if (learned.substr(0,2) in {'4L':1,'5L':1}) {
 							// gen 4 or 5 level-up moves
 							if (level >= parseInt(learned.substr(2),10)) {
+								// Chatter and Struggle cannot be sketched
+								if (sketch && (move === 'chatter' || move === 'struggle')) return true;
 								// we're past the required level to learn it
 								return false;
 							}
@@ -461,15 +481,17 @@ module.exports = (function () {
 										// can't breed mons from future gens
 										dexEntry.gen <= parseInt(learned.substr(0,1),10) &&
 										// genderless pokemon can't pass egg moves
-										dexEntry.gender !== 'N' &&
-										// if chainbreeding, only match the original source
-										(!alreadyChecked[dexEntry.speciesid] || fromSelf) &&
-										// the breeding target can learn this move
-										dexEntry.learnset && (dexEntry.learnset[move]||dexEntry.learnset['sketch'])) {
-										if (dexEntry.eggGroups.intersect(eggGroups).length) {
-											// we can breed with it
-											atLeastOne = true;
-											sources.push(learned+dexEntry.id);
+										dexEntry.gender !== 'N') {
+										if (
+											// chainbreeding
+											fromSelf ||
+											// otherwise parent must be able to learn the move
+											!alreadyChecked[dexEntry.speciesid] && dexEntry.learnset && (dexEntry.learnset[move]||dexEntry.learnset['sketch'])) {
+											if (dexEntry.eggGroups.intersect(eggGroups).length) {
+												// we can breed with it
+												atLeastOne = true;
+												sources.push(learned+dexEntry.id);
+											}
 										}
 									}
 								}
@@ -946,7 +968,18 @@ module.exports = (function () {
 	 */
 	Tools.prototype.install = function(battle) {
 		for (var i in this) {
-			battle[i] = this[i];
+			if (battle[i] === undefined) battle[i] = this[i];
+		}
+	};
+	/**
+	 * Install our data.Scripts functions into the battle object
+	 * TODO: merge this back into Tools.prototype.install once
+	 * we refactor battles.js to use prototypes
+	 */
+	Tools.prototype.installScripts = function(battle) {
+		// Scripts override the default Battle prototype for a mod
+		for (var i in this.data.Scripts) {
+			battle[i] = this.data.Scripts[i];
 		}
 	};
 

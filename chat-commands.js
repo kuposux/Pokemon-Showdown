@@ -2692,9 +2692,17 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			return false;
 		}
 
-		rooms.lobby.logEntry(user.name + ' used /kill');
+		rooms.lobby.destroyLog(function() {
+			rooms.lobby.logEntry(user.name + ' used /kill');
+		}, function() {
+			process.exit();
+		});
 
-		process.exit();
+		// Just in the case the above never terminates, kill the process
+		// after 10 seconds.
+		setTimeout(function() {
+			process.exit();
+		}, 10000);
 		return false;
 		break;
 
@@ -2731,6 +2739,16 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			}
 			emit(socket, 'console', 'banned '+i+' ips');
 		});
+		return false;
+		break;
+
+	case 'refreshpage':
+		if (!user.can('hotpatch')) {
+			emit(socket, 'console', '/refreshpage - Access denied.');
+			return false;
+		}
+		rooms.lobby.send('|refresh|');
+		rooms.lobby.logEntry(user.name + ' used /refreshpage');
 		return false;
 		break;
 
@@ -2987,10 +3005,11 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 		if (target === 'all' || target === 'highlight') {
 			matched = true;
-			emit(socket, 'console', 'Set your highlights preference:');
-			emit(socket, 'console', '/highlight delete - deletes all highlighting words.');
-			emit(socket, 'console', '/highlight add, word - adds a highlighing word. You can add several words separated by commas.');
-			emit(socket, 'console', '/highlight delete, word - deletes a single or several highlighting words. Separated by commas.');
+			emit(socket, 'console', 'Set up highlights:');
+			emit(socket, 'console', '/highlight add, word - add a new word to the highlight list.');
+			emit(socket, 'console', '/highlight list - list all words that currently highlight you.');
+			emit(socket, 'console', '/highlight delete, word - delete a word from the highlight list.');
+			emit(socket, 'console', '/highlight delete - clear the highlight list');
 		}
 		if (target === 'all' || target === 'poof' || target === 'd') {
 			matched = true;

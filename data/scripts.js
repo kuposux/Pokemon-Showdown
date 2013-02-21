@@ -200,11 +200,14 @@ exports.BattleScripts = {
 			}
 			hits = Math.floor(hits);
 			for (var i=0; i<hits && target.hp && pokemon.hp; i++) {
+				if (!move.sourceEffect && pokemon.status === 'slp') break;
+
 				var moveDamage = this.moveHit(target, pokemon, move);
 				if (moveDamage === false) break;
 				// Damage from each hit is individually counted for the
 				// purposes of Counter, Metal Burst, and Mirror Coat.
 				damage = (moveDamage || 0);
+				this.eachEvent('Update');
 			}
 			if (i === 0) return true;
 			this.add('-hitcount', target, i);
@@ -469,7 +472,7 @@ exports.BattleScripts = {
 			while (true) {
 				var x=Math.floor(Math.random()*649)+1;
 				if (teamdexno.indexOf(x) === -1) {
-					teamdexno.push(x)
+					teamdexno.push(x);
 					break;
 				}
 			}
@@ -583,12 +586,11 @@ exports.BattleScripts = {
 			var moves;
 			var pool = ['struggle'];
 			if (poke === 'Smeargle') {
-				pool = Object.keys(this.data.Movedex)
-			} else {
-				if (template.learnset) pool = Object.keys(template.learnset);
+				pool = Object.keys(this.data.Movedex).exclude('struggle', 'chatter');
+			} else if (template.learnset) {
+				pool = Object.keys(template.learnset);
 			}
-			if (template.learnset) pool = Object.keys(template.learnset);
-			if (pool.length < 5) {
+			if (pool.length <= 4) {
 				moves = pool;
 			} else {
 				moves=pool.sample(4);
