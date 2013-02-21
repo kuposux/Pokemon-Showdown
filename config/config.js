@@ -180,6 +180,7 @@
                               ban: true,
                               modchat: true,
                               redirect: true,
+                              kick: true,
                               forcerename: true,
                               ip: true,
                               modlog: true,
