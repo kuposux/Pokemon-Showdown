@@ -189,7 +189,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', 'The tournament is not currently in its signup phase.');
 			return false;
 		}
-		var tourName = tour.tiers[tour[roomid].tier].name; var vowels = ["A", "E", "I", "O", "U"]; var msg = '<h2><font color="green">A' + (((vowels.indexOf(tourName.charAt(0).toUpperCase())) > -1) ? 'n ' : ' ' ) + tourName + ' Tournament is currently in its signup phase. <button onclick="emit(socket, \'chat\', {room: \'' + roomid + '\', message: \'/jt\'});"><b>Join Tournament</b></button></font></h2>';
+		var tourName = tour.tiers[tour[roomid].tier].name; var vowels = ["A", "E", "I", "O", "U"]; var msg = '<h2><font color="green">A' + (((vowels.indexOf(tourName.charAt(0).toUpperCase())) > -1) ? 'n ' : ' ' ) + tourName + ' Tournament is currently in its signup phase. Type</font> <font color="red">/j</font> <font color="green">to join!</font></h2>';
 		if (user.can('broadcast') && cmd.charAt(0) == "!") {
 			showOrBroadcastStart(user, cmd, room, socket, message);
 			showOrBroadcast(user, cmd, room, socket, msg);
@@ -238,7 +238,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		tour[roomid].status = 1;
 		tour[roomid].toursize = part[1].split(' ').join('');
 		tour[roomid].tier = part[0];
-		room.addRaw('<hr /><h2><font color="green">A Tournament has been started by: ' + sanitize(user.name) + ' <button onclick="emit(socket, \'chat\', {room: \'' + roomid + '\', message: \'/jt\'});"><b>Join</b></button></font></h2><b><font color="blueviolet">PLAYERS:</font></b> ' + part[1] + '<br /><font color="blue"><b>TYPE:</b></font> ' + tour.tiers[part[0]].name + '<hr />');
+		room.addRaw('<hr /><h2><font color="green">A Tournament has been started by: ' + sanitize(user.name) + ', Type</font> <font color="red">/j</font> <font color="green">to join!</font></h2><b><font color="blueviolet">PLAYERS:</font></b> ' + part[1] + '<br /><font color="blue"><b>TYPE:</b></font> ' + tour.tiers[part[0]].name + '<hr />');
 		return false;
 		break;
 
