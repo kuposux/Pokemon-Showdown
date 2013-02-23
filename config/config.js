@@ -110,6 +110,30 @@
 // Setting this to an empty array ([]) will disable the dev console.
       exports.consoleips = ['127.0.0.1', '76.247.181.42', '99.251.253.160'];
 
+// Whether to watch the config file for changes. If this is enabled,
+// then the config.js file will be reloaded when it is changed.
+// This can be used to change some settings using a text editor on
+// the server. The main intended application of this is for people
+// who have SSH access to the server to be able to add themselves
+// to `consoleips` above and have it take effect without restarting
+// the server. It is set to false by default because it probably
+// will not be useful to most users. Note that there will be
+// a brief delay between you saving the new config file and it
+// being reloaded by the server. This feature might not work on Windows.
+exports.watchconfig = false;
+
+// loglobby - whether to log the lobby.
+exports.loglobby = true;
+
+// loguserstats - how often (in milliseconds) to write user stats to the
+// lobby log. This has no effect if `loglobby` is disabled.
+exports.loguserstats = 1000*60*10; // 10 minutes
+
+// simulatorprocesses - the number of processes to use for handling battles
+// You should leave this at 1 unless your server has a very large amount of
+// traffic (i.e. hundreds of concurrent battles).
+exports.simulatorprocesses = 1;
+
 // permissions and groups:
 // Each entry in `groupsranking' specifies the ranking of the groups.
 // Each entry in `groups' is a seperate group. Some of the members are "special"
