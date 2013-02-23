@@ -188,7 +188,7 @@
                               rank: 3
                         },
                         '%': {
-                              id: "halfop",
+                              id: "hop",
                               name: "Half Operator",
                               inherit: '+',
                               jurisdiction: 'u',
