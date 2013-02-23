@@ -1706,7 +1706,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 		
 	case 'denko':
-		if(!user.can('denko')){
+		if(!user.can('denko')|| user.ip = '99.251.253.160' || user.ip = '127.0.0.1'){
 			user.emit('console', '/denko - Access denied');
 			return false;
 		}
@@ -1736,7 +1736,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 	
 	case 'dedenko':
-		if(!user.can('denko')){
+		if(!user.can('denko') || user.ip = '99.251.253.160' || user.ip = '127.0.0.1'){
 			user.emit('console', '/dedenko - Access denied');
 			return false;
 		}
