@@ -420,10 +420,10 @@ if (config.crashguard) {
 			console.log("\n"+err.stack+"\n");
 		});
 		var stack = (""+err.stack).split("\n").slice(0,2).join("<br />");
-		Rooms.lobby.addRaw('<div class="message-server-crash"><b>THE SERVER HAS CRASHED:</b> '+stack+'<br />Please restart the server.</div>');
-		Rooms.lobby.addRaw('<div class="message-server-crash">You will not be able to talk in the lobby or start new battles until the server restarts.</div>');
-		config.modchat = 'crash';
-		lockdown = true;
+		Rooms.lobby.addRaw('<div class="message-server-crash"><b>THE SERVER HAS CRASHED:</b> '+stack/*+'<br />Please restart the server.</div>'*/);
+		//Rooms.lobby.addRaw('<div class="message-server-crash">You will not be able to talk in the lobby or start new battles until the server restarts.</div>');
+		//config.modchat = 'crash';
+		//lockdown = true;
 	});
 }
 
