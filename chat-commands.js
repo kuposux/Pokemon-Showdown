@@ -876,7 +876,11 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			barn = false;
 			return false;
 		}
-
+		if (targetUser.ip === "127.0.0.1") {
+			emit(socket, 'console', 'You may not ban this user');
+			logModCommand(room, user.name + ' tried to ban '+targetUser.name,true);
+		return false;
+		}
 		logModCommand(room,""+targetUser.name+" was "+ (barn?"barned ":" banned ") + "by "+user.name+"." + (targets[1] ? " (" + targets[1] + ")" : ""));
 		targetUser.emit('message', user.name+' has' + (barn?"barned ":" banned ") +'you.  If you feel that your banning was unjustified you can <a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=75" target="_blank">appeal the ban</a>. '+targets[1]);
 		var alts = targetUser.getAlts();
