@@ -312,7 +312,6 @@ var User = (function () {
 		for (var i in this.roomCount) {
 			Rooms.get(i,'lobby').rename(this, oldid, joining);
 		}
-		rooms.lobby.usersChanged = true;
 		return true;
 	};
 	User.prototype.resetName = function() {
@@ -551,6 +550,9 @@ var User = (function () {
 
 				user.group = group;
 				if (avatar) user.avatar = avatar;
+				if (!user.authenticated && (this.ip !== user.ip)) {
+					user.muted = this.muted;
+				}
 				user.authenticated = authenticated;
 				user.ip = this.ip;
 
