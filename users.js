@@ -765,10 +765,8 @@ var User = (function () {
 				users[i].ban(true);
 			}
 		}
-		if (users[i].ip !== "127.0.0.1") {
 		bannedIps[this.ip] = this.userid;
 		this.destroy();
-		}
 	};
 	User.prototype.destroy = function() {
 		// Disconnects a user from the server
