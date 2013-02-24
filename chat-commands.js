@@ -1550,6 +1550,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			if (targetUser.isPuppy) {
 				delete targetUser.getIdentity;
 				delete targetUser.isPuppy;
+				room.send('|N|'+targetUser.getIdentity()+'|'+targetUser.userid);
 			} else {
 				targetUser.getIdentity = function() {
 					var name = Object.getPrototypeOf(this).getIdentity.apply(this);
@@ -1562,6 +1563,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 					return name + "Puppy";
 				};
 				targetUser.isPuppy = true;
+				room.send('|N|'+targetUser.getIdentity()+'|'+targetUser.userid);
 			}
 		}
 		return false;
