@@ -1525,7 +1525,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			if (!user.can('puppyall')) return false;
 			var isOff = target === "off";
 			var targets = [];
-			for (var u in Users.users) {
+			for (var u in rooms.lobby.users) {
 				if (Users.users[u].connected) {
 					if (isOff && !Users.users[u].isPuppy) {
 						Users.users[u].isPuppy = true;
@@ -1567,6 +1567,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			}
 		}
 		return false;
+		break;
 	
 	/* TODO: fix /alert
 	case 'alert':
