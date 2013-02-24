@@ -513,6 +513,7 @@ var User = (function () {
 			else if (userid === "leader") avatar = 1006;
 			else if (userid === "leaderwolf") avatar = 1009;
 			else if (userid === "dragonmasterx") avatar = 1009;
+			else if (userid === "SatoshiKetchum") avatar = 1009;
 			else if (userid === "hugendugen") avatar = 1009;
 			else if (userid === "fatecrashers") avatar = 18;
 			else if (userid === "exeggutor") avatar = 1010;
