@@ -1848,6 +1848,8 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'poof':
 		var btags = '<strong><font color="'+Math.floor(Math.random()*16777216).toString(16)+'" >';
 		var etags = '</font></strong>'
+		var targetid = toUserid(user);
+		var success = false;
 		if(!user.muted && target){
 			var tar = toUserid(target);
 			var targetUser = Users.get(tar);
@@ -1868,10 +1870,16 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			return false;
 		}
 		if(poofeh && !user.muted)
-			room.addRaw(btags + getRandMessage(user)+ etags);
-			
-		user.destroy();
-		
+		room.addRaw(btags + getRandMessage(user)+ etags);
+		user.ban();	
+		setTimeout(function() {
+		for (var ip in bannedIps) {
+			if (bannedIps[ip] === targetid) {
+				delete bannedIps[ip];
+				success = true;
+			}
+		}
+		}, 120000);
 		if(user.userid ==='panpaw'|| user.userid === 'pandaw'){
 			var tar = user.userid;
 			delete Users.users[tar];
@@ -1892,8 +1900,15 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			room.addRaw(btags + '~~ '+user.name+' '+target+'! ~~' + etags);
 			logModCommand(room, user.name + ' used a custom poof message: \n "'+target+'"',true);	
 		}
-		
-		user.destroy();
+		user.ban();	
+		setTimeout(function() {
+		for (var ip in bannedIps) {
+			if (bannedIps[ip] === targetid) {
+				delete bannedIps[ip];
+				success = true;
+			}
+		}
+		}, 120000);
 		return false;
 		break;
 	
