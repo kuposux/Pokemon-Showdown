@@ -1246,6 +1246,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		user.getIdentity = function(){return ' ' + user.name};
 		room.send('|N|'+user.getIdentity()+'|'+user.userid);
 		emit(socket, 'console', 'Your staff symbol has been sucessfully hidden.');
+		logModCommand(room, user.name + ' has hidden their auth symbol.',true);
 		return false;
 		break;
 			
@@ -1258,6 +1259,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		delete user.getIdentity
 		room.send('|N|'+user.getIdentity()+'|'+user.userid);
 		emit(socket, 'console', 'Your staff symbol has been revealed.');
+		logModCommand(room, user.name + ' has revealed their auth symbol.',true);
 		return false;
 		break;
 
