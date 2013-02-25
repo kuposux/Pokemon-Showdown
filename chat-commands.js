@@ -2082,6 +2082,16 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			'</div>');
 		return false;
 		break;
+	
+	case 'skytrain':
+	case '!skytrain':
+		showOrBroadcastStart(user, cmd, room, socket, message);
+		showOrBroadcast(user, cmd, room, socket, '<div class="infobox">The Battle Tower\'s Epic Sky Train:<br />' +
+			'- <a href="http://thebattletower.no-ip.org/forums/forumdisplay.php?fid=40" target="_blank">Bawses </a><br />'+
+			'- <a href="http://thebattletower.no-ip.org/forums/forumdisplay.php?fid=41" target="_blank" >Brockers </a>'+
+			'</div>');
+		return false;
+		break;
 
 	case 'data':
 	case '!data':
