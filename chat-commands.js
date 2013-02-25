@@ -135,7 +135,6 @@ var poofeh = true;
 var gitpulling = false;
 var imgs = true;
 var updateServerLock = false;
-var poof = true;
 
 function parseCommandLocal(user, cmd, target, room, socket, message) {
 	if (!room) return;
@@ -1870,23 +1869,9 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			}
 			return false;
 		}
-		if(poofeh && !user.muted && poof)
+		if(poofeh && !user.muted)
 		room.addRaw(btags + getRandMessage(user)+ etags);
-		poof = false;
-		user.ban();	
-		setTimeout(function() {
-		for (var ip in bannedIps) {
-			if (bannedIps[ip] === targetid) {
-				delete bannedIps[ip];
-				success = true;
-			}
-		poof = true;
-		}
-		}, 120000);
-		if(user.userid ==='panpaw'|| user.userid === 'pandaw'){
-			var tar = user.userid;
-			delete Users.users[tar];
-		}
+		user.destroy();	
 		return false;
 		break;
 	
@@ -1903,23 +1888,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			room.addRaw(btags + '~~ '+user.name+' '+target+'! ~~' + etags);
 			logModCommand(room, user.name + ' used a custom poof message: \n "'+target+'"',true);	
 		}
-		if(!poof)
-		{
-			emit(socket, 'console', 'Poofing is disabled, try again in a few minutes.');
-			return false;
-			break;
-		}
-		poof = false;
-		user.ban();	
-		setTimeout(function() {
-		for (var ip in bannedIps) {
-			if (bannedIps[ip] === targetid) {
-				delete bannedIps[ip];
-				success = true;
-			}
-		poof = true;
-		}
-		}, 120000);
+		user.destroy();	
 		return false;
 		break;
 	
