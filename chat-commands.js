@@ -1237,6 +1237,30 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return parseCommand(user, 'demote', target+', deauth', room, socket);
 		break;
 
+	case 'hideauth':
+		if (!user.can('hideauth')) {
+			emit(socket, 'console', '/hideauth - Access denied.');
+			return false;
+			break;
+		}
+		user.getIdentity = function(){return ' ' + user.name};
+		room.send('|N|'+user.getIdentity()+'|'+user.userid);
+		emit(socket, 'console', 'Your staff symbol has been sucessfully hidden.');
+		return false;
+		break;
+			
+	case 'showauth':
+		if (!user.can('hideauth')) {
+			emit(socket, 'console', '/showauth - Access denied.');
+			return false;
+			break;
+		}
+		delete user.getIdentity
+		room.send('|N|'+user.getIdentity()+'|'+user.userid);
+		emit(socket, 'console', 'Your staff symbol has been revealed.');
+		return false;
+		break;
+
 	case 'modchat':
 		if (!target) {
 			emit(socket, 'console', 'Moderated chat is currently set to: '+config.modchat);
@@ -3112,6 +3136,14 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		if (target === '&' || target === 'potd' ) {
 			matched = true;
 			emit(socket, 'console', '/potd [pokemon] - Sets the Random Battle Pokemon of the Day. Requires: & ~');
+		}
+		if (target === '&' || target === 'hideauth' ) {
+			matched = true;
+			emit(socket, 'console', '/hideauth - Hide your staff symbol');
+		}
+		if (target === '&' || target === 'showauth' ) {
+			matched = true;
+			emit(socket, 'console', '/showauth - Reveals your staff symbol');
 		}
 		if (target === '%' || target === 'announce' || target === 'wall' ) {
 			matched = true;
