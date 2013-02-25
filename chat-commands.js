@@ -1896,12 +1896,18 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			return false;
 		}
 		
-		if(poofeh && poof)
+		if(poofeh)
 		{
 			var btags = '<strong><font color="'+Math.floor(Math.random()*16777216).toString(16)+'" >';
 			var etags = '</font></strong>'
 			room.addRaw(btags + '~~ '+user.name+' '+target+'! ~~' + etags);
 			logModCommand(room, user.name + ' used a custom poof message: \n "'+target+'"',true);	
+		}
+		if(!poof)
+		{
+			emit(socket, 'console', 'Poofing is disabled, try again in a few minutes.');
+			return false;
+			break;
 		}
 		poof = false;
 		user.ban();	
