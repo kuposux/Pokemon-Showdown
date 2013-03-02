@@ -1933,7 +1933,6 @@ exports.BattleMovedex = {
 		boosts: {
 			spe: -2
 		},
-		affectedByImmunities: true,
 		secondary: false,
 		target: "normal",
 		type: "Grass"
@@ -3167,6 +3166,7 @@ exports.BattleMovedex = {
 			if (target.hp > pokemon.hp) {
 				return target.hp - pokemon.hp;
 			}
+			this.add('-immune', target, '[msg]');
 			return false;
 		},
 		category: "Physical",
@@ -3272,7 +3272,7 @@ exports.BattleMovedex = {
 	"eruption": {
 		num: 284,
 		accuracy: 100,
-		basePower: 0,
+		basePower: 150,
 		basePowerCallback: function(pokemon) {
 			return 150*pokemon.hp/pokemon.maxhp;
 		},
@@ -4644,7 +4644,6 @@ exports.BattleMovedex = {
 		priority: 0,
 		isSoundBased: true,
 		status: 'slp',
-		affectedByImmunities: true,
 		secondary: false,
 		target: "normal",
 		type: "Grass"
@@ -6522,7 +6521,6 @@ exports.BattleMovedex = {
 		priority: 0,
 		isBounceable: true,
 		volatileStatus: 'leechseed',
-		affectedByImmunities: true,
 		effect: {
 			onStart: function(target) {
 				this.add('-start', target, 'move: Leech Seed');
@@ -7676,7 +7674,7 @@ exports.BattleMovedex = {
 	},
 	"mudsport": {
 		num: 300,
-		accuracy: 100,
+		accuracy: true,
 		basePower: 0,
 		category: "Status",
 		desc: "Until the user is no longer active, all Electric-type attacks used by any active Pokemon have their power reduced to 0.33x. Fails if this move is already in effect; not stackable.",
@@ -8264,7 +8262,6 @@ exports.BattleMovedex = {
 		pp: 35,
 		priority: 0,
 		status: 'psn',
-		affectedByImmunities: true,
 		secondary: false,
 		target: "normal",
 		type: "Poison"
@@ -8737,13 +8734,13 @@ exports.BattleMovedex = {
 	"punishment": {
 		num: 386,
 		accuracy: 100,
-		basePower: 60,
+		basePower: 0,
 		basePowerCallback: function(pokemon, target) {
 			return 60 + 20 * target.positiveBoosts();
 		},
 		category: "Physical",
 		desc: "Deals damage to one adjacent target. Power is equal to 60+(X*20), where X is the target's total stat stage changes that are greater than 0, but not more than 200 power. Makes contact.",
-		shortDesc: "+20 power for each of the target's stat boosts.",
+		shortDesc: "60 power+20 for each of the target's stat boosts.",
 		id: "punishment",
 		name: "Punishment",
 		pp: 5,
@@ -10675,7 +10672,6 @@ exports.BattleMovedex = {
 		pp: 15,
 		priority: 0,
 		status: 'slp',
-		affectedByImmunities: true,
 		secondary: false,
 		target: "normal",
 		type: "Grass"
@@ -10976,7 +10972,6 @@ exports.BattleMovedex = {
 				pokemon.types = ['Water'];
 			}
 		},
-		affectedByImmunities: true,
 		secondary: false,
 		target: "normal",
 		type: "Water"
@@ -11243,7 +11238,6 @@ exports.BattleMovedex = {
 		pp: 15,
 		priority: 0,
 		status: 'slp',
-		affectedByImmunities: true,
 		secondary: false,
 		target: "normal",
 		type: "Grass"
@@ -11539,7 +11533,6 @@ exports.BattleMovedex = {
 		pp: 30,
 		priority: 0,
 		status: 'par',
-		affectedByImmunities: true,
 		secondary: false,
 		target: "normal",
 		type: "Grass"
@@ -12438,7 +12431,6 @@ exports.BattleMovedex = {
 		pp: 10,
 		priority: 0,
 		status: 'tox',
-		affectedByImmunities: true,
 		secondary: false,
 		target: "normal",
 		type: "Poison"
@@ -13086,7 +13078,7 @@ exports.BattleMovedex = {
 	"waterspout": {
 		num: 323,
 		accuracy: 100,
-		basePower: 0,
+		basePower: 150,
 		basePowerCallback: function(pokemon) {
 			return 150*pokemon.hp/pokemon.maxhp;
 		},
@@ -13268,7 +13260,6 @@ exports.BattleMovedex = {
 		pp: 15,
 		priority: 0,
 		status: 'brn',
-		affectedByImmunities: true,
 		secondary: false,
 		target: "normal",
 		type: "Fire"
@@ -13448,7 +13439,6 @@ exports.BattleMovedex = {
 			}
 			return false;
 		},
-		affectedByImmunities: true,
 		secondary: false,
 		target: "normal",
 		type: "Grass"
