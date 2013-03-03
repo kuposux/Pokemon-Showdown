@@ -2108,7 +2108,8 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case '!skytrain':
 		showOrBroadcastStart(user, cmd, room, socket, message);
 		showOrBroadcast(user, cmd, room, socket, '<div class="infobox">The Battle Tower\'s Epic Sky Train:<br />' +
-			'- <a href="http://thebattletower.no-ip.org/forums/forumdisplay.php?fid=43" target="_blank">Click Me </a><br />'+
+			'- <a href="http://thebattletower.no-ip.org/forums/forumdisplay.php?fid=40" target="_blank">Bawses </a><br />'+
+			'- <a href="http://thebattletower.no-ip.org/forums/forumdisplay.php?fid=41" target="_blank" >Brockers </a>'+
 			'</div>');
 		return false;
 		break;
@@ -2116,9 +2117,8 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'frontier':
 	case '!frontier':
 		showOrBroadcastStart(user, cmd, room, socket, message);
-		showOrBroadcast(user, cmd, room, socket, '<div class="infobox">The Battle Tower\'s Battle Frontier:<br />' +
-			'- <a href="http://thebattletower.no-ip.org/forums/forumdisplay.php?fid=40" target="_blank">Bawses </a><br />'+
-			'- <a href="http://thebattletower.no-ip.org/forums/forumdisplay.php?fid=41" target="_blank" >Brockers </a>'+
+		showOrBroadcast(user, cmd, room, socket, '<div class="infobox">The Battle Tower\'s Battle Frontier<br />' +
+			'- <a href="http://thebattletower.no-ip.org/forums/forumdisplay.php?fid=43" target="_blank">Click Me </a><br />'+
 			'</div>');
 		return false;
 		break;
