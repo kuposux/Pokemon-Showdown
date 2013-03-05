@@ -950,7 +950,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		if (targetUser.warnings == 1) {
 			message = '<div><b><font color=\"red\">You have been kicked from the server by '+user.name+'. Reason: '+targets[1]+'</color></b></div>'
 			targetUser.emit('console', {rawMessage: message});
-			message = '<div><b><font color=\"red\">Please take a few minutes to read our rules at http://www.pokemonshowdown.com/rules</color></b></div>';
+			message = '<div><b><font color=\"red\">Please take a few minutes to read our rules at http://thebattletower.no-ip.org/forums/showthread.php?tid=257</color></b></div>';
 			targetUser.emit('console', {rawMessage: message});
 			message = '<div><b><font color=\"red\">You now have one warning. If you gain more than 3 warnings you will be automatically banned from the server!';
 			targetUser.emit('console', {rawMessage: message});
@@ -958,7 +958,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		if (targetUser.warnings == 2) {
 			message = '<div><b><font color=\"red\">You have been kicked from the server by '+user.name+'. Reason: '+targets[1]+'</color></b></div>'
 			targetUser.emit('console', {rawMessage: message});
-			message = '<div><b><font color=\"red\">Please take a few minutes to read our rules at http://www.pokemonshowdown.com/rules</color></b></div>';
+			message = '<div><b><font color=\"red\">Please take a few minutes to read our rules at http://thebattletower.no-ip.org/forums/showthread.php?tid=257</color></b></div>';
 			targetUser.emit('console', {rawMessage: message});
 			message = '<div><b><font color=\"red\">You now have two warnings. If you gain more than 3 warnings you will be automatically banned from the server!';
 			targetUser.emit('console', {rawMessage: message});
@@ -966,7 +966,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		if (targetUser.warnings == 3) {
 			message = '<div><b><font color=\"red\">You have been kicked from the server by '+user.name+'. Reason: '+targets[1]+'</color></b></div>'
 			targetUser.emit('console', {rawMessage: message});
-			message = '<div><b><font color=\"red\">Please take a few minutes to read our rules at http://www.pokemonshowdown.com/rules</color></b></div>';
+			message = '<div><b><font color=\"red\">Please take a few minutes to read our rules at http://thebattletower.no-ip.org/forums/showthread.php?tid=257</color></b></div>';
 			targetUser.emit('console', {rawMessage: message});
 			message = '<div><b><font color=\"red\">You now have three warnings. If you gain one more warning you will be automatically banned from the server!';
 			targetUser.emit('console', {rawMessage: message});
@@ -2410,7 +2410,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		showOrBroadcastStart(user, cmd, room, socket, message);
 		showOrBroadcast(user, cmd, room, socket,
 			'<div class="infobox">Please follow the rules:<br />' +
-			'- <a href="http://pokemonshowdown.com/rules" target="_blank">Rules</a><br />' +
+			'- <a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=257" target="_blank">Rules</a><br />' +
 			'</div>');
 		return false;
 		break;
