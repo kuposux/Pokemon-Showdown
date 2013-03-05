@@ -1014,6 +1014,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 				logModCommand(room, targetUser.name + ' was automatically banned from the server for receiving more than 3 warnings!');
 				return false;
 			}
+		}
 
 		user.emit('console', '/warn - Access denied.');
 		return false;
