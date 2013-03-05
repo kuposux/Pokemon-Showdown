@@ -172,6 +172,8 @@ exports.simulatorprocesses = 1;
 // - potd: Set PotD.
 // - forcewin: /forcewin command.
 // - battlemessage: /a command.
+// - resetwarnings: /resetwarnings command.
+// - hideauth: /hideauth and /showauth commands.
       exports.groupsranking = [' ', '+', '%', '@', '&', '~'];
       exports.groups = {
                         '~': {
@@ -194,6 +196,7 @@ exports.simulatorprocesses = 1;
                               potd: true,
                               namelock: true,
 			      hideauth: true,
+			      resetwarnings: true,
                               forcerenameto: true,
                               rank: 4
                         },
