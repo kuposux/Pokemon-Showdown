@@ -939,12 +939,54 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			return false;
 		}
 		logModCommand(room, ''+targetUser.name+' was kicked from the server by '+user.name+'. Reason: '+targets[1]);
-		targetUser.emit('console', 'You have been kicked from the server by '+user.name+'. Reason: '+targets[1]);
-		targetUser.emit('console', 'Please take a few minutes to read our rules at http://www.pokemonshowdown.com/rules');
+		if (targetUser.warnings != 1 && targetUser.warnings != 2 && targetUser.warnings != 3) {
+			targetUser.warnings = 0;
+		}
+		targetUser.warnings++;
+		if (targetUser.warnings == 1) {
+			message = '<div><b><font color=\"red\">You have been kicked from the server by '+user.name+'. Reason: '+targets[1]+'</color></b></div>'
+			targetUser.emit('console', {rawMessage: message});
+			message = '<div><b><font color=\"red\">Please take a few minutes to read our rules at http://www.pokemonshowdown.com/rules</color></b></div>';
+			targetUser.emit('console', {rawMessage: message});
+			message = '<div><b><font color=\"red\">You now have one warning. If you gain more than 3 warnings you will be automatically banned from the server!';
+			targetUser.emit('console', {rawMessage: message});
+		}
+		if (targetUser.warnings == 2) {
+			message = '<div><b><font color=\"red\">You have been kicked from the server by '+user.name+'. Reason: '+targets[1]+'</color></b></div>'
+			targetUser.emit('console', {rawMessage: message});
+			message = '<div><b><font color=\"red\">Please take a few minutes to read our rules at http://www.pokemonshowdown.com/rules</color></b></div>';
+			targetUser.emit('console', {rawMessage: message});
+			message = '<div><b><font color=\"red\">You now have two warnings. If you gain more than 3 warnings you will be automatically banned from the server!';
+			targetUser.emit('console', {rawMessage: message});
+		}
+		if (targetUser.warnings == 3) {
+			message = '<div><b><font color=\"red\">You have been kicked from the server by '+user.name+'. Reason: '+targets[1]+'</color></b></div>'
+			targetUser.emit('console', {rawMessage: message});
+			message = '<div><b><font color=\"red\">Please take a few minutes to read our rules at http://www.pokemonshowdown.com/rules</color></b></div>';
+			targetUser.emit('console', {rawMessage: message});
+			message = '<div><b><font color=\"red\">You now have three warnings. If you gain one more warning you will be automatically banned from the server!';
+			targetUser.emit('console', {rawMessage: message});
+		}
+		if (targetUser.warnings == 4) {
+			message = '<div><b><font color=\"red\">You have been kicked from the server by '+user.name+'. Reason: '+targets[1]+'</color></b></div>'
+			targetUser.emit('console', {rawMessage: message});
+			message = '<div><b><font color=\"red\">You have been banned for receiving more than 3 warnings!</color></b></div>';
+			targetUser.emit('console', {rawMessage: message});
+			targetUser.ban();
+			logModCommand(room, targetUser.name + ' was automatically banned from the server for receiving more than 3 warnings!');
+			targetUser.warnings = 0;
+		}
 		targetUser2.destroy();
 		return false;
 		break;
-
+	case 'warnings':
+		if (user.warnings != 1 && user.warnings != 2 && user.warnings != 3) {
+			user.emit('console', 'You currently have 0 warnings, if you receive more than 3 warnings you will automatically be banned.');
+		}
+		else 
+		user.emit('console', 'You currently have ' + user.warnings + ' warnings, if you receive more than 3 warnings you will automatically be banned.');
+		return false;
+		break;
 	var unbarn = false;
 	case 'unbarn':
 		unbarn = true;
@@ -3079,6 +3121,11 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', 'all - change all timestamps preferences, lobby - change only lobby chat preferences, pms - change only PM preferences');
 			emit(socket, 'console', 'off - set timestamps off, minutes - show timestamps of the form [hh:mm], seconds - show timestamps of the form [hh:mm:ss]');
 		}
+		if (target === 'warnings') {
+			matched = true;
+			emit(socket, 'console', 'View how many warnings you currently have:');
+			emit(socket, 'console', '/warnings');
+		}
 		if (target === '+' || target === 'cpoof') {
 			matched = true;
 			emit(socket, 'console', 'Poof with a custom message:');
@@ -3098,7 +3145,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 		if (target === "@" || target === 'kick' || target === 'k') {
 			matched = true;
-			emit(socket, 'console', '/kick OR /k [username] - Quickly kicks a user by redirecting them to the Pokemon Showdown Rules page. Requires: @ & ~');
+			emit(socket, 'console', '/kick OR /k [username] - Quickly kicks a user from the server and increases their warning count by one. Requires: @ & ~');
 		}
 		if (target === '@' || target === 'unban') {
 			matched = true;
@@ -3194,7 +3241,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', '/help OR /h OR /? - Gives you help.');
 		}
 		if (!target) {
-			emit(socket, 'console', 'COMMANDS: /msg, /reply, /ip, /rating, /nick, /avatar, /rooms, /whois, /help, /away, /back, /timestamps');
+			emit(socket, 'console', 'COMMANDS: /msg, /reply, /ip, /rating, /nick, /avatar, /rooms, /whois, /help, /away, /back, /timestamps, /warnings, /poof');
 			emit(socket, 'console', 'INFORMATIONAL COMMANDS: /data, /groups, /opensource, /avatars, /faq, /rules, /intro, /tiers, /othermetas, /learn, /analysis, /calc (replace / with ! to broadcast. (Requires: + % @ & ~))');
 			emit(socket, 'console', 'For details on all commands, use /help all');
 			if (user.group !== config.groupsranking[0]) {
