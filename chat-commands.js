@@ -988,7 +988,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		if (!target) return parseCommand(user, '?', cmd, room, socket);
 		var targets = splitTarget(target);
 		var targetUser = targets[0];
-		if (user.can('kick')) {
+		if (user.can('kick', targetUser)) {
 			if (!targetUser || !targetUser.connected) {
 				emit(socket, 'console', 'User '+targets[2]+' not found.');
 				return false;
