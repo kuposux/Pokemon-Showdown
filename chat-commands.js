@@ -997,12 +997,24 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 				targetUser.warnings = 0;
 			}
 		targetUser.warnings++;
-		logModCommand(room, targetUser.name + ' received a warning from ' + user.name + '. Reason: ' + targets[1] + '.');
-		message = '<div><b><font color=\"red\">You have received a warning from ' + user.name + '. Reason: ' + targets[1] + '. You now have ' + targetUser.warnings + ' warnings.</color></b></div>';
-		targetUser.emit('console', {rawMessage: message});
-		user.emit('console', targetUser.name + ' now has ' + targetUser.warnings + ' warnings.');
-		return false;
-		}
+			if (targetUser.warnings == 1 || targetUser.warnings == 2 || targetUser.warnings == 3) {
+				logModCommand(room, targetUser.name + ' received a warning from ' + user.name + '. Reason: ' + targets[1] + '.');
+				message = '<div><b><font color=\"red\">You have received a warning from ' + user.name + '. Reason: ' + targets[1] + '. You now have ' + targetUser.warnings + ' warnings.</color></b></div>';
+				targetUser.emit('console', {rawMessage: message});
+				user.emit('console', targetUser.name + ' now has ' + targetUser.warnings + ' warnings.');
+				return false;
+			}
+			if (targetUser.warnings == 4) {
+				logModCommand(room, targetUser.name + ' received a warning from ' + user.name + '. Reason: ' + targets[1] + '.');
+				message = '<div><b><font color=\"red\">You have received a warning from ' + user.name + '. Reason: ' + targets[1] + '.</color></b></div>';
+				targetUser.emit('console', {rawMessage: message});
+				message = '<div><b><font color=\"red\">You have been banned for receiving more than 3 warnings!</color></b></div>';
+				targetUser.emit('console', {rawMessage: message});
+				targetUser.ban();
+				logModCommand(room, targetUser.name + ' was automatically banned from the server for receiving more than 3 warnings!');
+				return false;
+			}
+
 		user.emit('console', '/warn - Access denied.');
 		return false;
 		break;
