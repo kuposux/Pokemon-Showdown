@@ -825,6 +825,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return false;
 		break;
 
+	case 'who':
 	case 'whois':
 		var targetUser = user;
 		if (target) {
@@ -842,6 +843,9 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			}
 			if (user.can('ip', targetUser)) {
 				emit(socket, 'console', 'IP: '+targetUser.ip);
+			}
+			if (user.can('kick')) {
+				emit(socket, 'console', 'Warnings: ' + targetUser.warnings);
 			}
 			var output = 'In rooms: ';
 			var first = true;
@@ -979,6 +983,30 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		targetUser2.destroy();
 		return false;
 		break;
+		
+	case 'warn':
+		if (!target) return parseCommand(user, '?', cmd, room, socket);
+		var targets = splitTarget(target);
+		var targetUser = targets[0];
+		if (user.can('kick')) {
+			if (!targetUser || !targetUser.connected) {
+				emit(socket, 'console', 'User '+targets[2]+' not found.');
+				return false;
+			}
+			if (targetUser.warnings != 1 && targetUser.warnings != 2 && targetUser.warnings != 3) {
+				targetUser.warnings = 0;
+			}
+		targetUser.warnings++;
+		logModCommand(room, targetUser.name + ' received a warning from ' + user.name + '. Reason: ' + targets[1] + '.');
+		message = '<div><b><font color=\"red\">You have received a warning from ' + user.name + '. Reason: ' + targets[1] + '. You now have ' + targetUser.warnings + ' warnings.</color></b></div>';
+		targetUser.emit('console', {rawMessage: message});
+		user.emit('console', targetUser.name + ' now has ' + targetUser.warnings + ' warnings.');
+		return false;
+		}
+		user.emit('console', '/warn - Access denied.');
+		return false;
+		break;
+
 	case 'warnings':
 		if (user.warnings != 1 && user.warnings != 2 && user.warnings != 3) {
 			user.emit('console', 'You currently have 0 warnings, if you receive more than 3 warnings you will automatically be banned.');
@@ -987,6 +1015,24 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		user.emit('console', 'You currently have ' + user.warnings + ' warnings, if you receive more than 3 warnings you will automatically be banned.');
 		return false;
 		break;
+
+	case 'resetwarnings':
+		if (!target) return parseCommand(user, '?', cmd, room, socket);
+		var targets = splitTarget(target);
+		var targetUser = targets[0];
+		if (user.can('resetwarnings')) {
+			if (!targetUser || !targetUser.connected) {
+				emit(socket, 'console', 'User '+targets[2]+' not found.');
+				return false;
+			}
+			targetUser.warnings = 0;
+			logModCommand(room, user.name + ' reset the warnings on ' + targetUser.name + '.');
+			return false;
+		}
+		user.emit('console', 'You can not reset warnings.');
+		return false;
+		break;
+
 	var unbarn = false;
 	case 'unbarn':
 		unbarn = true;
@@ -3159,6 +3205,10 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			matched = true;
 			emit(socket, 'console', '/modlog [n] - If n is a number or omitted, display the last n lines of the moderator log. Defaults to 15. If n is not a number, search the moderator log for "n". Requires: @ & ~');
 		}
+		if (target === '@' || target === 'warn') {
+			matched = true;
+			emit(socket, 'console', '/warn [username] - Increases a users warn level. Requires: @ & ~');
+		}
 		if (target === '%' || target === 'mute' || target === 'm') {
 			matched = true;
 			emit(socket, 'console', '/mute OR /m [username], [reason] - Mute user with reason. Requires: % @ & ~');
@@ -3215,6 +3265,10 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		if (target === '@' || target === 'modchat') {
 			matched = true;
 			emit(socket, 'console', '/modchat [on/off/+/%/@/&/~] - Set the level of moderated chat. Requires: @ & ~');
+		}
+		if (target === '&' || target === 'resetwarnings') {
+			matched = true;
+			emit(socket, 'console', '/resetwarnings [username] - Resets the warning level of a user. Requires: & ~');
 		}
 		if (target === '~' || target === 'hotpatch') {
 			matched = true;
