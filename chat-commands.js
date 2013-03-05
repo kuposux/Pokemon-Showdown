@@ -996,7 +996,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			if (targetUser.warnings != 1 && targetUser.warnings != 2 && targetUser.warnings != 3) {
 				targetUser.warnings = 0;
 			}
-		targetUser.warnings++;
+			targetUser.warnings++;
 			if (targetUser.warnings == 1 || targetUser.warnings == 2 || targetUser.warnings == 3) {
 				logModCommand(room, targetUser.name + ' received a warning from ' + user.name + '. Reason: ' + targets[1] + '.');
 				message = '<div><b><font color=\"red\">You have received a warning from ' + user.name + '. Reason: ' + targets[1] + '. You now have ' + targetUser.warnings + ' warnings.</color></b></div>';
@@ -1174,9 +1174,25 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', '/mute - Access denied.');
 			return false;
 		}
-
+		if (targetUser.warnings != 1 && targetUser.warnings != 2 && targetUser.warnings != 3) {
+				targetUser.warnings = 0;
+			}
+			targetUser.warnings++;
+		if (targetUser.warnings == 4) {
+			logModCommand(room,''+targetUser.name+' was muted by '+user.name+'.' + (targets[1] ? " (" + targets[1] + ")" : ""));
+			targetUser.emit('message', user.name+' has muted you. '+targets[1]);
+			message = '<div><b><font color=\"red\">You have been automatically banned for receiving more than 3 warnings!</color></b></div>';
+			targetUser.emit('console', {rawMessage: message});
+			targetUser.ban();
+			logModCommand(room, targetUser.name + ' was automatically banned from the server for receiving more than 3 warnings!');
+			return false;
+			}
 		logModCommand(room,''+targetUser.name+' was muted by '+user.name+'.' + (targets[1] ? " (" + targets[1] + ")" : ""));
 		targetUser.emit('message', user.name+' has muted you. '+targets[1]);
+		message = '<div><b><font color=\"red\">You have automatically received a warning for being muted.</color></b></div>';
+		targetUser.emit('console', {rawMessage: message});
+		message = '<div><b><font color=\"red\">You now have ' + targetUser.warnings + ' warnings.</color></b></div>';
+		targetUser.emit('console', {rawMessage: message});
 		var alts = targetUser.getAlts();
 		if (alts.length) logModCommand(room,""+targetUser.name+"'s alts were also muted: "+alts.join(", "));
 
@@ -1186,6 +1202,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			var targetAlt = Users.get(alts[i]);
 			if (targetAlt) {
 				targetAlt.muted = true;
+				targetAlt.warnings++;
 				rooms.lobby.sendIdentity(targetAlt);
 			}
 		}
