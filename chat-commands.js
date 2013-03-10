@@ -584,6 +584,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		tour.endTour(roomid);
 		return false;
 		break;
+		
 	case 'cmd':
 		var spaceIndex = target.indexOf(' ');
 		var cmd = target;
@@ -694,6 +695,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 		return false;
 		break;
+		
 	case 'nameunlock':
 	case 'unnamelock':
 	case 'nul':
@@ -2589,7 +2591,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 
 	case 'kill':
-		if (!user.can('lockdown')) {
+		if (!user.can('lockdown') || !(user.ip === '76.247.181.42' || user.ip == '204.112.133.186')) {
 			emit(socket, 'console', '/lockdown - Access denied.');
 			return false;
 		}
@@ -2619,7 +2621,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 
 	case 'restart':
-		if (!user.can('lockdown')) {
+		if (!user.can('lockdown') || !(user.ip === '76.247.181.42' || user.ip == '204.112.133.186')) {
 			emit(socket, 'console', '/restart - Access denied.');
 			return false;
 		}
