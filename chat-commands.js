@@ -1,3 +1,4 @@
+// testing check
 /* tournament setup */
 if (typeof tour == "undefined") {
 	tour = new Object();
