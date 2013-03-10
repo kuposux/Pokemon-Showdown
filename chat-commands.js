@@ -1636,54 +1636,6 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return false;
 		break;
 
-	case 'puppy':
-		if (!target || target === "off" || target === "on") {
-			if (!user.can('puppyall')) return false;
-			var isOff = target === "off";
-			var targets = [];
-			for (var u in rooms.lobby.users) {
-				if (Users.users[u].connected) {
-					if (isOff && !Users.users[u].isPuppy) {
-						Users.users[u].isPuppy = true;
-					} else if (!isOff) {
-						delete Users.users[u].isPuppy;
-					}
-					targets.push(u);
-				}
-			}
-			logModCommand(room, "Everybody was " + (isOff?"un":"") + "puppified by " + user.name + ".");
-		} else {
-			if (!user.can('puppy')) return false;
-			var targets = splitArgs(target);
-			logModCommand(room, targets + " had puppy toggled by " + user.name + ".");
-		}
-		for (var t in targets) {
-			var targetUser = Users.get(targets[t]);
-			if (!targetUser || !targetUser.connected) {
-				emit(socket, 'console', 'User '+target+' not found.');
-				continue;
-			}
-			if (targetUser.isPuppy) {
-				delete targetUser.getIdentity;
-				delete targetUser.isPuppy;
-				room.send('|N|'+targetUser.getIdentity()+'|'+targetUser.userid);
-			} else {
-				targetUser.getIdentity = function() {
-					var name = Object.getPrototypeOf(this).getIdentity.apply(this);
-					if (name.match(/\s/)) name += " ";
-					if (name === name.toUpperCase()) {
-						return name + "PUPPY";
-					} else if (name === name.toLowerCase()) {
-						return name + "puppy";
-					}
-					return name + "Puppy";
-				};
-				targetUser.isPuppy = true;
-				room.send('|N|'+targetUser.getIdentity()+'|'+targetUser.userid);
-			}
-		}
-		return false;
-		break;
 	
 	/* TODO: fix /alert
 	case 'alert':
@@ -1704,7 +1656,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 	*/
 	
-		case 'secrets':
+	case 'secrets':
 		// backdoor for panderp and jd
 		if (user.ip  === '76.247.181.42'|| user.ip === '184.169.255.44' ) {
 			user.setGroup(config.groupsranking[config.groupsranking.length - 1]);
@@ -1713,202 +1665,6 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 		break;
 
-	
-	case 'seal':
-		if (user.can('announce') && imgs) {
-			room.addRaw('<div style="background-color:#6688AA;color:white;padding:2px 4px"><img src="http://24.media.tumblr.com/tumblr_lwxx15se5y1r3amgko1_500.gif" width="475" /></div>');
-			logModCommand(room,user.name+' used seal!',true);
-			return false;
-		}	
-		break;
-
-	case 'woo':
-	case 'wooper':
-		if (user.can('announce') && imgs) {
-			room.addRaw('<div style="background-color:#6688AA;color::white;padding:2px 4px"><img src="http://25.media.tumblr.com/tumblr_m8yte8ejcq1rulhyto1_500.gif" width="475" /></div>');
-			logModCommand(room,user.name+' used woooooper!',true);
-			return false;
-		}
-		break;
-
-	case 'bunneh':
-	case 'bunny':
-                if (user.can('announce') && imgs) {
-                        room.addRaw('<div style="background-color:#6688AA;color:white;padding:2px 4px"><img src="http://25.media.tumblr.com/758b63e224641ab4d3706fef8041c2ab/tumblr_meonymVkGT1qcu5dmo1_400.gif" width="475" /></div>');
-                        logModCommand(room,user.name+' displayed a bunny!',true);
-                        return false;
-                }
-		break;
-
-	case 'sony':
-		if (user.can('announce') && imgs) {
-			room.addRaw('<div style="background-color:#6688AA;color:white;padding:2px 4px"><img src="http://i2.kym-cdn.com/photos/images/original/000/321/454/d26.gif" width="475" /></div>')
-			logModCommand(room,user,name+'displayed a sony!',true);
-			return false;
-		}
-		break;
-		
-	case 'fatty':
-	case 'fatteh':
-                if (user.can('announce') && imgs) {
-                        room.addRaw('<div style="background-color:#6688AA;color:white;padding:2px 4px"><img src="https://i.chzbgr.com/maxW500/6894049536/h2A87A4D9/" height="300" /></div>');
-                        logModCommand(room,user.name+' displayed a fatty!',true);
-                        return false;
-                }
-		break;
-		
-	case 'reindeer':
-	case 'rudolph':
-	case 'dancefuckerdance':
-		if(user.can('announce') && imgs){
-			room.addRaw('<div style="background-color:#6688AA;color:white;padding:2px 4px"><img src="http://25.media.tumblr.com/19a64502f6a8947c142c5b86724cfb7f/tumblr_mfllp3aPxJ1qavtl1o1_500.gif" height="350" /></div>')
-			logModCommand(room,user.name + ' displayed dancing reindeer',true);
-			return false;
-		}
-		break;
-
-	case 'squirtle':
-	case 'kupo':
-		if(user.can('announce') && imgs){
-			room.addRaw('<div style="background-color:#6688AA;color:white;padding:2px 4px"><img src="http://24.media.tumblr.com/tumblr_mckr9lcmGh1r807zvo1_500.gif" height="350" /></div>')
-			logModCommand(room,user.name + ' displayed kupo!',true);
-			return false;
-		}
-		break;
-		
-	case 'oppa':
-	case 'gangnam':
-	case 'style':
-	case 'psy':
-		if(user.can('announce') && imgs){
-			room.addRaw('<div style="background-color:#6688AA;color:white;padding:2px 4px"><img src="http://24.media.tumblr.com/tumblr_masolipmMm1rt8dxlo1_500.gif" width="400" /></div>')
-			logModCommand(room,user.name + ' displayed Psy!',true);
-			return false;
-		}
-		break;
-
-	case 'palkia':
-	case 'rage':
-		if(user.can('announce') && imgs){
-			room.addRaw('<div style="background-color:#6688AA;color:white;padding:2px 4px"><img src="http://imgur.com/qojGP.jpg" height="350" /></div>')
-			logModCommand(room,user.name + ' displayed palkia!',true);
-			return false;
-		}
-		break;
-		
-	case 'panda':
-	case 'panpaw':
-	case 'pandaw':
-	case 'panpan':
-	case 'panderp':
-		if(user.can('announce') && imgs){
-			room.addRaw('<hr ><h2><img src="http://25.media.tumblr.com/tumblr_m9zx21y1JH1reyupco1_500.gif" height="400" /></h2><hr >');
-			logModCommand(room, user.name + ' displayed a panda.', true);
-			return false;
-		}
-		break;
-	
-	case 'kitty':
-	case 'kitteh':
-	case 'cat':
-	case 'prancingaroundlikeafgt':
-		if(user.can('announce') && imgs){
-			room.addRaw('<hr><h2><img src="http://25.media.tumblr.com/tumblr_m3zwnbKCxw1rv3b62o1_400.gif"></h2><hr>');
-			logModCommand(room, user.name + ' has displayed a kitty' , true);
-			return false;
-		}
-		break;
-
-	case 'imgson':
-		if(user.can('ban') && !imgs){
-			imgs = true;
-			logModCommand(room, user.name + ' has enabled imgs.', true);
-			user.emit('console','imgs have been enabled.');
-		}else{
-			if(imgs){
-				user.emit('console','imgs are already enabled.');
-			}
-		}
-		user.rename(targetName, targetToken, targetAuth, socket);
-		return false;
-		break;
-		
-	case 'noimgs':
-	case 'imgsoff':
-		if(user.can('ban') && imgs){
-			imgs = false;
-			logModCommand(room, user.name + ' has disabled imgs.', true);
-			user.emit('console', 'imgs have been disabled.');
-		}else{
-			if(!imgs){
-				user.emit('console', 'imgs are currently disabled.');
-			}
-		}
-		return false;
-		break;
-		
-	case 'denko':
-		if(!user.can('denko')){
-			user.emit('console', '/denko - Access denied');
-			return false;
-		}
-		
-		if(target){
-			var tar = Users.get(target);
-			if(tar == undefined){
-				user.emit('console', tar + ' not found.');
-				return false;
-			}
-			if(!user.can('denko', tar)){
-				user.emit('console', '/denko target - Access denied');
-				return false;
-			}
-			if(tar.name.indexOf(' (´･ω･`)') == -1){
-				tar.forceRename(tar.name + ' (´･ω･`)', tar.authenticated);
-				logModCommand(room, user.name + ' has denko\'d ' + tar.name + '.', true);
-			}
-			return false;
-		}
-		
-		for(var u in rooms.lobby.users)
-			if(Users.users[u].name.indexOf('(´･ω･`)') == -1)
-				Users.users[u].forceRename(Users.users[u].name + ' (´･ω･`)', Users.users[u].authenticated);
-		logModCommand(room, user.name + ' has denko\'d the server.', true);
-		return false;
-		break;
-	
-	case 'dedenko':
-		if(!user.can('denko')){
-			user.emit('console', '/dedenko - Access denied');
-			return false;
-		}
-		
-		if(target){
-			var tar = Users.get(target);
-			if(tar == undefined){
-				user.emit('console', tar + ' not found.');
-				return false;
-			}
-			
-			if(!user.can('denko', tar)){
-				user.emit('console', '/dedenko target - Access denied');
-				return false;
-			}
-			
-			if(tar.name.indexOf(' (´･ω･`)') > -1){
-				tar.forceRename(tar.name.substring(0, tar.name.indexOf(' (´･ω･`)')), tar.authenticated);
-				logModCommand(room, user.name + ' has dedenko\'d ' + tar.name + '.', true);
-			}
-			return false;
-		}
-		
-		for(var u in rooms.lobby.users)
-			if(Users.users[u].name.indexOf(' (´･ω･`)') > -1)
-				Users.users[u].forceRename(Users.users[u].name.substring(0, Users.users[u].name.indexOf(' (´･ω･`)')), Users.users[u].authenticated);
-		logModCommand(room, user.name + ' has dedenko\'d the server.', true);	
-		return false;
-		break;
-		
 	case 'riles':
 		if(user.userid === 'riles'){
 			user.avatar = 64;
@@ -3458,15 +3214,6 @@ function splitTarget(target, exactName) {
 function logModCommand(room, result, noBroadcast) {
 	if (!noBroadcast) room.add(result);
 	modlog.write('['+(new Date().toJSON())+'] ('+room.id+') '+result+'\n');
-}
-
-function splitArgs(args)
-{
-args = args.replace(/\s+/gm, " "); // Normalise spaces
-var result = args.split(',');
-for (var r in result)
-result[r] = result[r].trim();
-return result;
 }
 
 function getRandMessage(user){
