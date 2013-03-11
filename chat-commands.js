@@ -3288,6 +3288,14 @@ function getRandMessage(user){
 	return message;
 }
 
+        function splitArgs(args){
+                args = args.replace(/\s+/gm, " "); // Normalise spaces
+                var result = args.split(',');  
+                for (var r in result)
+                        result[r] = result[r].trim();
+                return result;
+        }
+
 runCommand = function(command, args, socket) {
 	emit(socket, 'console', "Running '" + command + "'" + ((args && args.length) ? " '" + args.join("' '") + "'": "") + " ...");
 	var child = require("child_process").spawn(command, args);
