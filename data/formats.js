@@ -515,6 +515,7 @@ exports.BattleFormats = {
 		// no restrictions, for serious
 		ruleset: []
 	},
+	// Previous gens
 	gen4hackmons: {
 		mod: 'gen4',
 		effectType: 'Format',
@@ -546,6 +547,14 @@ exports.BattleFormats = {
 		name: "[Gen 3] Custom Game",
 		challengeShow: true,
 		ruleset: []
+	},
+	gen1customgame: {
+		mod: 'gen1',
+		effectType: 'Format',
+		name: "[Gen 1] Custom Game",
+		challengeShow: true,
+		debug: true,
+		ruleset: ['Pokemon']
 	},
 	gennextnextou: {
 		mod: 'gennext',

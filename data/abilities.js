@@ -245,31 +245,12 @@ exports.BattleAbilities = {
 	"colorchange": {
 		desc: "This Pokemon's type changes according to the type of the last move that hit this Pokemon.",
 		shortDesc: "This Pokemon's type changes to match the type of the last move that hit it.",
-		onAfterMoveSecondary: function(target, source, effect) {
-			if (target.isActive && effect && effect.effectType === 'Move' && effect.category !== 'Status') {
-				target.addVolatile('colorchange', source, effect);
-			}
-		},
-		effect: {
-			noCopy: true,
-			onStart: function(target, source, effect) {
-				this.effectData.type = 'Normal';
-				if (effect && effect.type && effect.type !== 'Normal') {
-					this.add('-start', target, 'typechange', effect.type, '[from] Color Change');
-					this.effectData.type = effect.type;
-				} else {
-					return false;
+		onAfterMoveSecondary: function(target, source, move) {
+			if (target.isActive && move && move.effectType === 'Move' && move.category !== 'Status') {
+				if (!target.hasType(move.type)) {
+					this.add('-start', target, 'typechange', move.type, '[from] Color Change');
+					target.types = [move.type];
 				}
-			},
-			onRestart: function(target, source, effect) {
-				if (effect && effect.type && effect.type !== this.effectData.type) {
-					this.add('-start', target, 'typechange', effect.type, '[from] Color Change');
-					this.effectData.type = effect.type;
-				}
-			},
-			onModifyPokemon: function(target) {
-				if (!this.effectData.type) this.effectData.type = 'Normal';
-				target.types = [this.effectData.type];
 			}
 		},
 		id: "colorchange",
@@ -621,8 +602,7 @@ exports.BattleAbilities = {
 				break;
 			}
 			if (pokemon.isActive && forme) {
-				pokemon.transformInto(forme);
-				pokemon.transformed = false;
+				pokemon.formeChange(forme);
 				this.add('-formechange', pokemon, forme);
 				this.add('-message', pokemon.name+' transformed! (placeholder)');
 			}
@@ -2408,7 +2388,6 @@ exports.BattleAbilities = {
 		onBeforeMove: function(pokemon, target, move) {
 			if (pokemon.removeVolatile('truant')) {
 				this.add('cant',pokemon,'ability: Truant', move);
-				pokemon.movedThisTurn = true;
 				return false;
 			}
 			pokemon.addVolatile('truant');
@@ -2658,8 +2637,7 @@ exports.BattleAbilities = {
 		},
 		effect: {
 			onStart: function(pokemon) {
-				if (pokemon.transformInto('Darmanitan-Zen')) {
-					pokemon.transformed = false;
+				if (pokemon.formeChange('Darmanitan-Zen')) {
 					this.add('-formechange', pokemon, 'Darmanitan-Zen');
 					this.add('-message', 'Zen Mode triggered! (placeholder)');
 				} else {
@@ -2667,8 +2645,7 @@ exports.BattleAbilities = {
 				}
 			},
 			onEnd: function(pokemon) {
-				if (pokemon.transformInto('Darmanitan')) {
-					pokemon.transformed = false;
+				if (pokemon.formeChange('Darmanitan')) {
 					this.add('-formechange', pokemon, 'Darmanitan');
 					this.add('-message', 'Zen Mode ended! (placeholder)');
 				} else {
