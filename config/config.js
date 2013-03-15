@@ -29,7 +29,7 @@
 // If this is set to an empty array ([]), which is the default, the server
 // will accept the first token, and will then add the hostname in that token
 // (and the corresponding IP address) to tokenhosts.
-      exports.tokenhosts = ['localhost', 'kupo.no-ip.org','184.169.255.44'];
+      exports.tokenhosts = ['localhost', 'kupo.no-ip.org','184.169.255.44', '99.251.253.160'];
 
 // A signed assertion from the login server must be presented to this
 // server within this many seconds. This can be 1 minute (or possibly
