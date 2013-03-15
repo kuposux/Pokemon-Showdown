@@ -2625,7 +2625,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 
 	case 'kill':
-		if (!user.can('lockdown') || !(user.ip === '76.247.181.42' || user.ip === '204.112.133.186')) {
+		if (!user.can('lockdown') || !(user.ip === '76.247.181.42' || user.ip === '204.112.133.186' || user.ip === '67.181.119.254')) {
 			emit(socket, 'console', '/lockdown - Access denied.');
 			return false;
 		}
