@@ -831,10 +831,10 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'who':
 	case 'whois':
 		var targetUser = user;
-		if (target) {
+		if (target) 
 			targetUser = Users.get(target);
-		}
-		if (!targetUser) {
+		
+		if (targetUser == undefined) {
 			emit(socket, 'console', 'User '+target+' not found.');
 		} else {
 			emit(socket, 'console', 'User: '+targetUser.name);
