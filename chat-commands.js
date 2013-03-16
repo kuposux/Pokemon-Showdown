@@ -1955,8 +1955,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			'- <a href="http://thebattletower.no-ip.org/forums" target="_blank">Forums</a><br />'+
 			'- <a href="http://thebattletower.no-ip.org/team-manager" target="_blank">Team Manager</a><br />'+
 			'- <a href="http://play.pokemonshowdown.com/" target="_blank"> PS main </a><br />'+
-			'- <a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=45" target="_blank" >Promotion Guide </a><br />'+
-			'- <a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=18" target="_blank">Epic Quotes Thread</a><br />'+
+			'- <a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=341" target="_blank">Epic Quotes Thread</a><br />'+
 			'- <a href="http://thebattletower.no-ip.org/forums/forumdisplay.php?fid=97" target="_blank">TBT POKEMON LEAGUE</a>'+
 			'</div>');
 		return false;
