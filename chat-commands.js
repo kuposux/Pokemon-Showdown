@@ -1957,7 +1957,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			'- <a href="http://play.pokemonshowdown.com/" target="_blank"> PS main </a><br />'+
 			'- <a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=45" target="_blank" >Promotion Guide </a><br />'+
 			'- <a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=18" target="_blank">Epic Quotes Thread</a><br />'+
-			'- <a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=85&pid=391#pid391" target="_blank">TBT POKEMON LEAGUE</a>'+
+			'- <a href="http://thebattletower.no-ip.org/forums/forumdisplay.php?fid=97" target="_blank">TBT POKEMON LEAGUE</a>'+
 			'</div>');
 		return false;
 		break;
@@ -1966,8 +1966,8 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case '!league':
 		showOrBroadcastStart(user, cmd, room, socket, message);
 		showOrBroadcast(user, cmd, room, socket, '<div class="infobox">The Battle Tower\'s Pokémon League:<br />' +
-			'- <a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=85&pid=391#pid391" target="_blank">Gyms </a><br />'+
-			'- <a href="http://thebattletower.no-ip.org/forums/showthread.php?tid=86" target="_blank" >Elite 4 </a>'+
+			'- <a href="http://thebattletower.no-ip.org/forums/forumdisplay.php?fid=116" target="_blank">Gyms </a><br />'+
+			'- <a href="http://thebattletower.no-ip.org/forums/forumdisplay.php?fid=117" target="_blank" >Elite 4 </a>'+
 			'</div>');
 		return false;
 		break;
@@ -1976,8 +1976,8 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case '!skytrain':
 		showOrBroadcastStart(user, cmd, room, socket, message);
 		showOrBroadcast(user, cmd, room, socket, '<div class="infobox">The Battle Tower\'s Epic Sky Train:<br />' +
-			'- <a href="http://thebattletower.no-ip.org/forums/forumdisplay.php?fid=40" target="_blank">Bawses </a><br />'+
-			'- <a href="http://thebattletower.no-ip.org/forums/forumdisplay.php?fid=41" target="_blank" >Brockers </a>'+
+			'- <a href="http://thebattletower.no-ip.org/forums/forumdisplay.php?fid=118" target="_blank">Bawses </a><br />'+
+			'- <a href="http://thebattletower.no-ip.org/forums/forumdisplay.php?fid=119" target="_blank" >Brockers </a>'+
 			'</div>');
 		return false;
 		break;
@@ -1986,7 +1986,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case '!frontier':
 		showOrBroadcastStart(user, cmd, room, socket, message);
 		showOrBroadcast(user, cmd, room, socket, '<div class="infobox">The Battle Tower\'s Battle Frontier<br />' +
-			'- <a href="http://thebattletower.no-ip.org/forums/forumdisplay.php?fid=43" target="_blank">Click Me </a><br />'+
+			'- <a href="http://thebattletower.no-ip.org/forums/forumdisplay.php?fid=99" target="_blank">Click Me </a><br />'+
 			'</div>');
 		return false;
 		break;
