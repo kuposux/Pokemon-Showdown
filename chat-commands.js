@@ -907,7 +907,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return false;
 		break;
 
-      /*case 'kick':
+        case 'kick':
 	case 'k':
 		// TODO: /kick will be removed in due course.
 		if (!target) return parseCommand(user, '?', cmd, room, socket);
@@ -924,124 +924,6 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 
 		logModCommand(room,''+targetUser.name+' was kicked to the Rules page by '+user.name+'' + (targets[1] ? " (" + targets[1] + ")" : ""));
 		targetUser.emit('console', {evalRulesRedirect: 1});
-		return false;
-		break;*/
-	case 'kick':
-	case 'k':
-		if (!target) return parseCommand(user, '?', cmd, room, socket);
-		var targets = splitTarget(target);
-		var targetUser = targets[0];
-		var tar2 = toUserid(targets[0]);
-		var targetUser2 = Users.get(tar2);
-		if (!targetUser || !targetUser.connected) {
-			emit(socket, 'console', 'User '+targets[2]+' not found.');
-			return false;
-		}
-		if (!user.can('kick', targetUser)) {
-			emit(socket, 'console', '/kick - Access denied.');
-			return false;
-		}
-		logModCommand(room, ''+targetUser.name+' was kicked from the server by '+user.name+'. Reason: '+targets[1]);
-		if (targetUser.warnings != 1 && targetUser.warnings != 2 && targetUser.warnings != 3) {
-			targetUser.warnings = 0;
-		}
-		targetUser.warnings++;
-		if (targetUser.warnings == 1) {
-			message = '<div><b><font color=\"red\">You have been kicked from the server by '+user.name+'. Reason: '+targets[1]+'</color></b></div>'
-			targetUser.emit('console', {rawMessage: message});
-			message = '<div><b><font color=\"red\">Please take a few minutes to read our rules at http://thebattletower.no-ip.org/forums/showthread.php?tid=257</color></b></div>';
-			targetUser.emit('console', {rawMessage: message});
-			message = '<div><b><font color=\"red\">You now have one warning. If you gain more than 3 warnings you will be automatically banned from the server!';
-			targetUser.emit('console', {rawMessage: message});
-		}
-		if (targetUser.warnings == 2) {
-			message = '<div><b><font color=\"red\">You have been kicked from the server by '+user.name+'. Reason: '+targets[1]+'</color></b></div>'
-			targetUser.emit('console', {rawMessage: message});
-			message = '<div><b><font color=\"red\">Please take a few minutes to read our rules at http://thebattletower.no-ip.org/forums/showthread.php?tid=257</color></b></div>';
-			targetUser.emit('console', {rawMessage: message});
-			message = '<div><b><font color=\"red\">You now have two warnings. If you gain more than 3 warnings you will be automatically banned from the server!';
-			targetUser.emit('console', {rawMessage: message});
-		}
-		if (targetUser.warnings == 3) {
-			message = '<div><b><font color=\"red\">You have been kicked from the server by '+user.name+'. Reason: '+targets[1]+'</color></b></div>'
-			targetUser.emit('console', {rawMessage: message});
-			message = '<div><b><font color=\"red\">Please take a few minutes to read our rules at http://thebattletower.no-ip.org/forums/showthread.php?tid=257</color></b></div>';
-			targetUser.emit('console', {rawMessage: message});
-			message = '<div><b><font color=\"red\">You now have three warnings. If you gain one more warning you will be automatically banned from the server!';
-			targetUser.emit('console', {rawMessage: message});
-		}
-		if (targetUser.warnings == 4) {
-			message = '<div><b><font color=\"red\">You have been kicked from the server by '+user.name+'. Reason: '+targets[1]+'</color></b></div>'
-			targetUser.emit('console', {rawMessage: message});
-			message = '<div><b><font color=\"red\">You have been banned for receiving more than 3 warnings!</color></b></div>';
-			targetUser.emit('console', {rawMessage: message});
-			targetUser.ban();
-			logModCommand(room, targetUser.name + ' was automatically banned from the server for receiving more than 3 warnings!');
-			targetUser.warnings = 0;
-		}
-		targetUser2.destroy();
-		return false;
-		break;
-		
-	case 'warn':
-		if (!target) return parseCommand(user, '?', cmd, room, socket);
-		var targets = splitTarget(target);
-		var targetUser = targets[0];
-		if (user.can('kick', targetUser)) {
-			if (!targetUser || !targetUser.connected) {
-				emit(socket, 'console', 'User '+targets[2]+' not found.');
-				return false;
-			}
-			if (targetUser.warnings != 1 && targetUser.warnings != 2 && targetUser.warnings != 3) {
-				targetUser.warnings = 0;
-			}
-			targetUser.warnings++;
-			if (targetUser.warnings == 1 || targetUser.warnings == 2 || targetUser.warnings == 3) {
-				logModCommand(room, targetUser.name + ' received a warning from ' + user.name + '. Reason: ' + targets[1] + '.');
-				message = '<div><b><font color=\"red\">You have received a warning from ' + user.name + '. Reason: ' + targets[1] + '. You now have ' + targetUser.warnings + ' warnings.</color></b></div>';
-				targetUser.emit('console', {rawMessage: message});
-				user.emit('console', targetUser.name + ' now has ' + targetUser.warnings + ' warnings.');
-				return false;
-			}
-			if (targetUser.warnings == 4) {
-				logModCommand(room, targetUser.name + ' received a warning from ' + user.name + '. Reason: ' + targets[1] + '.');
-				message = '<div><b><font color=\"red\">You have received a warning from ' + user.name + '. Reason: ' + targets[1] + '.</color></b></div>';
-				targetUser.emit('console', {rawMessage: message});
-				message = '<div><b><font color=\"red\">You have been banned for receiving more than 3 warnings!</color></b></div>';
-				targetUser.emit('console', {rawMessage: message});
-				targetUser.ban();
-				logModCommand(room, targetUser.name + ' was automatically banned from the server for receiving more than 3 warnings!');
-				return false;
-			}
-		}
-
-		user.emit('console', '/warn - Access denied.');
-		return false;
-		break;
-
-	case 'warnings':
-		if (user.warnings != 1 && user.warnings != 2 && user.warnings != 3) {
-			user.emit('console', 'You currently have 0 warnings, if you receive more than 3 warnings you will automatically be banned.');
-		}
-		else 
-		user.emit('console', 'You currently have ' + user.warnings + ' warnings, if you receive more than 3 warnings you will automatically be banned.');
-		return false;
-		break;
-
-	case 'resetwarnings':
-		if (!target) return parseCommand(user, '?', cmd, room, socket);
-		var targets = splitTarget(target);
-		var targetUser = targets[0];
-		if (user.can('resetwarnings')) {
-			if (!targetUser || !targetUser.connected) {
-				emit(socket, 'console', 'User '+targets[2]+' not found.');
-				return false;
-			}
-			targetUser.warnings = 0;
-			logModCommand(room, user.name + ' reset the warnings on ' + targetUser.name + '.');
-			return false;
-		}
-		user.emit('console', 'You can not reset warnings.');
 		return false;
 		break;
 
