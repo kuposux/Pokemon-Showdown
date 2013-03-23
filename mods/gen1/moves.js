@@ -24,16 +24,6 @@ exports.BattleMovedex = {
 		},
 		target: "normal"
 	},
-	agility: {
-		inherit: true,
-		onModifyMove: function(move, pokemon) {
-			// If there's a paralyse speed drop, it's negated by agility but not boost is gained
-			if (pokemon.volatiles['parspeeddrop']) {
-				pokemon.removeVolatile('parspeeddrop');
-				move.boosts = {};
-			}
-		}
-	},
 	amnesia: {
 		inherit: true,
 		desc: "Raises the user's Special by 2 stages.",
@@ -60,7 +50,7 @@ exports.BattleMovedex = {
 		effect: {
 			duration: 2,
 			durationCallBack: function (target, source, effect) {
-				return this.random(2, 3);
+				return this.random(3, 4);
 			},
 			onStart: function(pokemon) {
 				this.effectData.totalDamage = 0;
@@ -274,7 +264,8 @@ exports.BattleMovedex = {
 		willCrit: false,
 		damageCallback: function(pokemon) {
 			if (pokemon.lastAttackedBy && pokemon.lastAttackedBy.thisTurn 
-			&& (this.getMove(pokemon.lastAttackedBy.move).type === 'Normal' || this.getMove(pokemon.lastAttackedBy.move).type === 'Fighting')) {
+			&& ((this.getMove(pokemon.lastAttackedBy.move).type === 'Normal' || this.getMove(pokemon.lastAttackedBy.move).type === 'Fighting'))
+			&& this.getMove(pokemon.lastAttackedBy.move).id !== 'seismictoss') {
 				return 2 * pokemon.lastAttackedBy.damage;
 			}
 			this.add('-fail',pokemon.id);
@@ -525,8 +516,14 @@ exports.BattleMovedex = {
 					}
 					this.sides[i].removeSideCondition('lightscreen');
 					this.sides[i].removeSideCondition('reflect');
-					if (hasTox) this.sides[i].active[j].setStatus('psn');
-					this.sides[i].active[j].clearVolatile();
+					// Turns toxic to poison for user
+					if (hasTox && this.sides[i].active[j].id === source.id) {
+						this.sides[i].active[j].setStatus('psn');
+					}
+					// Clears volatile only from user
+					if (this.sides[i].active[j].id === source.id) {
+						this.sides[i].active[j].clearVolatile();
+					}
 				}
 			}
 		}
@@ -594,13 +591,30 @@ exports.BattleMovedex = {
 	},
 	leechseed: {
 		inherit: true,
-		desc: "The Pokemon at the user's position steals 1/8 of one adjacent target's max HP, rounded down, at the end of each turn. Grass-types are unaffected.",
+		onHit: function (target, source, move) {
+			if (!source || source.fainted || source.hp <= 0) {
+				// Well this shouldn't happen
+				this.debug('Nothing to leech into');
+				return;
+			}
+			if (target.newlySwitched && target.speed <= source.speed) {
+				if (target.status === 'tox') {
+					// Stage plus one since leech seed runs before Toxic
+					var toLeech = clampIntRange(target.maxhp/16, 1) * (target.statusData.stage + 1);
+				} else {
+					var toLeech = clampIntRange(target.maxhp/16, 1);
+				}
+				var damage = this.damage(toLeech, target, source, 'move: Leech Seed');
+				if (damage) {
+					this.heal(damage, source, target);
+				}
+			}
+		},
 		effect: {
 			onStart: function(target) {
 				this.add('-start', target, 'move: Leech Seed');
 			},
-			onResidualOrder: 8,
-			onResidual: function(pokemon) {
+			onAfterMoveSelf: function(pokemon) {
 				var target = pokemon.side.foe.active[pokemon.volatiles['leechseed'].sourcePosition];
 				if (!target || target.fainted || target.hp <= 0) {
 					this.debug('Nothing to leech into');
@@ -1038,7 +1052,7 @@ exports.BattleMovedex = {
 					var SubBlocked = {
 						lockon:1, meanlook:1, mindreader:1, nightmare:1
 					};
-					if (move.status === 'psn' || move.status === 'tox' || move.boosts || move.volatileStatus === 'confusion' || SubBlocked[move.id]) {
+					if (move.status === 'psn' || move.status === 'tox' || (move.boosts && target !== source) || move.volatileStatus === 'confusion' || SubBlocked[move.id]) {
 						return false;
 					}
 					return;
@@ -1061,7 +1075,7 @@ exports.BattleMovedex = {
 					this.damage(Math.round(damage * move.recoil[0] / move.recoil[1]), source, target, 'recoil');
 				}
 				// Attacker does not heal from drain if substitute breaks
-				if (move.drain && target.volatiles['substitute'].hp > 0) {
+				if (move.drain && target.volatiles['substitute'] && target.volatiles['substitute'].hp > 0) {
 					this.heal(Math.ceil(damage * move.drain[0] / move.drain[1]), source, target, 'drain');
 				}
 				this.runEvent('AfterSubDamage', target, source, move, damage);
@@ -1082,16 +1096,6 @@ exports.BattleMovedex = {
 	swift: {
 		inherit: true,
 		category: "Physical"
-	},
-	swordsdance: {
-		inherit: true,
-		onModifyMove: function(move, pokemon) {
-			// If there's a burn attacl drop, it's negated by swords dance but not boost is gained
-			if (pokemon.volatiles['brnattackdrop']) {
-				pokemon.removeVolatile('brnattackdrop');
-				move.boosts = {};
-			}
-		}
 	},
 	tackle: {
 		inherit: true,
