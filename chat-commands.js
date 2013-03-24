@@ -3248,7 +3248,7 @@ function hashColor(name) {
 	var r, g, b
 	S /=100;
 	L /= 100;
-	if S == 0)
+	if (S == 0)
 		r = g = b = (L * 255).toString(16);
 	else {
 		if (L <= 0.5)
