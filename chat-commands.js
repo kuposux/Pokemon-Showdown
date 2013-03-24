@@ -1542,7 +1542,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	
 	case 'd':
 	case 'poof':
-		var btags = '<strong><font color="'+Math.floor((Math.random()*0xCF) + 0x30).toString(16)+Math.floor((Math.random()*0xCF) + 0x30).toString(16)+Math.floor((Math.random()*0xCF) + 0x30).toString(16)+'" >';
+		var btags = '<strong><font color="'+Math.floor((Math.random()*0x7F) + 0x7F).toString(16)+Math.floor((Math.random()*0x7F) + 0x7F).toString(16)+Math.floor((Math.random()*0x7F) + 0x7F).toString(16)+'" >';
 		var etags = '</font></strong>'
 		var targetid = toUserid(user);
 		var success = false;
@@ -1579,7 +1579,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		
 		if(poofeh)
 		{
-			var btags = '<strong><font color="'+Math.floor((Math.random()*0xCF) + 0x30).toString(16)+Math.floor((Math.random()*0xCF) + 0x30).toString(16)+Math.floor((Math.random()*0xCF) + 0x30).toString(16)+'" >';
+			var btags = '<strong><font color="'+Math.floor((Math.random()*0x7F) + 0x7F).toString(16)+Math.floor((Math.random()*0x7F) + 0x7F).toString(16)+Math.floor((Math.random()*0x7F) + 0x7F).toString(16)+'" >';
 			var etags = '</font></strong>'
 			room.addRaw(btags + '~~ '+user.name+' '+target+'! ~~' + etags);
 			logModCommand(room, user.name + ' used a custom poof message: \n "'+target+'"',true);	
