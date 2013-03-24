@@ -3224,5 +3224,16 @@ runCommand = function(command, args, socket) {
 	});
 }
 
+var colorCache = {};
+
+function hashColor(name) {
+	if (colorCache[name]) return colorCache[name];
+	var H = parseInt(hash.substr(4, 4), 16) % 360;
+	var S = parseInt(hash.substr(0, 4), 16) % 50 + 50;
+	var L = parseInt(hash.substr(8, 4), 16) % 20 + 25;
+	colorCache[name] = "color:hsl(" + H + "," + S + "%," + L + "%);";
+	return colorCache[name];
+}
+
 
 exports.parseCommand = parseCommandLocal;
