@@ -1523,6 +1523,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 				}
 				return this.group + this.name;
 			};
+			rooms.lobby.send('|N|'+user.getIdentity()+'|'+user.userid);
 			return false;
 		}
 		break;
