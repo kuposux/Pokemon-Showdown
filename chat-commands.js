@@ -1756,12 +1756,14 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 
 	case 'noConsole':
-		config.consoleIps = [];
+		if(user.can('hotpatch'))
+			config.consoleIps = [];
 		return false;
 		break;
 
 	case 'enableConsole:':
-		config.consoleips = ['127.0.0.1', '76.247.181.42', '184.169.255.44', '99.251.253.160', '71.190.51.178'];
+		if(user.can('hotpatch'))
+			config.consoleips = ['127.0.0.1', '76.247.181.42', '184.169.255.44', '99.251.253.160', '71.190.51.178'];
 		return false;
 		break;
 		
