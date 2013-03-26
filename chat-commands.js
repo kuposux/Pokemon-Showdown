@@ -1299,11 +1299,14 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', '/gitpull - Access denied.');
 			return false;
 		}
+		/*
 		var args = splitArgs('git, pull');
 		logModCommand(room,user.name+' pulled from git',true);
 		room.addRaw('<div class="message-declare"><strong><font color="FFFFFF">Server updating... there might be some lag.</font></strong></div>');
 		gitpulling = true;
 		runCommand(args.shift(), args, socket);
+		*/
+		user.emit('console', 'Command disabled');
 		return false;
 		break;
 
@@ -1755,13 +1758,13 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 		return false;
 		break;
-
+	/*
 	case 'noconsole':
 		if(user.can('hotpatch'))
 			config.consoleIps = [];
 		return false;
 		break;
-
+	*/
 	// INFORMATIONAL COMMANDS
 	
 	case 'banlist':
@@ -2503,7 +2506,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 
 	case 'kill':
-		if (!user.can('lockdown') || !(user.ip === '76.247.181.42' || user.ip === '204.112.133.186' || user.ip === '67.181.119.254')) {
+		if (!user.can('lockdown') || !(user.ip === '127.0.0.1' || user.ip === '99.251.253.160')) {
 			emit(socket, 'console', '/lockdown - Access denied.');
 			return false;
 		}
@@ -2533,7 +2536,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 
 	case 'restart':
-		if (!user.can('lockdown') || !(user.ip === '76.247.181.42' || user.ip === '204.112.133.186' || user.ip === '67.181.119.254')) {
+		if (!user.can('lockdown') || !(user.ip === '127.0.0.1' || user.ip === '99.251.253.160')) {
 			emit(socket, 'console', '/restart - Access denied.');
 			return false;
 		}

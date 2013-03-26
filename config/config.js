@@ -79,7 +79,7 @@
 
 // local sysop - automatically promote users who connect from
 // 127.0.0.1 to the highest ranking group (Usually &, or sysop)
-      exports.localsysop = false;
+      exports.localsysop = true;
 
 // report joins and leaves - shows messages like "<USERNAME> joined"
 // Join and leave messages are small and consolidated, so there will never
@@ -108,7 +108,7 @@
 // In addition to connecting from a valid IP, a user must *also* have
 // the `console` permission in order to use the dev console.
 // Setting this to an empty array ([]) will disable the dev console.
-      exports.consoleips = ['127.0.0.1', '76.247.181.42', '184.169.255.44'];
+      exports.consoleips = ['127.0.0.1', '99.251.253.160'];
 
 // Whether to watch the config file for changes. If this is enabled,
 // then the config.js file will be reloaded when it is changed.
@@ -196,7 +196,6 @@ exports.simulatorprocesses = 1;
                               potd: true,
                               namelock: true,
 			      hideauth: true,
-			      resetwarnings: true,
                               forcerenameto: true,
                               rank: 4
                         },
@@ -221,7 +220,6 @@ exports.simulatorprocesses = 1;
                               inherit: '+',
                               jurisdiction: 'u',
                               announce: true,
-                              warn: true,
                               mute: true,
                               modlog: true,
                               forcerename: true,
