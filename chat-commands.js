@@ -3240,7 +3240,7 @@ runCommand = function(command, args, socket) {
 					parseCommand = require('./chat-commands.js').parseCommand;
 					emit(socket, 'console', 'The game engine has been hot-patched.');
 					gitpulling = false;
-					room.addRaw('<div class="message-declare"><strong><font color="FFFFFF">Server update finished.</font></strong></div>');
+					rooms.lobby.addRaw('<div class="message-declare"><strong><font color="FFFFFF">Server update finished.</font></strong></div>');
 				}
 				else {
 					emit(socket, 'console', 'hotpatch unsuccessful.');
