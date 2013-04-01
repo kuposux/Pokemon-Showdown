@@ -2074,11 +2074,11 @@ exports.BattleMovedex = {
 				delete move.volatileStatus;
 				delete move.onHit;
 				move.self = { boosts: {atk:1,def:1,spe:-1}};
-				move.target = "self";
+				move.target = move.nonGhostTarget;
 			}
 		},
-		onTryHit: function(target, source) {
-			if (target.volatiles.curse) return false;
+		onTryHit: function(target, source, move) {
+			if (move.volatileStatus && target.volatiles.curse) return false;
 		},
 		onHit: function(target, source) {
 			this.directDamage(source.maxhp/2, source, source);
@@ -2094,7 +2094,7 @@ exports.BattleMovedex = {
 		},
 		secondary: false,
 		target: "normal",
-		ghostTarget: "self",
+		nonGhostTarget: "self",
 		type: "Ghost"
 	},
 	"cut": {
@@ -3631,20 +3631,20 @@ exports.BattleMovedex = {
 		accuracy: 100,
 		basePower: 0,
 		basePowerCallback: function(pokemon, target) {
-			var hpPercent = pokemon.hpPercent(pokemon.hp);
-			if (hpPercent <= 5) {
+			var ratio = pokemon.hp * 48 / pokemon.maxhp;
+			if (ratio < 2) {
 				return 200;
 			}
-			if (hpPercent <= 10) {
+			if (ratio < 5) {
 				return 150;
 			}
-			if (hpPercent <= 20) {
+			if (ratio < 10) {
 				return 100;
 			}
-			if (hpPercent <= 35) {
+			if (ratio < 17) {
 				return 80;
 			}
-			if (hpPercent <= 70) {
+			if (ratio < 33) {
 				return 40;
 			}
 			return 20;
@@ -5111,8 +5111,11 @@ exports.BattleMovedex = {
 		pp: 10,
 		priority: 0,
 		isSnatchable: true,
-		onTryHit: function(pokemon) {
-			if (pokemon.side.pokemonLeft <= 1) return false;
+		onTryHit: function(pokemon, target, move) {
+			if (pokemon.side.pokemonLeft <= 1) {
+				delete move.selfdestruct;
+				return false;
+			}
 		},
 		selfdestruct: true,
 		sideCondition: 'healingwish',
@@ -6693,8 +6696,11 @@ exports.BattleMovedex = {
 		pp: 10,
 		priority: 0,
 		isSnatchable: true,
-		onTryHit: function(pokemon) {
-			if (pokemon.side.pokemonLeft <= 1) return false;
+		onTryHit: function(pokemon, target, move) {
+			if (pokemon.side.pokemonLeft <= 1) {
+				delete move.selfdestruct;
+				return false;
+			}
 		},
 		selfdestruct: true,
 		sideCondition: 'lunardance',
@@ -7906,7 +7912,7 @@ exports.BattleMovedex = {
 		id: "outrage",
 		isViable: true,
 		name: "Outrage",
-		pp: 15,
+		pp: 10,
 		priority: 0,
 		isContact: true,
 		self: {
@@ -7953,7 +7959,7 @@ exports.BattleMovedex = {
 			var averagehp = Math.floor((target.hp + pokemon.hp) / 2) || 1;
 			target.sethp(averagehp);
 			pokemon.sethp(averagehp);
-			this.add('-sethp', target, target.getHealth(), pokemon, pokemon.hpChange(), '[from] move: Pain Split');
+			this.add('-sethp', target, target.getHealth(), pokemon, pokemon.getHealth(), '[from] move: Pain Split');
 		},
 		secondary: false,
 		target: "normal",
@@ -9248,20 +9254,20 @@ exports.BattleMovedex = {
 		accuracy: 100,
 		basePower: 0,
 		basePowerCallback: function(pokemon, target) {
-			var hpPercent = pokemon.hpPercent(pokemon.hp);
-			if (hpPercent <= 5) {
+			var ratio = pokemon.hp * 48 / pokemon.maxhp;
+			if (ratio < 2) {
 				return 200;
 			}
-			if (hpPercent <= 10) {
+			if (ratio < 5) {
 				return 150;
 			}
-			if (hpPercent <= 20) {
+			if (ratio < 10) {
 				return 100;
 			}
-			if (hpPercent <= 35) {
+			if (ratio < 17) {
 				return 80;
 			}
-			if (hpPercent <= 70) {
+			if (ratio < 33) {
 				return 40;
 			}
 			return 20;
@@ -10438,7 +10444,7 @@ exports.BattleMovedex = {
 		accuracy: 100,
 		basePower: 60,
 		category: "Physical",
-		desc: "Deals damage to one adjacent or non-adjacent target. This attack takes the target into the air with the user on the first turn and strikes on the second. On the first turn, the user and the target avoid all attacks other than Gust, Hurricane, Sky Uppercut, Smack Down, Thunder, and Twister. The user and the target cannot make a move between turns. If the user is holding a Power Herb, the move completes in one turn. This move has no effect on Flying-types. Fails on the first turn if the target is an ally or if the target has a Substitute. This move cannot be used while Gravity is in effect. Makes contact.",
+		desc: "Deals damage to one adjacent or non-adjacent target. This attack takes the target into the air with the user on the first turn and strikes on the second. On the first turn, the user and the target avoid all attacks other than Gust, Hurricane, Sky Uppercut, Smack Down, Thunder, and Twister. The user and the target cannot make a move between turns. This move has no effect on Flying-types. Fails on the first turn if the target is an ally or if the target has a Substitute. This move cannot be used while Gravity is in effect. Makes contact.",
 		shortDesc: "User and foe fly up turn 1. Damages on turn 2.",
 		id: "skydrop",
 		name: "Sky Drop",
@@ -13234,7 +13240,7 @@ exports.BattleMovedex = {
 				if (!target.fainted) {
 					var source = this.effectData.source;
 					var damage = this.heal(this.effectData.hp, target, target);
-					if (damage) this.add('-heal', target, target.hpChange(damage), '[from] move: Wish', '[wisher] '+source.name);
+					if (damage) this.add('-heal', target, target.getHealth(), '[from] move: Wish', '[wisher] '+source.name);
 				}
 			}
 		},

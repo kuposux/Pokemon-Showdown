@@ -1,24 +1,40 @@
 const LOGIN_SERVER_TIMEOUT = 15000;
 const LOGIN_SERVER_BATCH_TIME = 1000;
 
-/**
- * Require a module, but display a helpful error message if it fails.
- * This is currently only used in this file, and only for modules which are
- * not bundled with node.js, because that should be adequate to convey the
- * point to the user.
- */
-function requireGracefully(path) {
-	try {
-		return require(path);
-	} catch (e) {
-		console.error("ERROR: " + e.message + ". Please run\n\n" +
-			"           npm install\n\n" +
-			"       or refer to README.md for more help running Pokemon Showdown.");
-		process.exit(1);
-	}
+function runNpm(command) {
+	console.log('Running `npm ' + command + '`...');
+	var child_process = require('child_process');
+	var npm = child_process.spawn('npm', [command]);
+	npm.stdout.on('data', function(data) {
+		process.stdout.write(data);
+	});
+	npm.stderr.on('data', function(data) {
+		process.stderr.write(data);
+	});
+	npm.on('close', function(code) {
+		if (!code) {
+			child_process.fork('app.js').disconnect();
+		}
+	});
 }
 
-requireGracefully('sugar');
+if ({'v0.10.0': 1, 'v0.10.1': 1}[process.version]) {
+	// See https://github.com/joyent/node/pull/5016
+	console.log('ERROR: You are using node ' + process.version + ', which has a bug that prevents');
+	console.log('       Pokemon Showdown from working properly. Please upgrade to node v0.10.2.');
+	process.exit(1);
+}
+
+try {
+	require('sugar');
+} catch (e) {
+	runNpm('install');
+	return;
+}
+if (!Object.select) {
+	runNpm('update');
+	return;
+}
 
 fs = require('fs');
 if (!fs.existsSync) {
@@ -262,14 +278,14 @@ if (config.protocol !== 'io' && config.protocol !== 'eio') config.protocol = 'ws
 var app;
 var server;
 if (config.protocol === 'io') {
-	server = requireGracefully('socket.io').listen(config.port).set('log level', 1);
+	server = require('socket.io').listen(config.port).set('log level', 1);
 	server.set('transports', ['websocket', 'htmlfile', 'xhr-polling']); // temporary hack until https://github.com/LearnBoost/socket.io/issues/609 is fixed
 } else if (config.protocol === 'eio') {
 	app = require('http').createServer().listen(config.port);
 	server = require('engine.io').attach(app);
 } else {
 	app = require('http').createServer();
-	server = requireGracefully('sockjs').createServer({sockjs_url: "http://cdn.sockjs.org/sockjs-0.3.min.js", log: function(severity, message) {
+	server = require('sockjs').createServer({sockjs_url: "http://cdn.sockjs.org/sockjs-0.3.min.js", log: function(severity, message) {
 		if (severity === 'error') console.log('ERROR: '+message);
 	}});
 }
@@ -356,6 +372,7 @@ Users = require('./users.js');
 
 Rooms = require('./rooms.js');
 
+delete process.send; // in case we're a child process
 Verifier = require('./verifier.js');
 
 parseCommand = require('./chat-commands.js').parseCommand;
