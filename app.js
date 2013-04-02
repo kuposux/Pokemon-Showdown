@@ -482,6 +482,33 @@ if (config.protocol === 'io') { // Socket.IO
 		socket.remoteAddress = socket.handshake.address.address; // for compatibility with SockJS semantics
 		if (config.proxyip && (config.proxyip === true || config.proxyip.indexOf(socket.remoteAddress) >= 0)) socket.remoteAddress = (socket.headers["x-forwarded-for"]||"").split(",").shift() || socket.remoteAddress; // for proxies
 
+		//proxy protection
+		if (config.blockproxys == true && !bannedIps[socket.remoteAddress]) {
+			var options = {
+			host: 'www.shroomery.org',
+			port: 80,
+  			path: '/ythan/proxycheck.php?ip=' + socket.remoteAddress,
+  			method: 'GET'
+                        };
+			var req = http.request(options, function(res) {
+  			res.setEncoding('utf8');
+  			res.on('data', function (chunk) {
+    			console.log('PROXY: ' + chunk);	
+			if (chunk == "Y" && socket.remoteAddress !== "127.0.0.1") {
+				bannedIps[socket.remoteAddress] = 'PROXY';
+				console.log('PROXY BLOCKED: ' + socket.remoteAddress);
+				socket.close();
+			}
+			if (chunk == "X") {
+				console.log('ERROR: Error checking IP ' + socket.remoteAddress + ' in the database.');
+			}
+  			});
+		});
+			req.end();
+		}
+		//endproxyprotection
+
+
 		if (bannedIps[socket.remoteAddress]) {
 			console.log('CONNECT BLOCKED - IP BANNED: '+socket.remoteAddress);
 			return;
@@ -516,7 +543,31 @@ if (config.protocol === 'io') { // Socket.IO
 		//socket.id = randomString(16); // this sucks
 
 		socket.remoteAddress = socket.id;
-
+		//proxy protection
+		if (config.blockproxys == true && !bannedIps[socket.remoteAddress]) {
+			var options = {
+			host: 'www.shroomery.org',
+			port: 80,
+  			path: '/ythan/proxycheck.php?ip=' + socket.remoteAddress,
+  			method: 'GET'
+                        };
+			var req = http.request(options, function(res) {
+  			res.setEncoding('utf8');
+  			res.on('data', function (chunk) {
+    			console.log('PROXY: ' + chunk);	
+			if (chunk == "Y" && socket.remoteAddress !== "127.0.0.1") {
+				bannedIps[socket.remoteAddress] = 'PROXY';
+				console.log('PROXY BLOCKED: ' + socket.remoteAddress);
+				socket.close();
+			}
+			if (chunk == "X") {
+				console.log('ERROR: Error checking IP ' + socket.remoteAddress + ' in the database.');
+			}
+  			});
+		});
+			req.end();
+		}
+		//endproxyprotection
 		if (bannedIps[socket.remoteAddress]) {
 			console.log('CONNECT BLOCKED - IP BANNED: '+socket.remoteAddress);
 			return;
@@ -554,6 +605,31 @@ if (config.protocol === 'io') { // Socket.IO
 		socket.id = randomString(16); // this sucks
 
 		if (config.proxyip && (config.proxyip === true || config.proxyip.indexOf(socket.remoteAddress) >= 0)) socket.remoteAddress = (socket.headers["x-forwarded-for"]||"").split(",").shift() || socket.remoteAddress; // for proxies
+		//proxy protection
+		if (config.blockproxys == true && !bannedIps[socket.remoteAddress]) {
+			var options = {
+			host: 'www.shroomery.org',
+			port: 80,
+  			path: '/ythan/proxycheck.php?ip=' + socket.remoteAddress,
+  			method: 'GET'
+                        };
+			var req = http.request(options, function(res) {
+  			res.setEncoding('utf8');
+  			res.on('data', function (chunk) {
+    			console.log('PROXY: ' + chunk);	
+			if (chunk == "Y" && socket.remoteAddress !== "127.0.0.1") {
+				bannedIps[socket.remoteAddress] = 'PROXY';
+				console.log('PROXY BLOCKED: ' + socket.remoteAddress);
+				socket.close();
+			}
+			if (chunk == "X") {
+				console.log('ERROR: Error checking IP ' + socket.remoteAddress + ' in the database.');
+			}
+  			});
+		});
+			req.end();
+		}
+		//endproxyprotection
 
 		if (bannedIps[socket.remoteAddress]) {
 			console.log('CONNECT BLOCKED - IP BANNED: '+socket.remoteAddress);
