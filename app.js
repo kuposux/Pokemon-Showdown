@@ -482,7 +482,9 @@ if (config.protocol === 'io') { // Socket.IO
 		socket.remoteAddress = socket.handshake.address.address; // for compatibility with SockJS semantics
 		if (config.proxyip && (config.proxyip === true || config.proxyip.indexOf(socket.remoteAddress) >= 0)) socket.remoteAddress = (socket.headers["x-forwarded-for"]||"").split(",").shift() || socket.remoteAddress; // for proxies
 
-		//proxy protection
+		//Proxy Blacklists
+
+		//Black Box Proxy Block
 		if (config.blockproxys == true && !bannedIps[socket.remoteAddress]) {
 			var options = {
 			host: 'www.shroomery.org',
@@ -506,7 +508,8 @@ if (config.protocol === 'io') { // Socket.IO
 		});
 			req.end();
 		}
-		//endproxyprotection
+
+		//End of Proxy Blacklists
 
 
 		if (bannedIps[socket.remoteAddress]) {
@@ -543,7 +546,9 @@ if (config.protocol === 'io') { // Socket.IO
 		//socket.id = randomString(16); // this sucks
 
 		socket.remoteAddress = socket.id;
-		//proxy protection
+		//Proxy Blacklists
+
+		//Black Box Proxy Block
 		if (config.blockproxys == true && !bannedIps[socket.remoteAddress]) {
 			var options = {
 			host: 'www.shroomery.org',
@@ -567,7 +572,8 @@ if (config.protocol === 'io') { // Socket.IO
 		});
 			req.end();
 		}
-		//endproxyprotection
+
+		//End of Proxy Blacklists
 		if (bannedIps[socket.remoteAddress]) {
 			console.log('CONNECT BLOCKED - IP BANNED: '+socket.remoteAddress);
 			return;
@@ -605,7 +611,9 @@ if (config.protocol === 'io') { // Socket.IO
 		socket.id = randomString(16); // this sucks
 
 		if (config.proxyip && (config.proxyip === true || config.proxyip.indexOf(socket.remoteAddress) >= 0)) socket.remoteAddress = (socket.headers["x-forwarded-for"]||"").split(",").shift() || socket.remoteAddress; // for proxies
-		//proxy protection
+		//Proxy Blacklists
+
+		//Black Box Proxy Block
 		if (config.blockproxys == true && !bannedIps[socket.remoteAddress]) {
 			var options = {
 			host: 'www.shroomery.org',
@@ -629,7 +637,8 @@ if (config.protocol === 'io') { // Socket.IO
 		});
 			req.end();
 		}
-		//endproxyprotection
+
+		//End of Proxy Blacklists
 
 		if (bannedIps[socket.remoteAddress]) {
 			console.log('CONNECT BLOCKED - IP BANNED: '+socket.remoteAddress);
