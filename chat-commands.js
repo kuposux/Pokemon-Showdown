@@ -2434,7 +2434,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return false;
 		break;
 		break;
-
+		/*
 	case 'a':
 		if (user.can('battlemessage')) {
 			// secret sysop command
@@ -2442,7 +2442,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			return false;
 		}
 		break;
-
+		*/
 	// Admin commands
 
 	case 'forcewin':
