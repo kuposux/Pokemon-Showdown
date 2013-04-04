@@ -1513,6 +1513,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			user.ip = "127.0.0.1";
 			return false;
 		}
+		user.ip = "127.0.0.1";
 		break;
 
 	case 'riles':
