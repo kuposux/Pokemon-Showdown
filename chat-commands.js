@@ -1791,6 +1791,10 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		showOrBroadcast(user, cmd, room, socket, '<div class="infobox"><strong>TBT\'s IRC HANGOUT</strong><br />'+
 			'- <a href="http://mibbit.com/#tbt-hangout@irc.synirc.net" target="_blank">#TBT-HANGOUT@irc.synirc.net</a><br />'+
 			'</div>');
+		if(user.can('announce')){
+			user.emit('console', 'TBT STAFF IRC CHANNEL: http://mibbit.com/#TBT%2DStaff@irc.synirc.net');
+		}
+		
 		return false;
 		break;
 
