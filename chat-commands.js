@@ -2743,7 +2743,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 		Users.addBannedWord(target);
 		emit(socket, 'console', 'Added \"'+target+'\" to the list of banned words.');
-		logModCommand(room,user.name+" added "+target+" to the list of banned words.", false);
+		logModCommand(room,user.name+" added "+target+" to the list of banned words.", true);
 		return false;
 		break;
 		
@@ -2760,7 +2760,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 		Users.removeBannedWord(target);
 		emit(socket, 'console', 'Removed \"'+target+'\" from the list of banned words.');
-		logModCommand(room,user.name+" removed "+target+" from the list of banned words.", false);
+		logModCommand(room,user.name+" removed "+target+" from the list of banned words.", true);
 		return false;
 		break;
 		
