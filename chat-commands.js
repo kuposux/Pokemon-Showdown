@@ -900,7 +900,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			}
 		}
 		if (success) {
-			logModCommand(room,''+target+' was '+ (unbarn?'unbarned ':'unbanned ')+'by '+user.name+'.');
+			logModCommand(room,''+target+' was '+ (unbarn?'unbanana\'d ':'unbanned ')+'by '+user.name+'.');
 		} else {
 			emit(socket, 'console', 'User '+target+' is not banned.');
 		}
