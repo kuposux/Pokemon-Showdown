@@ -877,7 +877,8 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 
 	var unbarn = false;
-	case 'unbarn':
+	case 'ub':
+	case 'unbanana':
 		unbarn = true;
 	case 'unban':
 		if (!target){ 
