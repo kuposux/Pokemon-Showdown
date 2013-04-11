@@ -1464,7 +1464,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			user.getIdentity = function(){
 			if(this.muted)
 				return '!' + this.name;
-			if(this.namelocked)
+			if(this.namelocked())
 				return '#' + this.name;
 			return ' ' + this.name;
 			};
@@ -1630,7 +1630,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		user.getIdentity = function(){
 			if(this.muted)
 				return '!' + this.name;
-			if(this.namelocked)
+			if(this.namelocked())
 				return '#' + this.name;
 			return tar + this.name;
 		};
