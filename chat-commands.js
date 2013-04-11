@@ -1465,7 +1465,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 				return '!' + this.name;
 			if(this.namelocked)
 				return '#' + this.name;
-			return tar + this.name;
+			return ' ' + this.name;
 			};
 			rooms.lobby.send('|N|'+user.getIdentity()+'|'+user.userid);
 			user.emit('console', 'You have been promoted.')
@@ -2609,6 +2609,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return false;
 		break;
 
+	case 'gitpull':
 	case 'updateserver':
 		if (!user.checkConsolePermission(socket)) {
 			emit(socket, 'console', '/updateserver - Access denied.');
