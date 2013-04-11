@@ -605,7 +605,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			}
 			room.logEntry(user.name + ' used /kupo ' + target);
 			room.add('|c| kupo|/me '+target, true);
-			logModCommand('room', user.name + 'used /kupo to say: ' + target , true);
+			logModCommand(room, user.name + ' used /kupo to say: ' + target , true);
 			return false;
 		}
 		break;
