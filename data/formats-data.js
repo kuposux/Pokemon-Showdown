@@ -275,7 +275,7 @@ exports.BattleFormatsData = {
 		eventPokemon: [
 			{"generation":4,"level":30,"gender":"F","nature":"Naughty","moves":["helpinghand","volttackle","swagger","painsplit"]}
 		],
-		tier: "LC"
+		tier: ""
 	},
 	pikachu: {
 		viableMoves: {"thunderbolt":1,"volttackle":1,"voltswitch":1,"grassknot":1,"hiddenpowerice":1,"brickbreak":1,"extremespeed":1,"encore":1,"substitute":1},
@@ -2805,7 +2805,7 @@ exports.BattleFormatsData = {
 		tier: "NU"
 	},
 	froslass: {
-		viableMoves: {"icebeam":1,"spikes":1,"destinybond":1,"shadowball":1,"substitute":1,"thunderbolt":1,"thunderwave":1},
+		viableMoves: {"icebeam":1,"spikes":1,"destinybond":1,"shadowball":1,"substitute":1,"taunt":1,"thunderbolt":1,"thunderwave":1},
 		dreamWorldRelease: true,
 		tier: "UU"
 	},

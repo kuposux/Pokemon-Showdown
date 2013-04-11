@@ -186,23 +186,63 @@ var BattleRoom = (function() {
 		this.active = false;
 		this.update();
 	};
+	// idx = 0, 1 : player log
+	// idx = 2    : spectator log
+	// idx = 3    : replay log
+	BattleRoom.prototype.getLog = function(idx) {
+		var log = [];
+		for (var i = 0; i < this.log.length; ++i) {
+			var line = this.log[i];
+			if (line === '|split') {
+				log.push(this.log[i + idx + 1]);
+				i += 4;
+			} else {
+				log.push(line);
+			}
+		}
+		return log;
+	};
+	BattleRoom.prototype.getLogForUser = function(user) {
+		var slot = this.battle.getSlot(user);
+		if (slot < 0) slot = 2;
+		return this.getLog(slot);
+	};
 	BattleRoom.prototype.update = function(excludeUser) {
 		if (this.log.length < this.lastUpdate) return;
-		var updates = this.log.slice(this.lastUpdate);
-		var update = {
-			since: this.lastUpdate,
-			updates: updates,
-			active: this.active
+		var logs = [[], [], []];
+		var updateLines = this.log.slice(this.lastUpdate);
+		for (var i = 0; i < updateLines.length;) {
+			var line = updateLines[i++];
+			if (line === '|split') {
+				logs[0].push(updateLines[i++]); // player 0
+				logs[1].push(updateLines[i++]); // player 1
+				logs[2].push(updateLines[i++]); // spectators
+				i++; // replays
+			} else {
+				logs[0].push(line);
+				logs[1].push(line);
+				logs[2].push(line);
+			}
 		}
+		var roomid = this.id;
+		var updates = logs.map(function(log) {
+			return {
+				room: roomid,
+				since: this.lastUpdate,
+				updates: log,
+				active: this.active
+			};
+		});
 		this.lastUpdate = this.log.length;
 
-		update.room = this.id;
 		var hasUsers = false;
 		for (var i in this.users) {
 			var user = this.users[i];
 			hasUsers = true;
 			if (user === excludeUser) continue;
-			user.emit('update', update);
+			var slot = this.battle.getSlot(user);
+			if (slot < 0) slot = 2;
+			user.emit('update', updates[slot]);
 		}
 
 		// empty rooms time out after ten minutes
@@ -221,6 +261,7 @@ var BattleRoom = (function() {
 		logData.p2rating = p2rating;
 		logData.endType = this.battle.endType;
 		if (!p1rating) logData.ladderError = true;
+		logData.log = BattleRoom.prototype.getLog.call(logData, 3); // replay log (exact damage)
 		var date = new Date();
 		var logfolder = date.format('{yyyy}-{MM}');
 		var logsubfolder = date.format('{yyyy}-{MM}-{dd}');
@@ -528,7 +569,7 @@ var BattleRoom = (function() {
 			room: this.id,
 			roomType: 'battle',
 			version: BATTLE_ROOM_PROTOCOL_VERSION,
-			battlelog: this.log
+			battlelog: this.getLogForUser(user)
 		};
 		emit(socket, 'init', initdata);
 		if (this.battle.requests[user.userid]) {
@@ -555,7 +596,7 @@ var BattleRoom = (function() {
 			room: this.id,
 			roomType: 'battle',
 			version: BATTLE_ROOM_PROTOCOL_VERSION,
-			battlelog: this.log
+			battlelog: this.getLogForUser(user)
 		};
 		user.emit('init', initdata);
 

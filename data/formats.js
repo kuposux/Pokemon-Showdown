@@ -244,8 +244,8 @@ exports.BattleFormats = {
 	// Doubles
 	///////////////////////////////////////////////////////////////////
 
-	doublesvgc2013dev: {
-		name: "Doubles VGC 2013 (dev)",
+	doublesvgc2013: {
+		name: "Doubles VGC 2013",
 		section: 'Doubles',
 
 		effectType: 'Format',
@@ -253,7 +253,6 @@ exports.BattleFormats = {
 		rated: true,
 		challengeShow: true,
 		searchShow: true,
-		debug: true,
 		onBegin: function() {
 			this.debug('cutting down to 4');
 			this.p1.pokemon = this.p1.pokemon.slice(0,4);
@@ -302,7 +301,6 @@ exports.BattleFormats = {
 		challengeShow: true,
 		searchShow: true,
 		rated: true,
-		debug: true,
 		// no restrictions, for serious
 		ruleset: ['Pokemon', 'Team Preview', 'Sleep Clause', 'Species Clause', 'OHKO Clause', 'Moody Clause', 'Evasion Moves Clause', 'Evasion Abilities Clause'],
 		banlist: ['Unreleased', 'Illegal', 'Sky Drop', 'Dark Void', 'Soul Dew',
@@ -897,8 +895,8 @@ exports.BattleFormats = {
 		maxLevel: 5,
 		challengeShow: true,
 		ruleset: ['LC'],
-		banlist: ['Abra', 'Aipom', 'Archen', 'Aron', 'Axew', 'Bronzor', 'Chinchou', 'Clamperl', 'Cottonee', 'Cranidos', 'Croagunk', 'Diglett', 'Dratini', 'Drifloon', 'Drilbur', 'Dwebble', 'Elekid', 'Ferroseed', 'Foongus', 'Frillish', 'Gastly', 'Hippopotas', 'Houndour', 'Larvesta', 'Lileep', 'Magnemite', 'Meowth', 'Mienfoo', 'Misdreavus', 'Munchlax', 'Murkrow', 'Onix', 'Pawniard', 'Ponyta', 'Porygon', 'Riolu', 'Sandshrew', 'Scraggy', 'Shellder', 'Snover', 'Staryu', 'Taillow', 'Tentacool', 'Timburr', 'Tirtouga']
-	},
+		banlist: ['Abra', 'Aipom', 'Archen', 'Axew', 'Bronzor', 'Chinchou', 'Clamperl', 'Cottonee', 'Cranidos', 'Croagunk', 'Diglett', 'Drifloon', 'Drilbur', 'Dwebble', 'Ferroseed', 'Foongus', 'Frillish', 'Gastly', 'Hippopotas', 'Houndour', 'Koffing', 'Larvesta', 'Lileep', 'Machop', 'Magnemite', 'Mienfoo', 'Misdreavus', 'Munchlax', 'Murkrow', 'Pawniard', 'Ponyta', 'Porygon', 'Riolu', 'Sandshrew', 'Scraggy', 'Shellder', 'Shroomish', 'Slowpoke', 'Snover', 'Staryu', 'Tentacool', 'Timburr', 'Tirtouga']
+		},
 	dwubers: {
 		name: "DW Ubers",
 		section: "Other Metagames",
