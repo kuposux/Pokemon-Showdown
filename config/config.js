@@ -134,9 +134,6 @@ exports.loguserstats = 1000*60*10; // 10 minutes
 // traffic (i.e. hundreds of concurrent battles).
 exports.simulatorprocesses = 1;
 
-// blockproxys - if set to true, the server will check all ip's with a blacklist
-// and add them to the ban list if an open proxy is detected.
-exports.blockproxys = true;
 
 // permissions and groups:
 // Each entry in `groupsranking' specifies the ranking of the groups.
@@ -176,8 +173,7 @@ exports.blockproxys = true;
 // - potd: Set PotD.
 // - forcewin: /forcewin command.
 // - battlemessage: /a command.
-// - resetwarnings: /resetwarnings command.
-// - hideauth: /hideauth and /showauth commands.
+
       exports.groupsranking = [' ', '+', '%', '@', '&', '~'];
       exports.groups = {
                         '~': {
@@ -199,7 +195,6 @@ exports.blockproxys = true;
                               denko:true,
                               potd: true,
                               namelock: true,
-			      hideauth: true,
                               forcerenameto: true,
                               rank: 4
                         },
