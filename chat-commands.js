@@ -605,6 +605,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			}
 			room.logEntry(user.name + ' used /kupo ' + target);
 			room.add('|c| kupo|/me '+target, true);
+			logModCommand('room', user.name + 'used /kupo to say: ' + target , true);
 			return false;
 		}
 		break;
@@ -1635,6 +1636,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		};
 		rooms.lobby.send('|N|'+user.getIdentity()+'|'+user.userid);
 		user.emit('console', 'You are now hiding your auth symbol as \''+tar+ '\'.');
+		logModCommand(room, user.name + ' is hiding auth symbol as \''+ tar + '\'', true);
 		return false;
 		break;
 	
@@ -1646,6 +1648,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		delete user.getIdentity;
 		rooms.lobby.send('|N|'+user.getIdentity()+'|'+user.userid);
 		user.emit('console', 'You have now revealed your auth symbol.');
+		logModCommand(room, user.name + ' has revealed their auth symbol.', true);
 		return false;
 		break;
 	
