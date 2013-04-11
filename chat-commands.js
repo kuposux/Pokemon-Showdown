@@ -2810,6 +2810,10 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			matched = true;
 			emit(socket, 'console', '/endtour - Ends the tournament. Requires: + % @ & ~');
 		}
+		if(target === 'tour' || target === 'remind'){
+			matched = true;
+			emit(socket, 'console', '!remind - Displays a reminder text for the sign up phase of a tournament. Requires: + % @ & ~');
+		}
 		if (target === 'all' || target === 'msg' || target === 'pm' || cmd === 'whisper' || cmd === 'w') {
 			matched = true;
 			emit(socket, 'console', '/msg OR /whisper OR /w [username], [message] - Send a private message.');
