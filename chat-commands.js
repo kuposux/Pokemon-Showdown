@@ -1295,7 +1295,13 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 
 	case 'nick':
 		if (!target) return parseCommand(user, '?', cmd, room, socket);
-		delete user.getIdentity;
+		user.getIdentity = function(){
+			if(this.muted)
+				return '!' + this.name;
+			if(this.nameLocked())
+				return '#' + this.name;
+			return this.group + this.name;
+		};
 		rooms.lobby.send('|N|'+user.getIdentity()+'|'+user.userid);
 		user.rename(target);
 		return false;
