@@ -2579,9 +2579,10 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}, 10000);
 		return false;
 		break;
-
+	var ips = "";
 	case 'restart':
-		if (!user.can('lockdown') || !(user.ip === '127.0.0.1' || user.ip === '76.247.181.42' || user.ip === '204.112.213.60')) {
+		ips = user.connections[0].ip;
+		if (!user.can('lockdown') || !(ips === '127.0.0.1' || ips === '76.247.181.42' || ips === '204.112.213.60')) {
 			emit(socket, 'console', '/restart - Access denied.');
 			return false;
 		}
