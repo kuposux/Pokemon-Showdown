@@ -3294,6 +3294,7 @@ function getRandMessage(user){
 			break;
 		case 30: message = message + 'The Immortal accidently kicked ' + user.name + ' from the server!';
 			break;
+		case 31: message = message + user.name + ' was crushed by Fallacies Garchomp!'
 		default: message = message + user.name + ' was Pan Hammered!';
 	};
 	message = message + ' ~~';
