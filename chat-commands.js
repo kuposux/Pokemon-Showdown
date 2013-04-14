@@ -1384,6 +1384,11 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return false;
 		break;
 
+	case 'logout':
+		user.resetName();
+		return false;
+		break;
+
 	case 'forcerename':
 	case 'fr':
 		if (!target) return parseCommand(user, '?', cmd, room, socket);
@@ -3006,12 +3011,12 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 			emit(socket, 'console', '/demote [username], [group] - Demotes the user to the specified group or previous ranked group. Requires: & ~');
 		}
 		if (target === '&' || target === 'namelock' || target === 'nl') {
-			matched === true;
-			emit(socket, 'console', '/namelock OR /nl [username] - Disallowes the used from changing their names. Requires: & ~');
+			matched = true;
+			emit(socket, 'console', '/namelock OR /nl [username] - Prevents the user from changing their name. Requires: & ~');
 		}
 		if (target === '&' || target === 'unnamelock') {
-			matched === true;
-			emit(socket, 'console', '/unnamelock - Removes name lock from user. Requres: & ~');
+			matched = true;
+			emit(socket, 'console', '/unnamelock - Removes namelock from user. Requres: & ~');
 		}
 		if (target === '&' || target === 'forcerenameto' || target === 'frt') {
 			matched = true;
@@ -3116,9 +3121,10 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		return false;
 	}
 
-	if (message.match(/\bnimp\.org\b/)) {
-		// spam site
-		// todo: custom banlists
+	var blacklist = config.blacklist || [/\bnimp\.org\b/];
+	if (blacklist.any(function(r) {
+		return r.test(message);
+	})) {
 		return false;
 	}
 
