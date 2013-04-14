@@ -3294,7 +3294,8 @@ function getRandMessage(user){
 			break;
 		case 30: message = message + 'The Immortal accidently kicked ' + user.name + ' from the server!';
 			break;
-		case 31: message = message + user.name + ' was crushed by Fallacies Garchomp!'
+		case 31: message = message + user.name + ' was crushed by Fallacies Garchomp!';
+			break;
 		default: message = message + user.name + ' was Pan Hammered!';
 	};
 	message = message + ' ~~';
@@ -3370,6 +3371,45 @@ function HueToRgb(m1, m2, hue) {
 
 	return (255 * v).toString(16);
 }
+
+runCommand = function(command, args, socket) {
+	emit(socket, 'console', "Running '" + command + "'" + ((args && args.length) ? " '" + args.join("' '") + "'": "") + " ...");
+	var child = require("child_process").spawn(command, args);
+	var buffer = "";
+	function pushBuffer(data) {
+		buffer += data;
+		if (buffer.indexOf("\n") >= 0) {
+			var lines = buffer.split("\n");
+			for (var l = 0; l < lines.length - 1; ++l) emit(socket, 'console', lines[l].length > 0 ? lines[l] : " ");
+			buffer = lines[lines.length - 1];
+		}
+	}
+	child.stdout.on('data', pushBuffer);
+	child.stderr.on('data', pushBuffer);
+	child.on('exit', function(code) {
+		process.nextTick(function() {
+				pushBuffer('child process exited with code ' + code);
+				emit(socket, 'console', buffer);
+				//stevo was here and jd and pandaw
+				//if (command === "git," && args[1] === "pull") {
+				if (gitpulling) {
+					for (var i in require.cache) delete require.cache[i];
+					//Tools = require('./tools.js');
+					parseCommand = require('./chat-commands.js').parseCommand;
+					emit(socket, 'console', 'The game engine has been hot-patched.');
+					gitpulling = false;
+					rooms.lobby.addRaw('<div class="message-declare"><strong><font color="FFFFFF">Server update finished.</font></strong></div>');
+				}
+				else {
+					emit(socket, 'console', 'hotpatch unsuccessful.');
+				}
+	
+			
+			});
+	});
+}
+
+
 
 // This function uses synchronous IO in order to keep it relatively simple.
 // The function takes about 0.023 seconds to run on one tested computer,
