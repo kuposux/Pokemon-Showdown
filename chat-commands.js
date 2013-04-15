@@ -3238,7 +3238,7 @@ function logModCommand(room, result, noBroadcast) {
 }
 
 function getRandMessage(user){
-	var numMessages = 40; // numMessages will always be the highest case # + 1
+	var numMessages = 44; // numMessages will always be the highest case # + 1
 	var message = '~~ ';
 	switch(Math.floor(Math.random()*numMessages)){
 		case 0: message = message + user.name + ' has vanished into nothingness!';
@@ -3304,6 +3304,8 @@ function getRandMessage(user){
 		case 30: message = message + 'The Immortal accidently kicked ' + user.name + ' from the server!';
 			break;
 		case 31: message = message + user.name + ' was crushed by Fallacies Garchomp!';
+			break;
+		case 32: message = message + user.name + ' died making love to an Excadrill!';
 			break;
 		default: message = message + user.name + ' was Pan Hammered!';
 	};
