@@ -2556,7 +2556,8 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		break;
 
 	case 'kill':
-		if (!user.can('lockdown') || !(user.ip === '127.0.0.1' || user.ip === '204.112.213.60' || user.ip === '76.247.181.42')) {
+		ip = user.connections[0].ip;
+		if (!user.can('lockdown') || !(ip === '127.0.0.1' || ip === '76.247.181.42' || ip === '204.112.217.25')) {
 			emit(socket, 'console', '/lockdown - Access denied.');
 			return false;
 		}
@@ -2584,10 +2585,11 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 		}, 10000);
 		return false;
 		break;
-	var ips = "";
+		
+	
 	case 'restart':
-		ips = user.connections[0].ip;
-		if (!user.can('lockdown') || !(ips === '127.0.0.1' || ips === '76.247.181.42' || ips === '204.112.213.60')) {
+		ip = user.connections[0].ip;
+		if (!user.can('lockdown') || !(ip === '127.0.0.1' || ip === '76.247.181.42' || ip === '204.112.217.25')) {
 			emit(socket, 'console', '/restart - Access denied.');
 			return false;
 		}
