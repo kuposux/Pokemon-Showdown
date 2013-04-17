@@ -984,11 +984,8 @@ var User = (function () {
 			}
 		} else if (now < this.lastChatMessage + THROTTLE_DELAY) {
 			this.chatQueue = [[message, room, socket]];
-			// Needs to be a closure so the "this" variable stays correct. I think.
-			var self = this;
-			this.chatQueueTimeout = setTimeout(function() {
-				self.processChatQueue();
-			}, THROTTLE_DELAY);
+			this.chatQueueTimeout = setTimeout(
+				this.processChatQueue.bind(this), THROTTLE_DELAY);
 		} else {
 			this.lastChatMessage = now;
 			room.chat(this, message, socket);
@@ -1014,6 +1011,9 @@ var User = (function () {
 			this.chatQueueTimeout = setTimeout(function() {
 				self.processChatQueue();
 			}, THROTTLE_DELAY);
+		if (this.chatQueue.length) {
+			this.chatQueueTimeout = setTimeout(
+				this.processChatQueue.bind(this), THROTTLE_DELAY);
 		} else {
 			this.chatQueue = null;
 			this.chatQueueTimeout = null;

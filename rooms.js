@@ -840,8 +840,9 @@ function LobbyRoom(roomid) {
 		};
 	})();
 
-	// generate and cache the format list
-	this.formatListText = (function() {
+	this.formatListText = '|formats';
+
+	this.getFormatListText = function() {
 		var formatListText = '|formats';
 		var curSection = '';
 		for (var i in Tools.data.Formats) {
@@ -861,7 +862,7 @@ function LobbyRoom(roomid) {
 			if (format.team) formatListText += ',#';
 		}
 		return formatListText;
-	})();
+	};
 
 	this.rollLogFile = function(sync) {
 		var mkdir = sync ? (function(path, mode, callback) {

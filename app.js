@@ -284,25 +284,11 @@ if (config.watchconfig) {
 	fs.watchFile('./config/config.js', function(curr, prev) {
 		if (curr.mtime <= prev.mtime) return;
 		try {
-			for (var i in require.cache) delete require.cache[i];
+			delete require.cache[require.resolve('./config/config.js')];
 			config = require('./config/config.js');
 			console.log('Reloaded config/config.js');
 		} catch (e) {}
 	});
-}
-
-if ((config.loginserverpublickeyid === undefined) ||
-		(config.loginserverpublickeyid === 0)) {
-	console.log('Note: You are using the original login server public key. We suggest you');
-	console.log('      upgrade to the new public key by copying the values of the following');
-	console.log('      config settings from config/config-example.js to config/config.js:');
-	console.log('');
-	console.log('          exports.loginserverpublickeyid');
-	console.log('          exports.loginserverpublickey');
-	console.log('');
-	console.log('      The original public key will continue to work for now, but you should');
-	console.log('      upgrade at your earliest convenience.');
-	console.log('');
 }
 
 if (process.argv[2] && parseInt(process.argv[2])) {
@@ -405,7 +391,6 @@ catch (err) {
 }
 
 Data = {};
-Tools = require('./tools.js');
 
 Users = require('./users.js');
 
@@ -632,3 +617,12 @@ console.log('Server started on port ' + config.port);
 console.log('Test your server at http://localhost' +
 	((config.port !== 8000) ? ('-' + config.port) : '') +
 	'.psim.us');
+
+// This slow operation is done *after* we start listening for connections
+// to the server. Anybody who connects while this require() is running will
+// have to wait a couple seconds before they are able to join the server, but
+// at least they probably won't receive a connection error message.
+Tools = require('./tools.js');
+
+// After loading tools, generate and cache the format list.
+rooms.lobby.formatListText = rooms.lobby.getFormatListText();
